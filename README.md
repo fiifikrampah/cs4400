@@ -1,1 +1,1 @@
-# cs4400
+# cs4400: Team36 Heavyweight
