@@ -21,14 +21,14 @@
 </head>
 <body>
 <div align=center class="container-fluid">
-    <h1> Atlanta Beltline System Sign in </h1>
+    <h1> Atlanta Beltline Login</h1>
 
-    <form class="form-group" style="width:20%" action="sign_in" method="post" enctype="multipart/form-data">
+    <form class="form-group" style="width:20%" action="/sign_in" method="post" enctype="multipart/form-data">
         <label for="usr">Username</label>
-        <input type="text" name="usr" id="usr" class="form-control" placeholder="Name" required autofocus>
+        <input type="text" name="username" id="usr" class="form-control" placeholder="Name" required autofocus>
         <br>
         <label for="pwd">Password</label>
-        <input type="password" name="pwd" id="pwd" class="form-control" placeholder="Password" required>
+        <input type="password" name="password" id="pwd" class="form-control" placeholder="Password" required>
         <br>
 
         <button id="btnSignIn" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>

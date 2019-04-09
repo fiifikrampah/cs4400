@@ -21,8 +21,9 @@ def main():
     Starts app at login screen
     """
     set_connection()
-    return render_template('1-login.html', error = "")
-
+    # return render_template('1-login.html', error = "")
+    return render_template('login_test-bootstrapped.html', error = "")
+    
 @app.route("/to_register_navigation")
 def to_register_navigation():
     """

@@ -25,7 +25,7 @@ def set_connection():
             _database = pymysql.connect(host="localhost",
                                         user="root",
                                         passwd="password",
-                                        db="company")
+                                        db="beltline")
 
             print("*    Connection is secure and ready to go     *")
             _cursor = _database.cursor()

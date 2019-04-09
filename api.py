@@ -40,7 +40,8 @@ def login(username, password):
 
 	# execute the query 
 	hashed_password = hashlib.md5(password).hexdigest()
-	login_response = db_login(username, hashed_password)
+	#error on line below: figure out how to pass usertype 
+	login_response = db_login(username, hashed_password, UserType)
 
 	# close the connection to the DB
 	close_connection()
