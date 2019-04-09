@@ -7,6 +7,13 @@ from decimal import Decimal
 app = Flask(__name__)
 logged_user = ""
 logged_admin = ""
+logged_admin_visitor = ""
+logged_manager = ""
+logged_manager_visitor = ""
+logged_staff = ""
+logged_staff_visitor = ""
+logged_visitor = ""
+
 
 @app.route('/')
 def main():
@@ -52,4 +59,34 @@ def to_login():
     global logged_user
     logged_user = ""
     return render_template("login.html", error = "")
+
+@app.route("/sign_in", methods =['POST', 'GET'])
+def sign_in():
+	 """
+    This function signs the user in with given credentials
+    Makes call to python wrapper, and logs user in 
+    or displays appropriate error message
+    """
+    #read the posted values from the UI:
+    if request.method == "POST":
+    	_name = request.form["username"]
+    	_password = request.form["password"]
+    	login_response = login(_name, _password)
+
+    	if login_response == 1:
+    		global logged_admin
+    		logged_admin = _name
+    		return render_template("admin.html", error = "")
+
+    	elif login_response == 2:
+    		global logged_admin_visitor
+    		logged_admin_visitor = _name
+    		return render_template("admin_visitor.html", error = "")
+
+    	elif login_response == 3:
+    		global logged_manager
+    		logged_manager = _name
+    		return render_template("manager.html", error = "")
+
+
 
