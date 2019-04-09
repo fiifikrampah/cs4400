@@ -9,12 +9,11 @@ import random
 
 def validate_user_registration(username, password, status, fname, lname, UserType):
 	set_connection()
-	 # execute the query
+	# execute the query
 	# isDeclined_result = db_isDeclined(username)
 	# if isDeclined_result == 1:
-		
-    hashed_password = hashlib.md5(password).hexdigest()
-    user_insert_result = user_insert(username, hashed_password,status, fname, lname, UserType)
+	hashed_password = hashlib.md5(password).hexdigest()
+	user_insert_result = user_insert(username, hashed_password,status, fname, lname, UserType)
 
 
 
@@ -26,13 +25,14 @@ def validate_user_registration(username, password, status, fname, lname, UserTyp
 # Login function 
 # returns:
 #      0 for failed login
-#      1 for admin login
-#      2 for admin-visitor login
-#      3 for manager login 
-#      4 for manager-visitor login
-#      5 for staff login 
-#      6 for staff-visitor login
-#      7 for visitor login 
+# 	   1 for regular_user login
+#      2 for admin login
+#      3 for admin-visitor login
+#      4 for manager login 
+#      5 for manager-visitor login
+#      6 for staff login 
+#      7 for staff-visitor login
+#      8 for visitor login 
 
 def login(username, password):
 	# establish connection to DB

@@ -78,18 +78,21 @@ def db_emp_isAdmin(username):
 #
 # returns:
 #      0 for failed login
-#      1 for admin login
-#      2 for admin-visitor login
-#      3 for manager login 
-#      4 for manager-visitor login
-#      5 for staff login 
-#      6 for staff-visitor login
-#      7 for visitor login 
+#      1 for regular_user login
+#      2 for admin login
+#      3 for admin-visitor login
+#      4 for manager login 
+#      5 for manager-visitor login
+#      6 for staff login 
+#      7 for staff-visitor login
+#      8 for visitor login 
 # 
 
 def db_login(username, password):
-    query1 = "SELECT * FROM User WHERE Username= '%s' AND Password = '%s'"
-    response1 = _cursor.execute(query1 % (username, password))
+    query0 = "SELECT * FROM User WHERE Username= '%s' AND Password = '%s'"
+    response0 = _cursor.execute(query0 % (username, password))
+    query1 = "SELECT * FROM User WHERE Username = '%s' AND Password ='%s' AND Status != '%s' AND UserType ='%s'"
+    response1 = _cursor.execute(query1 % (username, password, 'User'))
     query2= "SELECT * FROM Employee WHERE Username = '%s' AND Password = '%s' AND EmployeeType ='%s'"
     response2 = _cursor.execute(query2 % (username, password,'Admin'))
     query3 = "SELECT * FROM User WHERE Username = '%s' AND Password ='%s' AND Status != '%s' AND UserType ='%s'"
@@ -106,22 +109,24 @@ def db_login(username, password):
     response8 = _cursor.execute(query3 % (username, password,'Declined', 'Visitor'))
     _cursor.fetchall()
 
-    if response1 == 0:
+    if response0 == 0:
         return 0
-    elif response2 == 1:
+    elif response1 == 1:
         return 1
-    elif response3 == 1:
+    elif response2 == 1:
         return 2
-    elif response4 == 1:
+    elif response3 == 1:
         return 3
-    elif response5 == 1:
+    elif response4 == 1:
         return 4
-    elif response6 == 1:
+    elif response5 == 1:
         return 5
-    elif response7 == 1:
+    elif response6 == 1:
         return 6
-    elif response8 == 1:
+    elif response7 == 1:
         return 7
+    elif response8 == 1:
+        return 8
     else:
         return 0
 
