@@ -77,66 +77,39 @@ def db_emp_isAdmin(username):
 # Function to check the login status of a user
 #
 # returns:
-#      0 for failed login
-#      1 for regular_user login
-#      2 for admin login
-#      3 for admin-visitor login
-#      4 for manager login 
-#      5 for manager-visitor login
-#      6 for staff login 
-#      7 for staff-visitor login
-#      8 for visitor login 
-# 
+#   0 if there was an error in logging in
+#   UserType if user successfully logged in
 
 def db_login(username, password):
-    query0 = "SELECT * FROM User WHERE Username= '%s' AND Password = '%s'"
-    response0 = _cursor.execute(query0 % (username, password))
-    query1 = "SELECT * FROM User WHERE Username = '%s' AND Password ='%s' AND Status != '%s' AND UserType ='%s'"
-    response1 = _cursor.execute(query1 % (username, password, 'User'))
-    query2= "SELECT * FROM Employee WHERE Username = '%s' AND Password = '%s' AND EmployeeType ='%s'"
-    response2 = _cursor.execute(query2 % (username, password,'Admin'))
-    query3 = "SELECT * FROM User WHERE Username = '%s' AND Password ='%s' AND Status != '%s' AND UserType ='%s'"
-    response3 = _cursor.execute(query3 % (username, password,'Declined', 'Admin-Visitor'))
-    query4 = "SELECT * FROM User WHERE Username = '%s' AND Password ='%s' AND Status != '%s' AND UserType ='%s'"
-    response4 = _cursor.execute(query3 % (username, password,'Declined', 'Manager'))
-    query5 = "SELECT * FROM User WHERE Username = '%s' AND Password ='%s' AND Status != '%s' AND UserType ='%s'"
-    response5 = _cursor.execute(query3 % (username, password,'Declined', 'Manager-Visitor'))
-    query6 = "SELECT * FROM User WHERE Username = '%s' AND Password ='%s' AND Status != '%s' AND UserType ='%s'"
-    response6 = _cursor.execute(query3 % (username, password,'Declined', 'Staff'))
-    query7 = "SELECT * FROM User WHERE Username = '%s' AND Password ='%s' AND Status != '%s' AND UserType ='%s'"
-    response7 = _cursor.execute(query3 % (username, password,'Declined', 'Staff-Visitor'))
-    query8 = "SELECT * FROM User WHERE Username = '%s' AND Password ='%s' AND Status != '%s' AND UserType ='%s'"
-    response8 = _cursor.execute(query3 % (username, password,'Declined', 'Visitor'))
+    query0 = "SELECT Username, Password FROM AllUsers WHERE Username= '%s' AND Password = '%s' AND Status != '%s'"
+    response0 = _cursor.execute(query0 % (username, password, "Declined"))
     _cursor.fetchall()
 
+    # if login is bad, error out
     if response0 == 0:
+        # print("bad login")
         return 0
-    elif response1 == 1:
-        return 1
-    elif response2 == 1:
-        return 2
-    elif response3 == 1:
-        return 3
-    elif response4 == 1:
-        return 4
-    elif response5 == 1:
-        return 5
-    elif response6 == 1:
-        return 6
-    elif response7 == 1:
-        return 7
-    elif response8 == 1:
-        return 8
+    elif response0 ==1:
+        query1 = "SELECT UserType from AllUsers WHERE Username = '%s'"
+        response1 = _cursor.execute(query1 % (username))
+        # print("good login")
+        return(_cursor.fetchone())[0]
     else:
         return 0
 
+# Function to hash all paswords stored in the database
+def hash_password():
+    set_connection()
+    query = "UPDATE AllUsers SET Password = MD5(Password)"
+    response = _cursor.execute(query)
+
+    
 
 # Register function to insert users or visitors into User table
 # returns:
 #   0 - successfully inserted
 #   1 - primary key violation
 #   2 - other violations
-
 def user_insert(username, password, status, fname, lname, UserType):
     query = "INSERT INTO User(Username, Password, Status, FirstName, LastName, UserType) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')"
     try:
@@ -203,6 +176,5 @@ def employee_insert(username, eID, phone, eAddress, eCity, eState, eZipcode, eTy
         else:
             # other violation  
             return 2
-
 
 

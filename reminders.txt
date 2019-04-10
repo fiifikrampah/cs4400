@@ -1,0 +1,2 @@
+Reminders of tasks - Fiifi:
+1. What screen do Employees and {Employee, Visitors} see when they log in?
