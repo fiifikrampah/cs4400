@@ -24,15 +24,8 @@ def validate_user_registration(username, password, status, fname, lname, UserTyp
 
 # Login function 
 # returns:
-#      0 for failed login
-# 	   1 for regular_user login
-#      2 for admin login
-#      3 for admin-visitor login
-#      4 for manager login 
-#      5 for manager-visitor login
-#      6 for staff login 
-#      7 for staff-visitor login
-#      8 for visitor login 
+#   0 if there was an error in logging in
+#   UserType if user successfully logged in
 
 def login(username, password):
 	# establish connection to DB
@@ -40,8 +33,7 @@ def login(username, password):
 
 	# execute the query 
 	hashed_password = hashlib.md5(password).hexdigest()
-	#error on line below: figure out how to pass usertype 
-	login_response = db_login(username, hashed_password, UserType)
+	login_response = db_login(username, hashed_password)
 
 	# close the connection to the DB
 	close_connection()

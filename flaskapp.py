@@ -121,49 +121,53 @@ def sign_in():
     if request.method == 'POST':
         _name = request.form["username"]
         _password = request.form["password"]
+        hash_password()
     	login_response = login(_name, _password)
 
-    	if login_response == 1:
-    		global logged_regular_user
-    		logged_regular_user = _name
-    		return render_template("7-userfunc.html", error = "")
+    	if login_response == 0:
+            return render_template("login_test-bootstrapped.html", error = "Cannot login, try again.")
 
-    	elif login_response == 2:
+        elif login_response in ['User','Employee', 'Employee, Visitor']:
+            global logged_regular_user
+            logged_regular_user = _name
+            return render_template("7-userfunc.html", error = "")
+
+    	elif login_response in ['Admin']:
     		global logged_admin
     		logged_admin = _name
     		return render_template("8-adminfunc.html", error = "")
 
-    	elif login_response == 3:
+    	elif login_response in ['Admin, Visitor']:
     		global logged_admin_visitor
     		logged_admin_visitor = _name
     		return render_template("9-adminvisitfunc.html", error = "")
 
-        elif login_response == 4:
+        elif login_response in ['Manager']:
             global logged_manager
             logged_manager = _name
             return render_template("10-manfunc.html", error = "")
 
-        elif login_response == 5:
+        elif login_response in ['Manager, Visitor']:
             global logged_manager_visitor
             logged_manager_visitor = _name
             return render_template("11-manvisitfunc.html", error = "")
 
-        elif login_response == 6:
+        elif login_response in ['Staff']:
             global logged_staff
             logged_staff = _name
             return render_template("12-stafffunc.html", error = "")
 
-        elif login_response == 7:
+        elif login_response in ['Staff, Visitor']:
             global logged_staff_visitor
             logged_staff_visitor = _name
             return render_template("13-staffvisitfunc.html", error = "")
 
-        elif login_response == 8:
+        elif login_response in ['Visitor']:
             global logged_visitor
             logged_visitor = _name
             return render_template("14-visitorfunc.html", error = "")
         else:
-            return render_template("1-login.html", error = "Cannot login, try again.")
+            return render_template("login_test-bootstrapped.html", error = "Cannot login, try again.")
 
 
 
