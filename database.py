@@ -195,3 +195,30 @@ def user_delete(Username):
         print("---> run into Exception:")
         print("---> " + str(e) + '\n')  # print exception message
         return 1
+
+
+
+# Function to determine type of employee
+#
+# return:
+# Employeetype
+def get_emptype(Username):
+    query = "SELECT EmployeeType FROM employee WHERE Username= %s"
+    response = _cursor.execute(query, (Username))
+    return(_cursor.fetchone())[0]
+    
+    
+    # if result in ['Admin']:
+    #     return 1
+    # elif result in ['Admin, Visitor']:
+    #     return 2
+    # elif result in ['Manager']:
+    #     return 3
+    # elif result in ['Manager, Visitor']:
+    #     return 4
+    # elif result in ['Staff']:
+    #     return 5
+    # elif result in ['Staff, Visitor']:
+    #     return 6
+    # else:
+    #     return 0

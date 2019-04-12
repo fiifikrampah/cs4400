@@ -258,41 +258,41 @@ def sign_in():
         _password = request.form["password"]
         # hash_password() --deprecated function
     	login_response = login(_name, _password)
-
+        emp_type = emptype_checker(_name)
     	if login_response == 0:
             return render_template("1-login.html", error = "Username or password is incorrect, please try again.")
 
-        elif login_response in ['User','Employee', 'Employee, Visitor']:
+        elif login_response in ['User']:
             global logged_regular_user
             logged_regular_user = _name
             return render_template("7-userfunc.html", error = "")
 
-    	elif login_response in ['Admin']:
+    	elif emp_type in ['Admin']:
     		global logged_admin
     		logged_admin = _name
     		return render_template("8-adminfunc.html", error = "")
 
-    	elif login_response in ['Admin, Visitor']:
+    	elif emp_type in ['Admin, Visitor']:
     		global logged_admin_visitor
     		logged_admin_visitor = _name
     		return render_template("9-adminvisitfunc.html", error = "")
 
-        elif login_response in ['Manager']:
+        elif emp_type in ['Manager']:
             global logged_manager
             logged_manager = _name
             return render_template("10-manfunc.html", error = "")
 
-        elif login_response in ['Manager, Visitor']:
+        elif emp_type in ['Manager, Visitor']:
             global logged_manager_visitor
             logged_manager_visitor = _name
             return render_template("11-manvisitfunc.html", error = "")
 
-        elif login_response in ['Staff']:
+        elif emp_type in ['Staff']:
             global logged_staff
             logged_staff = _name
             return render_template("12-stafffunc.html", error = "")
 
-        elif login_response in ['Staff, Visitor']:
+        elif emp_type in ['Staff, Visitor']:
             global logged_staff_visitor
             logged_staff_visitor = _name
             return render_template("13-staffvisitfunc.html", error = "")

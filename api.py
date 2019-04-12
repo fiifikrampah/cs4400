@@ -87,3 +87,10 @@ def employeeid_generator():
 	elif isApproved == 2 or isApproved == 0:
 		id = null
 		return id
+
+
+# Function to determine employee type for login
+def emptype_checker(Username):
+	set_connection()
+	usertype_result = get_emptype(Username)
+	return usertype_result
