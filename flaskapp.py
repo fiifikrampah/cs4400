@@ -359,7 +359,7 @@ return render_template('18-adminmanuser.html', error="")
 
 
 @app.route("/to_manage_transit")
-def manage_user():
+def manage_transit():
     """
     Takes user to manage transit page
     """
@@ -367,17 +367,43 @@ return render_template('22-adminmantransit.html', error="")
 
 
 @app.route("/to_manage_site")
-def manage_user():
+def manage_site():
     """
     Takes user to manage site page
     """
 return render_template('19-adminmansite.html', error="")
 
 
+@app.route("/to_manage_event")
+def manage_event():
+    """
+    Takes user to manage event page
+    """
+return render_template('25-managermanevent.html', error="")
 
 
+@app.route("/to_view_staff")
+def view_staff():
+    """
+    Takes user to view staff page
+    """
+return render_template('30-staffview.html', error="") # is this page correct?
 
 
+@app.route("/to_view_site_report")
+def view_site_report():
+    """
+    Takes user to view site report page
+    """
+return render_template('29-viewsitereport.html', error="")
+
+
+@app.route("/to_view_schedule")
+def view_schedule():
+    """
+    Takes user to view schedule page
+    """
+return render_template('31-viewschedule.html', error="")
 
 
 
