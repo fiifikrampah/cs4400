@@ -10,9 +10,9 @@ import traceback
 #Global variables for use [local to this file. Do not get imported in the other python files:
 _connected = False
 _database = None
-_cursor = None  
+_cursor = None
 
-def set_connection(): 
+def set_connection():
     global _connected
     global _database
     global _cursor
@@ -20,23 +20,23 @@ def set_connection():
     if not _connected:
         try:
             print("********************************************")
-            print("*          Preparing for connection          *")
+            print("*          Preparing for connection        *")
 
             _database = pymysql.connect(host="localhost",
                                         user="root",
                                         passwd="password",
                                         db="beltline")
 
-            print("*    Connection is secure and ready to go     *")
+            print("*   Connection is secure and ready to go   *")
             _cursor = _database.cursor()
             _connected = True
             if _connected:
                 # _cursor.execute("SELECT VERSION()")
                 # version = _cursor.fetchone()
                 # print("Database version: {}".format(version[0]))
-                print("*            Connection Setup Successfully!            *")
+                print("*     Connection Setup Successfully!       *")
             else:
-                print("*            Connection Setup Failed!              *")
+                print("*        Connection Setup Failed!          *")
             print("********************************************\n")
 
         except Exception as e:
@@ -103,7 +103,7 @@ def hash_password():
     query = "UPDATE AllUsers SET Password = MD5(Password)"
     response = _cursor.execute(query)
 
-    
+
 
 # Register function to insert users or visitors into User table
 # returns:
@@ -126,10 +126,10 @@ def user_insert(username, password, status, fname, lname, UserType):
             # violates primary key constraint
             return 1
         else:
-            # other violation  
+            # other violation
             return 2
 
-# Email Register function to insert emails into UserEmail table 
+# Email Register function to insert emails into UserEmail table
 #   0 - successfully inserted
 #   1 - primary key violation
 #   2 - other violations
@@ -150,7 +150,7 @@ def email_insert(username, email):
             # violates primary key constraint
             return 1
         else:
-            # other violation  
+            # other violation
             return 2
 
 # Register function to insert employee into Employee table
@@ -174,7 +174,53 @@ def employee_insert(username, eID, phone, eAddress, eCity, eState, eZipcode, eTy
             # violates primary key constraint
             return 1
         else:
-            # other violation  
+            # other violation
             return 2
 
+def getSiteNames():
+    querySitenames = """
+        SELECT DISTINCT SiteName
+        FROM site;"""
+    response = _cursor.execute(querySitenames)
+    return _cursor.fetchall()
 
+def getTransitTypes():
+    queryTransitType = """
+        SELECT DISTINCT TransitType
+        FROM transit;"""
+    response = _cursor.execute(queryTransitType)
+    return _cursor.fetchall()
+
+def getAllTransit():
+    queryTransit = """
+        SELECT T.TransitRoute, T.TransitType, T.TransitPrice, C.Count
+        FROM transit AS T
+        INNER JOIN ( SELECT TransitType, TransitRoute, Count(*) AS Count
+            FROM connect
+            GROUP BY TransitType, TransitRoute ) AS C
+        ON T.TransitType = C.TransitType
+        AND T.TransitRoute = C.TransitRoute"""
+    response = _cursor.execute(queryTransit)
+    return _cursor.fetchall();
+
+def getFilteredTransit(site, type, minPrice, maxPrice):
+    queryTransit = """
+        SELECT *
+        FROM (
+            SELECT T.TransitRoute, T.TransitType, T.TransitPrice, C.Count
+            FROM Transit AS T, Connect
+            WHERE (T.Price >= '%s' OR '%s' is NULL)
+            AND (T.Price <= '%s' OR '%s' is NULL)
+            AND (T.TransitType = '%s' OR '%s' is NULL);
+            INNER JOIN ( SELECT TransitType, TransitRoute, Count(*) AS Count
+                FROM Connect
+                GROUP BY TransitType, TransitRoute ) AS C
+            ON T.TransitType = C.TransitType
+            AND T.TransitRoute = C.TransitRoute
+            ) AS PossibleTransit
+        WHERE PossibleTransit.TransitType, PossibleTransit.TransitRoute
+        IN (SELECT *
+        	FROM Connect
+        	WHERE SiteName = '%s' );"""
+    response = _cursor.execute(minPrice, minPrice, maxPrice, maxPrice, type, type, site);
+    return _cursor.fetchall();

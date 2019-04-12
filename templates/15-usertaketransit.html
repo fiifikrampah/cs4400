@@ -1,60 +1,110 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>user take transit</title>
+    <meta charset="UTF-8">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script src="../static/js/login.js"></script>
+
+    <!--<script src="../Scripts/login.js"></script>-->
+
+    <title>User Take Transit</title>
 </head>
+
 <body>
+<div align=center class="container-fluid" style="width:60%; min-width:600px">
+    <form class="form-group" align=center style="width:60%; min-width:600px" action="/filter" method="post" enctype="multipart/form-data">
+        <h1>Take Transit</h1>
 
-<h1>Take Transit</h1>
+        <!-- contain site and transport type -->
+        <div class="row">
+            <div class="col-xs-6" align=left>
+                <label for="site">Contain Site</label>
+                <select name="site">
+                    <option value="0">-ALL-</option>
 
-<p> 
-    <label for="site">Contain Site</label><select name="site">
-    <option value="az">-ALL-</option>
-    <option value="al">Atlanta Betline center</option>
-    <option value="ak">Gordon-White Park</option>
-    <option value="ar">Historic Fourth Ward Park</option>
-    <option value="ca">Inman Park</option>
-    <option value="co">Piedmont Park</option>
-    <option value="ct">Rose Circle Park</option>
-    <option value="de">Westview Cemetery</option>
-  </select>
-    
+                    {% for site in sites %}
+                        <option value="{{site.SiteName}}">{{site.SiteName}}</option>
+                    {% endfor %}
 
-    <label for="transtype">Transport Type</label><select name="transtype">
-    <option value="az">-ALL-</option>
-    <option value="al">MARTA</option>
-    <option value="ak">Bus</option>
-    <option value="ar">Bike</option>
-  
-  </select>
-   
-</p>
+                </select>
+            </div>
 
+            <div class="col-xs-6" align=right>
+                <label for="transtype">Transport Type</label>
+                <select name="transittype">
+                    <option value="az">-ALL-</option>
 
-<p> <label for="range">Price Range</label>
-    <input type = "number" id = "p1" min = "0" step = "0.1"/>
-    <label for="dash"> -- </label>
-    <input type = "number" id = "p1" min = "0" step = "0.1"/>
+                    {% for type in types %}
+                        <option value="{{type.TransitType}}">{{type.TransitType}}</option>
+                    {% endfor %}
 
-<button type="Filter"><a href="">Filter</a></button>
-</p>
+                </select>
+            </div>
+        </div>
 
-<p> 
-    <table border = "1">
-    <tr>
-        <th>Route</th>
-        <th>Transport Type</th>
-        <th>Price</th>
-        <th># Connected Sites</th>
-    </tr>
-</table>
-</p>
+        <!-- price range and filter button -->
+        <div class="row">
+            <div class="col-xs-8" align=left>
+                <label for="range">Price Range</label>
+                <input type = "number" name = "minPrice" id = "p1" min = "0" step = "0.1" style="width: 75px" href=""/>
+                <label for="dash"> -- </label>
+                <input type = "number" name = "maxPrice" id = "p1" min = "0" step = "0.1" style="width: 75px" href=""/>
+            </div>
+            <div class="col-xs-4" align=right>
+                <button id="btnFilter" type="filter" style="width: 100px"><a href="">Filter</a></button>
+            </div>
+        </div>
+    </form>
 
-<p> <button type="back"><a href="2-registernavigation.html">Back</a></button>
+    <form class="form-group" align=center style="width:60%; min-width:600px" action="/log_transit" method="post" enctype="multipart/form-data">
+        <!-- results table -->
+        <div align=center style="margin:20px">
+            <table class="table table-striped">
+            <tr>
+                <th>Route</th>
+                <th>Transport Type</th>
+                <th>Price</th>
+                <th># Connected Sites</th>
+            </tr>
 
-<label for="date">Transit Date</label>
-<input type = "date" id = "date" required />
+            {% for transit in transits %}
+                <tr>
+                    <td><input type="radio" name="transit" value="{{transit}}"> {{transit.TransitRoute}}</td>
+                    <td>{{transit.TransitType}}</td>
+                    <td>{{transit.Price}}</td>
+                    <td>{{transit.ConnectedSites}}</td>
+                </tr>
+            {% endfor %}
 
+            </table>
+        </div>
 
-<button type="log"><a href="">Log Transit</a></button>
-</p>
+        <!-- back button, log transit -->
+        <div class="row">
+            <div class="col-xs-3" align=right>
+                <button type="back"><a href="">Back</a></button>
+            </div>
+
+            <div class="col-xs-6" align=center>
+                <label for="date">Transit Date</label>
+                <input type = "date" id = "date" required />
+            </div>
+
+            <div class="col-xs-3" align=left>
+                <button id="btnLogTransit" type="submit"><a href="/log_transit">Log Transit</a></button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>
