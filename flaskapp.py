@@ -347,7 +347,7 @@ def manage_profile():
     """
     Takes user to manage profile page
     """
-return render_template('17-empmanageprofile.html', error="")
+    return render_template('17-empmanageprofile.html', error="")
 
 
 @app.route("/to_manage_user")
@@ -355,23 +355,23 @@ def manage_user():
     """
     Takes user to manage user page
     """
-return render_template('18-adminmanuser.html', error="")
+    return render_template('18-adminmanuser.html', error="")
 
 
 @app.route("/to_manage_transit")
-def manage_user():
+def manage_transit():
     """
     Takes user to manage transit page
     """
-return render_template('22-adminmantransit.html', error="")
+    return render_template('22-adminmantransit.html', error="")
 
 
 @app.route("/to_manage_site")
-def manage_user():
+def manage_site():
     """
     Takes user to manage site page
     """
-return render_template('19-adminmansite.html', error="")
+    return render_template('19-adminmansite.html', error="")
 
 
 
