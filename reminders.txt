@@ -1,5 +1,6 @@
 Reminders of tasks - Fiifi:
-1. What screen do Employees and {Employee, Visitors} see when they log in?
+
+1. Solve email multivalued attributes
 
 
 
@@ -14,3 +15,6 @@ Reminders of tasks - Nicholas:
 4. require radio button in order to press log transit
 5. make log transit button function
 6. should put dropdowns on the column heads that let you alphabetize based on that particular attribute
+
+
+

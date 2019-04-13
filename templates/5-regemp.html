@@ -1,100 +1,144 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Register Emp Only</title>
+    <meta charset="UTF-8">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script src="../static/js/login.js"></script>
+
+    <!--<script src="../Scripts/login.js"></script>-->
+<title>Register Employee Only</title>
 </head>
 <body>
-
+<div align=center class="container-fluid">
 <h1>Register Employee</h1>
 
-<p> <label for="fname">First Name</label>
-    <input type="text" name="fname" required> 
+<form class="form-group" style="width:20%" action="register_employee" method="post" enctype="multipart/form-data">
 
-	<label for="lname">Last Name</label>
-    <input type="text" name="lname" required> </p>
+    <label for="fname">First Name</label>
+    <input type="text" name="firstname" id="fname" class="form-control" placeholder="First Name" required autofocus>
+    <br>
 
-<p> <label for="uname">Username</label>
-    <input type="text" name="uname" required> <label for="utype">User Type</label>
-    <select name="utype">
-    <option value="man">Manager</option>
-    <option value="st">Staff</option>
-    </select> </p>
 
-<p> <label for="pword">Password</label>
-    <input type="text" name="pword" required> 
+    <label for="lname">Last Name</label>
+    <input type="text" name="lastname" id="lname" class="form-control" placeholder="Last Name" required autofocus>
+    <br>
 
-<label for="cpword">Confirm Password</label>
-    <input type="text" name="cpword" required> </p>
+    <label for="uname">Username</label>
+    <input type="text" name="username" id="uname" class="form-control" placeholder="Username" required autofocus>
+    <br>
 
-  <p>  <label for="phone">Phone</label>
-    <input type="text" name="phone" required> <label for="address">Address</label>
-    <input type="text" name="address" required> </p>
+    <label for="utype">User Type</label>
+    <select name="usertype" id="utype" class="form-control">
+    <option value="Manager">Manager</option>
+    <option value="Staff">Staff</option>
+    </select>
 
-<p> <label for="city">City</label><input type="text" name="city" required> 
-    <label for="state">State</label><select name="state">
-    <option value="al">AL</option>
-    <option value="ak">AK</option>
-    <option value="az">AZ</option>
-    <option value="ar">AR</option>
-    <option value="ca">CA</option>
-    <option value="co">CO</option>
-    <option value="ct">CT</option>
-    <option value="de">DE</option>
-    <option value="fl">FL</option>
-    <option value="ga">GA</option>
-    <option value="hi">HI</option>
-    <option value="id">ID</option>
-    <option value="il">IL</option>
-    <option value="in">IN</option>
-    <option value="ia">IA</option>
-    <option value="ks">KS</option>
-    <option value="ky">KY</option>
-    <option value="la">LA</option>
-    <option value="me">ME</option>
-    <option value="md">MD</option>
-    <option value="ma">MA</option>
-    <option value="mi">MI</option>
-    <option value="mn">MN</option>
-    <option value="ms">MS</option>
-    <option value="mo">MO</option>
-    <option value="mt">MT</option>
-    <option value="ne">NE</option>
-    <option value="nv">NV</option>
-    <option value="nh">NH</option>
-    <option value="nj">NJ</option>
-    <option value="nm">NM</option>
-    <option value="ny">NY</option>
-    <option value="nc">NC</option>
-    <option value="nd">ND</option>
-    <option value="oh">OH</option>
-    <option value="ok">OK</option>
-    <option value="or">OR</option>
-    <option value="pa">PA</option>
-    <option value="ri">RI</option>
-    <option value="sc">SC</option>
-    <option value="sd">SD</option>
-    <option value="tn">TN</option>
-    <option value="tx">TX</option>
-    <option value="ut">UT</option>
-    <option value="vt">VT</option>
-    <option value="va">VA</option>
-    <option value="wa">WA</option>
-    <option value="wv">WV</option>
-    <option value="wi">WI</option>
-    <option value="wy">WY</option>
-   <option value="other">Other</option>
+    <br>
+
+    <label for="pword">Password</label>
+    <input type="password" name="password" id="pword" class="form-control" placeholder="Password" required autofocus>
+    <br> 
+
+    <label for="cpword">Confirm Password</label>
+    <input type="password" name="confirm_password" id="cpword" class="form-control" placeholder="Confirm Password" required autofocus>
+    <br>
+
+
+
+    <label for="phone">Phone</label>
+    <input type="text" name="phone" id="phone" class="form-control" placeholder="###-###-####" required autofocus>
+    <br>
+
+     <label for="address">Address</label>
+    <input type="text" name="address" id="address" class="form-control" placeholder="Address" required autofocus>
+    <br>
+
+    <label for="city">City</label>
+    <input type="text" name="city" id="city" class="form-control" placeholder="City" required autofocus>
+    <br>
+
+    <label for="state">State</label>
+    <select name="state" id="state" class="form-control">
+    <option value="AL">AL</option>
+    <option value="AK">AK</option>
+    <option value="AZ">AZ</option>
+    <option value="AR">AR</option>
+    <option value="CA">CA</option>
+    <option value="CO">CO</option>
+    <option value="CT">CT</option>
+    <option value="DE">DE</option>
+    <option value="FL">FL</option>
+    <option value="GA">GA</option>
+    <option value="HI">HI</option>
+    <option value="ID">ID</option>
+    <option value="IL">IL</option>
+    <option value="IN">IN</option>
+    <option value="IA">IA</option>
+    <option value="KS">KS</option>
+    <option value="KY">KY</option>
+    <option value="LA">LA</option>
+    <option value="ME">ME</option>
+    <option value="MD">MD</option>
+    <option value="MA">MA</option>
+    <option value="MI">MI</option>
+    <option value="MN">MN</option>
+    <option value="MS">MS</option>
+    <option value="MO">MO</option>
+    <option value="MT">MT</option>
+    <option value="NE">NE</option>
+    <option value="NV">NV</option>
+    <option value="NH">NH</option>
+    <option value="NJ">NJ</option>
+    <option value="NM">NM</option>
+    <option value="NY">NY</option>
+    <option value="NC">NC</option>
+    <option value="ND">ND</option>
+    <option value="OH">OH</option>
+    <option value="OK">OK</option>
+    <option value="OR">OR</option>
+    <option value="PA">PA</option>
+    <option value="RI">RI</option>
+    <option value="SC">SC</option>
+    <option value="SD">SD</option>
+    <option value="TN">TN</option>
+    <option value="TX">TX</option>
+    <option value="UT">UT</option>
+    <option value="VT">VT</option>
+    <option value="VA">VA</option>
+    <option value="WA">WA</option>
+    <option value="WV">WV</option>
+    <option value="WI">WI</option>
+    <option value="WY">WY</option>
+   <option value="Other">Other</option>
   </select>
-    <label for="zip">Zipcode</label><input type="text" name="zip" required> 
+  <br>
 
-</p>
+   <label for="zipcode">Zipcode</label>
+    <input type="text" pattern="[0-9]{5}" name="zipcode" id="zipcode" class="form-control" placeholder="Zipcode" required autofocus>
+    <br>
 
-    <p> <label for="email">Email</label>
-    <input type="text" name="email" required><button type="add">Add</button> </p>
+<!-- fix: allow multiple emails -->
 
-    <p><button type="back"><a href="2-registernavigation.html">Back</a></button>
-    <button type="register">Register</button></p>
+    <label for="email-add">Email</label>
+    <input type="email" name="email" id="email-add" class="form-control" placeholder="Email" required autofocus><br><button type="add">Add Email</button></p>
+    <br></br>
 
+    <button id="btnRegister" class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+    <br>
+    <a class=" btn btn-default" href="to_register_navigation" role="button">Back</a>
+    <p id = "feedback"  style="color: red">{{error}}</p>
 
-
+</form>
+</div>
 </body>
 </html>
