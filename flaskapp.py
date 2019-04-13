@@ -5,8 +5,8 @@ from flask import Flask, render_template, json, request, Response
 from decimal import Decimal
 
 app = Flask(__name__)
-_logged_user = "manager2"
-_logged_userType = "Manager, Visitor"
+_logged_user = ""
+_logged_userType = ""
 
 
 @app.route('/')
@@ -17,7 +17,7 @@ def main():
     set_connection()
 
     #return transit_history();
-    return take_transit();
+    # return take_transit();
     return render_template('1-login.html', error = "")
 
 
@@ -257,23 +257,36 @@ def sign_in():
         _password = request.form["password"]
         # hash_password() --deprecated function
     	login_response = login(_name, _password)
-        emp_type = emptype_checker(_name)
     	if login_response == 0:
             return render_template("1-login.html", error = "Cannot login, try again.")
         else:
-            _logged_user = name;
-            if login_response in ['User', 'Employee', 'Employee, Visitor', 'Admin', 'Admin, Visitor', 'Manager', 'Manager, Visitor', 'Staff', 'Staff, Visitor', 'Visitor']:
-                _logged_userType = login_response;
+            global _logged_user
+            logged_user = _name
+            if login_response in ['User']:
+                global _logged_userType
+                _logged_userType = login_response
+                return render_template("7-userfunc.html", error = "")
+            elif login_response in ['Visitor']:
+                global _logged_userType
+                _logged_userType = login_response
+                return render_template("14-visitorfunc.html", error = "")
+            elif login_response in ['Employee', 'Employee, Visitor', 'Admin', 'Admin, Visitor', 'Manager', 'Manager, Visitor', 'Staff', 'Staff, Visitor']:
+                emp_type = emptype_checker(_name)
+                global _logged_userType
+                _logged_userType = emp_type
                 return go_to_functionality_screen();
             else:
-                _logged_user = "";
-                _logged_userType = "";
-                return render_template("login_test-bootstrapped.html", error = "Cannot login, try again.")
+                global _logged_user
+                global _logged_userType
+                _logged_user = ""
+                _logged_userType = ""
+                return render_template("1-login.html", error = "Cannot login, try again.")
 
-@app.route("/back-button", methods = ['GET'])
+@app.route("/back-button", methods = ['POST','GET'])
 def go_to_functionality_screen():
-    if request.method == 'GET':
-        if _logged_userType in ['User','Employee', 'Employee, Visitor']:
+    if request.method == 'POST':
+        global _logged_userType
+        if _logged_userType in ['Employee', 'Employee, Visitor']:
             return render_template("7-userfunc.html", error = "")
         elif _logged_userType in ['Admin']:
             return render_template("8-adminfunc.html", error = "")
@@ -287,10 +300,8 @@ def go_to_functionality_screen():
             return render_template("12-stafffunc.html", error = "")
         elif _logged_userType in ['Staff, Visitor']:
             return render_template("13-staffvisitfunc.html", error = "")
-        elif _logged_userType in ['Visitor']:
-            return render_template("14-visitorfunc.html", error = "")
         else:
-            return render_template("1-login.html", error = "Username or password is incorrect,please try again.")
+            return render_template("1-login.html", error = "Username or password is incorrect, please try again.")
 
 
 @app.route("/to_user_take_transit")
