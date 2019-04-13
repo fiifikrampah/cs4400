@@ -1,2 +1,20 @@
 Reminders of tasks - Fiifi:
+
 1. Solve email multivalued attributes
+
+
+
+
+
+
+Reminders of tasks - Nicholas:
+1. buttons in the table headers to sort by that column criteria (for example on screen 15)
+    - the sorting needs to be done with sql, not using javascript
+2. implement functionality to send back button to the correct user functionality
+3. price range fields on screen ten should not post the form when enter key is pressed while focused on them
+4. require radio button in order to press log transit
+5. make log transit button function
+6. should put dropdowns on the column heads that let you alphabetize based on that particular attribute
+
+
+
