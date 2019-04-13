@@ -100,7 +100,7 @@ def status_checker(username):
     query = "SELECT Status FROM allusers WHERE Username= %s AND UserType =%s"
     response = _cursor.execute(query, (username, 'Employee'))
     result = _cursor.fetchone()[0]
-    
+
     if result in ['Approved']:
         # NEED TO DO AN UPDATE STATEMENT SOMEWHERE WITH EMPLOYEEID
         return 1
@@ -346,8 +346,8 @@ def get_emptype(Username):
     query = "SELECT EmployeeType FROM employee WHERE Username= %s"
     response = _cursor.execute(query, (Username))
     return(_cursor.fetchone())[0]
-    
-    
+
+
     # if result in ['Admin']:
     #     return 1
     # elif result in ['Admin, Visitor']:
@@ -363,3 +363,40 @@ def get_emptype(Username):
     # else:
     #     return 0
 
+def get_employee_info(user):
+    query = """
+        SELECT U.Firstname, U.Lastname, U.Username, S.SiteName, E.EmployeeID, E.Phone, E.EmployeeAddress, E.EmployeeCitty, E.EmployeeState, E.EmployeeZipcode
+        FROM allusers AS U
+        INNER JOIN (
+            SELECT Username, EmployeeID, Phone, EmployeeAddress, EmployeeCity, EmployeeState, EmployeeZipcode
+            FROM employee
+        ) AS E
+        ON U.Username = E.Username;
+        INNER JOIN (
+            SELECT SiteName, ManagerUsername
+            FROM site
+        ) AS S
+        ON U.Username = S.ManagerUsername
+        WHERE U.Username = '%s';
+        """
+    response = _cursor.execute(query % (user))
+    return _cursor.fetchall();
+
+def get_employee_emails(user):
+    query = """
+        SELECT *
+        FROM useremail
+        WHERE Username = user;
+        """
+
+    response = _cursor.execture(query % (user));
+    return _cursor.fetchall();
+
+
+
+
+
+
+
+
+    #bottom

@@ -17,7 +17,8 @@ def main():
     set_connection()
 
     #return transit_history();
-    return take_transit();
+    #return take_transit();
+    return emp_manage_profile();
     return render_template('1-login.html', error = "")
 
 
@@ -49,8 +50,8 @@ def register_user():
         confirmed_pass = request.form["confirm_password"]
 
         # email = request.form["email"]
-        
-        
+
+
 
         # if constraint_email_format(email) == 0:
         #     return render_template("3-reguseronly.html", error="Email does not match format!")
@@ -73,7 +74,7 @@ def register_user():
                 return render_template("3-reguseronly.html", error="Cannot register, try again")
 
 
-        
+
 
 @app.route("/to_visitor_register")
 def to_visitor_register():
@@ -231,7 +232,7 @@ def register_employee_visitor():
 
             elif result1 == 1:
                 return render_template("6-regempvisit.html", error="Username has already been taken")
-                
+
             else:
                 return render_template("6-regempvisit.html", error="Cannot register, try again")
 
@@ -366,7 +367,7 @@ def manage_site():
 def add_email():
     emails = request.get_json()
     # emails = request.get_json()
-    print emails  
+    print emails
 
 
 
@@ -523,6 +524,44 @@ def transit_history():
             transitList.append(transit);
 
         return render_template('16-usertranshistory.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+@app.route("/17-empmanageprofile.html", methods=['POST', 'GET'])
+def emp_manage_profile():
+    #if request.method == 'POST':
+
+
+    if request.method == 'GET':
+        #getting all employee information for this page except emails
+        global _logged_user;
+        request = getEmployeeInfo(_logged_user);
+        fname=request[0]
+        lname=request[1]
+        uname=request[2]
+        sname=request[3]
+        eid=request[4]
+        phone=request[5]
+        address=request[6] + ", " + request[7] + ", " + request[8] + " " + request[9]
+
+        response = get_employee_emails(user);
+
+        emailList = []
+        for item in response:
+            emailList.append(item);
+
+        return render_template('17-empmanageprofile.html', fname, lname, uname, sname, eid, phone, address, emails=emailList)
+
+"""
+@app.route("/18-adminmanuser.html", methods=['POST', 'GET'])
+def manage_users():
+    if request.method = 'POST'
+
+
+    if request.method = 'GET'
+"""
+
+
+
+
 
 if __name__ == '__main__':
     app.run()
