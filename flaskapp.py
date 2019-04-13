@@ -49,12 +49,13 @@ def register_user():
         Lastname = request.form["lastname"]
         UserType = 'User'
         confirmed_pass = request.form["confirm_password"]
-        email = request.form["email"]
+
+        # email = request.form["email"]
         
         
 
-        if constraint_email_format(email) == 0:
-            return render_template("3-reguseronly.html", error="Email does not match format!")
+        # if constraint_email_format(email) == 0:
+        #     return render_template("3-reguseronly.html", error="Email does not match format!")
         if constraint_username_format(Username) == 0:
             return render_template("3-reguseronly.html", error="Username does not meet requirement!")
 
@@ -374,8 +375,11 @@ def manage_site():
     return render_template('19-adminmansite.html', error="")
 
 
-
-
+@app.route("/add_email", methods =['POST'])
+def add_email():
+    emails = request.get_json()
+    # emails = request.get_json()
+    print emails  
 
 
 
