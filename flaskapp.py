@@ -241,7 +241,7 @@ def filter_take_transit():
 @app.route("/15-usertaketransit/log_transit", methods=['POST'])
 def log_transit():
     if request.method == 'POST':
-        transit = request.form["chosen-transit"]
+        transit = request.form["chosen_transit"]
         date = request.form["dateLogged"]
 
         response = logTransit(_logged_user, transit, date)
