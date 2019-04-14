@@ -10,9 +10,28 @@ Reminders of tasks - Fiifi:
 Reminders of tasks - Nicholas:
 1. buttons in the table headers to sort by that column criteria (for example on screen 15)
     - the sorting needs to be done with sql, not using javascript
-2. implement functionality to send back button to the correct user functionality
-3. price range fields on screen ten should not post the form when enter key is pressed while focused on them
-4. require radio button in order to press log transit
-5. make log transit button function
-6. should put dropdowns on the column heads that let you alphabetize based on that particular attribute
-7. back button functionality
+
+screen15-
+    -log transit button
+
+screen16-
+    -price doesn't appear in the results table for some reason
+    -filter button
+
+screen17-
+    -remove email button
+    -add email button
+    -update button
+
+screen18-
+    -replace 'Employee' in the results table with the specific employee type that user is
+    -approve button
+    -decline button
+
+screen19-
+    -create button
+    -edit button
+    -delete button
+
+screen21-
+    -create button
