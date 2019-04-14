@@ -22,8 +22,8 @@
 
 <body>
     <div align=center class="container-fluid" style="width:60%; min-width:600px">
-        <form class="form-group" align=center style="width:60%; min-width:600px" action="/19-adminmansite" method="post" enctype="multipart/form-data">
-            <h1>Take Transit</h1>
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_manage_site" method="post" enctype="multipart/form-data">
+            <h1>Manage Site</h1>
 
             <!-- sitename, manager -->
             <div class="row">
@@ -65,7 +65,7 @@
             <button id="btnFilter" type="submit" style="width: 100px">Filter</a></button>
         </form>
 
-        <form class="form-group" align=center style="width:60%; min-width:600px" action="/19-adminmansite/edit" method="post" enctype="multipart/form-data">
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_manage_site/edit" method="post" enctype="multipart/form-data">
             <!-- table of site results -->
             <div align=center style="margin:20px">
                 <table class="table table-striped">
@@ -88,12 +88,16 @@
 
             <!-- create, edit, and delete buttons -->
             <div class="row" align=center>
-                <button type="submit" style="width:100px" href="/18-adminmanuser/approve">Create</a></button>
                 <button type="submit" style="width:100px">Edit</a></button>
-                <button type="submit" style="width:100px" href="/18-adminmanuser/decline">Delete</a></button>
+                <button style="width:100px">Delete</button>
             </div>
         </form>
 
+        <form action="/to_create_site">
+            <button type="submit">Create New Site</button>
+        </form>
+
+        <br>
         <a class=" btn btn-default" href="/back-button" role="button">Back</a>
     </div>
 </body>

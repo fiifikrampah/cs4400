@@ -267,16 +267,19 @@ def getFilteredTransit(site, type, minPrice, maxPrice):
     return _cursor.fetchall();
 
 def getFilteredTransit2(user, site, type, route, startDate, endDate):
+    if(route == ""):
+        route = "-ALL-"
     query = """
-        SELECT B.TransitDate, B.TransitRoute, B.TransitType, B.TransitPrice
+        SELECT DISTINCT B.TransitDate, B.TransitRoute, B.TransitType, B.TransitPrice
         FROM (
-            SELECT TransitDate, TransitRoute, TransitType, TransitPrice
+            SELECT A.TransitDate, A.TransitRoute, A.TransitType, A.TransitPrice
             FROM (
                 SELECT TT.Username, TT.TransitDate, TT.TransitRoute, TT.TransitType, T.TransitPrice
                 FROM taketransit AS TT
                 INNER JOIN (
-                    SELECT TransitType, TransitRoute, TransitPrice
-                    FROM transit ) AS T
+                    SELECT *
+                    FROM transit
+                ) AS T
                 ON TT.TransitType = T.TransitType
                 WHERE TT.TransitRoute = T.TransitRoute
             ) AS A
@@ -286,14 +289,15 @@ def getFilteredTransit2(user, site, type, route, startDate, endDate):
             ) AS C
             ON C.TransitType = A.TransitType
             WHERE C.TransitRoute = A.TransitRoute
-        ) AS B
-        WHERE A.Username = '%s';
-        AND (B.SiteName = '%s' OR '%s' = '-ALL-')
-        AND (B.TransitType = '%s' OR '%s' = '-ALL-')
-        AND (B.TransitRoute = '%s' OR '%s' = '')
+            AND A.Username = '%s'
+            AND (C.SiteName = '%s' OR '%s' = '-ALL-')
+            AND (A.TransitType = '%s' OR '%s' = '-ALL-')
+            AND (A.TransitRoute = '%s' OR '%s' = '-ALL-')
+        ) AS B;
         """
         # add support for checking the dates
-    #response =
+    response = _cursor.execute(query % (user, site, site, type, type, route, route))
+    return _cursor.fetchall();
 
 def logTransit(user, transit, date):
     transit = transit.replace("{", "").replace("}", "")
@@ -408,7 +412,7 @@ def getAllUsersList():
 
 def getFilteredUsersList(user, type, status):
     if(user == ""):
-        user = "includeAll";
+        user = "-ALL-";
 
     query = """
         SELECT U.Username, Email.Count, U.UserType, U.Status
@@ -419,7 +423,7 @@ def getFilteredUsersList(user, type, status):
             GROUP BY Username
         ) As Email
         ON U.Username = Email.Username
-        WHERE (U.Username = '%s' OR '%s' = 'includeAll')
+        WHERE (U.Username = '%s' OR '%s' = '-ALL-')
         AND (U.UserType = '%s' OR '%s' = '-ALL-')
         AND (U.Status = '%s' OR '%s' = '-ALL-')
         """
@@ -441,6 +445,86 @@ def getAllSites():
         """
     response = _cursor.execute(query)
     return _cursor.fetchall();
+
+
+def getAllTransitsM():
+    query = """
+        SELECT C.TransitRoute, C.TransitType, C.TransitPrice, C.ConnectedCount, F.LoggedCount
+        FROM (
+            SELECT T.TransitRoute, T.TransitType, T.TransitPrice, E.ConnectedCount
+            FROM transit AS T
+            INNER JOIN (
+                SELECT TransitRoute, TransitType, COUNT(*) AS ConnectedCount
+                FROM connect
+                GROUP BY TransitRoute, TransitType
+            ) AS E
+            ON E.TransitRoute = T.TransitRoute
+            WHERE E.TransitType = T.TransitType
+        ) AS C
+        INNER JOIN (
+            SELECT TransitRoute, TransitType, COUNT(*) AS LoggedCount
+            FROM taketransit
+            GROUP BY TransitRoute, TransitType
+        ) AS F
+        ON F.TransitRoute = C.TransitRoute
+        WHERE F.TransitType = C.TransitType;
+        """
+    response = _cursor.execute(query)
+    return _cursor.fetchall();
+
+def getFilteredTransitsM(site, type, route, minPrice, maxPrice):
+    if(minPrice == ""):
+        minPrice = -1
+    if(maxPrice == ""):
+        maxPrice = -1;
+    if(route == ""):
+        route = "-ALL-"
+    minPrice = float(minPrice)
+    maxPrice = float(maxPrice)
+    query = """
+        SELECT DISTINCT D.TransitRoute, D.TransitType, D.TransitPrice, D.ConnectedCount, D.LoggedCount
+        FROM (
+            SELECT C.TransitRoute, C.TransitType, C.TransitPrice, C.ConnectedCount, F.LoggedCount, C.SiteName
+            FROM (
+                SELECT B.TransitRoute, B.TransitType, B.TransitPrice, B.ConnectedCount, A.SiteName
+                FROM (
+                    SELECT T.TransitRoute, T.TransitType, T.TransitPrice, E.ConnectedCount
+                    FROM transit AS T
+                    INNER JOIN (
+                        SELECT TransitRoute, TransitType, COUNT(*) AS ConnectedCount
+                        FROM connect
+                        GROUP BY TransitRoute, TransitType
+                    ) AS E
+                    ON E.TransitRoute = T.TransitRoute
+                    WHERE E.TransitType = T.TransitType
+                ) AS B
+                INNER JOIN (
+                    SELECT TransitRoute, TransitType, SiteName
+                    FROM connect
+                ) AS A
+                ON B.TransitRoute = A.TransitRoute
+                WHERE B.TransitType = A.TransitType
+            ) AS C
+            INNER JOIN (
+                SELECT TransitRoute, TransitType, COUNT(*) AS LoggedCount
+                FROM taketransit
+                GROUP BY TransitRoute, TransitType
+            ) AS F
+            ON F.TransitRoute = C.TransitRoute
+            WHERE F.TransitType = C.TransitType
+        ) AS D
+        WHERE (D.SiteName = '%s' OR '%s' = '-ALL-')
+        AND (D.TransitType = '%s' OR '%s' = '-ALL-')
+        AND (D.TransitRoute = '%s' OR '%s' = '-ALL-')
+        AND (D.TransitPrice >= %.1f OR %.1f = -1.0)
+        AND (D.TransitPrice <= %.1f OR %.1f = -1.0);
+        """
+    response = _cursor.execute(query % (site, site, type, type, route, route, minPrice, minPrice, maxPrice, maxPrice))
+    return _cursor.fetchall();
+
+
+
+
 
 
 

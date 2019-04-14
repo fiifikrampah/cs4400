@@ -21,7 +21,7 @@
 </head>
 <body>
     <div align=center class="container-fluid" style="width:60%; min-width:600px">
-        <form class="form-group" align=center style="width:60%; min-width:600px" action="/filter" method="post" enctype="multipart/form-data">
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_user_transit_history" method="post" enctype="multipart/form-data">
             <h1>Transit History</h1>
 
             <!-- contain site and transport type -->
@@ -29,7 +29,7 @@
                 <div class="col-xs-6" align=left>
                     <label for="site">Contain Site</label>
                     <select name="site">
-                        <option value="0">-ALL-</option>
+                        <option value="-ALL-">-ALL-</option>
 
                         {% for site in sites %}
                         <option value="{{site.SiteName}}">{{site.SiteName}}</option>
@@ -41,7 +41,7 @@
                 <div class="col-xs-6" align=right>
                     <label for="transtype">Transport Type</label>
                     <select name="transittype">
-                        <option value="az">-ALL-</option>
+                        <option value="-ALL-">-ALL-</option>
 
                         {% for type in types %}
                         <option value="{{type.TransitType}}">{{type.TransitType}}</option>
@@ -55,21 +55,21 @@
             <div class="row">
                 <div class="col-xs-4" align=left>
                     <label for="route">Route</label>
-                    <input type = "text" id = "rt"/>
+                    <input type = "text" name="route"/>
                 </div>
                 <div class="col-xs-4" align=center>
                     <label for="sd">Start Date</label>
-                    <input type = "date" id = "start"/>
+                    <input type = "date" name="startdate"/>
                 </div>
                 <div class="col-xs-4" align=right>
                     <label for="ed">End Date</label>
-                    <input type = "date" id = "end"/>
+                    <input type = "date" name="enddate"/>
                 </div>
 
             </div>
 
             <div class="row" align=center>
-                <button type="Filter"><a href="">Filter</a></button>
+                <button type="submit" name="filter">Filter</button>
             </div>
         </form>
 
@@ -89,7 +89,7 @@
                     <td>{{transit.Date}}</td>
                     <td>{{transit.TransitRoute}}</td>
                     <td>{{transit.TransitType}}</td>
-                    <td>{{transit.Price}}</td>
+                    <td>{{transit.TransitPrice}}</td>
                 </tr>
                 {% endfor %}
 
