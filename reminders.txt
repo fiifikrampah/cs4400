@@ -15,6 +15,4 @@ Reminders of tasks - Nicholas:
 4. require radio button in order to press log transit
 5. make log transit button function
 6. should put dropdowns on the column heads that let you alphabetize based on that particular attribute
-
-
-
+7. back button functionality

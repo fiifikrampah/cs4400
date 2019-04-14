@@ -290,7 +290,7 @@ def getFilteredTransit2(user, site, type, route, startDate, endDate):
         WHERE A.Username = '%s';
         AND (B.SiteName = '%s' OR '%s' = '-ALL-')
         AND (B.TransitType = '%s' OR '%s' = '-ALL-')
-        AND (B.TransitRoute = '%s' OR '%s' = 'null')
+        AND (B.TransitRoute = '%s' OR '%s' = '')
         """
         # add support for checking the dates
     #response =
@@ -365,13 +365,13 @@ def get_emptype(Username):
 
 def get_employee_info(user):
     query = """
-        SELECT U.Firstname, U.Lastname, U.Username, S.SiteName, E.EmployeeID, E.Phone, E.EmployeeAddress, E.EmployeeCitty, E.EmployeeState, E.EmployeeZipcode
+        SELECT U.Firstname, U.Lastname, U.Username, S.SiteName, E.EmployeeID, E.Phone, E.EmployeeAddress, E.EmployeeCity, E.EmployeeState, E.EmployeeZipcode
         FROM allusers AS U
         INNER JOIN (
             SELECT Username, EmployeeID, Phone, EmployeeAddress, EmployeeCity, EmployeeState, EmployeeZipcode
             FROM employee
         ) AS E
-        ON U.Username = E.Username;
+        ON U.Username = E.Username
         INNER JOIN (
             SELECT SiteName, ManagerUsername
             FROM site
@@ -384,17 +384,63 @@ def get_employee_info(user):
 
 def get_employee_emails(user):
     query = """
-        SELECT *
+        SELECT Email
         FROM useremail
-        WHERE Username = user;
+        WHERE Username = '%s';
         """
 
-    response = _cursor.execture(query % (user));
+    response = _cursor.execute(query % (user));
     return _cursor.fetchall();
 
+def getAllUsersList():
+    query = """
+        SELECT U.Username, Email.Count, U.UserType, U.Status
+        FROM allusers AS U
+        INNER JOIN (
+          	SELECT DISTINCT Username, COUNT(Username) AS Count
+            FROM useremail
+            GROUP BY Username
+        ) As Email
+        ON U.Username = Email.Username;
+        """
+    response = _cursor.execute(query)
+    return _cursor.fetchall();
 
+def getFilteredUsersList(user, type, status):
+    if(user == ""):
+        user = "includeAll";
 
+    query = """
+        SELECT U.Username, Email.Count, U.UserType, U.Status
+        FROM allusers AS U
+        INNER JOIN (
+          	SELECT DISTINCT Username, COUNT(Username) AS Count
+            FROM useremail
+            GROUP BY Username
+        ) As Email
+        ON U.Username = Email.Username
+        WHERE (U.Username = '%s' OR '%s' = 'includeAll')
+        AND (U.UserType = '%s' OR '%s' = '-ALL-')
+        AND (U.Status = '%s' OR '%s' = '-ALL-')
+        """
+    response = _cursor.execute(query % (user, user, type, type, status, status))
+    return _cursor.fetchall();
 
+def getManagerNames():
+    query = """
+        SELECT ManagerUsername
+        FROM site;
+        """
+    response = _cursor.execute(query)
+    return _cursor.fetchall();
+
+def getAllSites():
+    query = """
+        SELECT SiteName, ManagerUsername, OpenEveryday
+        FROM site;
+        """
+    response = _cursor.execute(query)
+    return _cursor.fetchall();
 
 
 

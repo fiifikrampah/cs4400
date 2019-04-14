@@ -16,9 +16,12 @@ def main():
     """
     set_connection()
 
-    #return transit_history();
     #return take_transit();
-    return emp_manage_profile();
+    #return transit_history();
+    #return emp_manage_profile();
+    #return manage_users();
+    #return manage_sites();
+    return create_site();
     return render_template('1-login.html', error = "")
 
 
@@ -274,7 +277,8 @@ def sign_in():
 @app.route("/back-button", methods = ['GET'])
 def go_to_functionality_screen():
     if request.method == 'GET':
-        if _logged_userType in ['User','Employee', 'Employee, Visitor']:
+        global _logged_userType
+        if _logged_userType in ['User']: #,'Employee', 'Employee, Visitor'
             return render_template("7-userfunc.html", error = "")
         elif _logged_userType in ['Admin']:
             return render_template("8-adminfunc.html", error = "")
@@ -369,19 +373,6 @@ def add_email():
     # emails = request.get_json()
     print emails
 
-
-
-
-
-
-# IS THIS STILL NEEDED?
-@app.route("/back", methods=['GET'])
-def backButton():
-
-    #implement logic for sending user back to their corresponding functionality
-    return render_template("1-login.html", error="Cannot login, try again.")
-
-
 @app.route("/15-usertaketransit", methods = ['POST', 'GET'])
 def take_transit():
     # getting the sites for the dropdown
@@ -466,6 +457,7 @@ def log_transit():
         transit = request.form["chosen_transit"]
         date = request.form["dateLogged"]
 
+        global _logged_user
         response = logTransit(_logged_user, transit, date)
         return take_transit();
 
@@ -491,6 +483,7 @@ def transit_history():
 
     if request.method == 'GET':
         # getting unfiltered transit when the page is first loaded
+        global _logged_user
         response = getAllTransit2(_logged_user)
 
         transitList = []
@@ -511,8 +504,9 @@ def transit_history():
         route = request.form["route"]
         startDate = request.form["startDate"]
         endDate = request.form["endDate"]
+        global _logged_user
 
-        response = getFilteredTransit2(site, transitType, route, startDate, endDate)
+        response = getFilteredTransit2(_logged_user, site, transitType, route, startDate, endDate)
 
         transitList = []
         for item in response:
@@ -533,31 +527,98 @@ def emp_manage_profile():
     if request.method == 'GET':
         #getting all employee information for this page except emails
         global _logged_user;
-        request = getEmployeeInfo(_logged_user);
-        fname=request[0]
-        lname=request[1]
-        uname=request[2]
-        sname=request[3]
-        eid=request[4]
-        phone=request[5]
-        address=request[6] + ", " + request[7] + ", " + request[8] + " " + request[9]
+        response = get_employee_info(_logged_user);
+        info = response[0]
+        fname=info[0]
+        lname=info[1]
+        uname=info[2]
+        sname=info[3]
+        eid=info[4]
+        phone=info[5]
+        address=info[6] + ", " + info[7] + ", " + info[8] + " " + str(info[9])
 
-        response = get_employee_emails(user);
+        response = get_employee_emails(_logged_user);
 
         emailList = []
         for item in response:
             emailList.append(item);
 
-        return render_template('17-empmanageprofile.html', fname, lname, uname, sname, eid, phone, address, emails=emailList)
+        return render_template('17-empmanageprofile.html', fname=fname, lname=lname, uname=uname, sname=sname, eid=eid, phone=phone, address=address, emails=emailList)
 
-"""
 @app.route("/18-adminmanuser.html", methods=['POST', 'GET'])
 def manage_users():
-    if request.method = 'POST'
+    if request.method == 'GET':
+        response = getAllUsersList();
+
+        userList=[]
+        for item in response:
+            user={}
+            user['Username']=item[0]
+            user['EmailCount']=item[1]
+            user['Type']=item[2]
+            user['Status']=item[3]
+            userList.append(user)
+
+        return render_template('18-adminmanuser.html', users=userList)
+
+    if request.method == 'POST':
+        username = request.form["username"]
+        type = request.form["type"]
+        status = request.form["status"]
+
+        response = getFilteredUsersList(username, type, status)
+
+        userList=[]
+        for item in response:
+            user={}
+            user['Username']=item[0]
+            user['EmailCount']=item[1]
+            user['Type']=item[2]
+            user['Status']=item[3]
+            userList.append(user)
+
+        return render_template('18-adminmanuser.html', users=userList)
+
+@app.route("/19-adminmansite", methods=['POST', 'GET'])
+def manage_sites():
+    if request.method == 'GET':
+        response = getSiteNames();
+        siteNameList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteNameList.append(site)
+
+        response = getManagerNames();
+        managerList = []
+        for item in response:
+            manager={}
+            manager['Username']=item[0]
+            managerList.append(manager)
+
+        response = getAllSites();
+        siteList = []
+        for item in response:
+            site={}
+            site['Name']=item[0]
+            site['Manager']=item[1]
+            site['OpenEveryday']=item[2]
+            siteList.append(site)
+
+        return render_template('19-adminmansite.html', siteNames=siteNameList, managers=managerList, sites=siteList)
+
+    if request.method == 'POST':
+        print("someday")
+
+@app.route("/21-admincreatesite", methods=['POST'])
+def create_site():
+    return render_template('21-admincreatesite.html')
 
 
-    if request.method = 'GET'
-"""
+
+
+
+
 
 
 

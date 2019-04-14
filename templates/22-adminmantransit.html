@@ -17,9 +17,41 @@
 
     <!--<script src="../Scripts/login.js"></script>-->
 
-<title>Administrator Functionality</title>
+<title>Manage Transit</title>
 </head>
 
+<body>
+    <div align=center class="container-fluid" style="width:60%; min-width:600px">
+        <h1>Manage Transit</h1>
 
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/22-adminmantransit" method="post" enctype="multipart/form-data">
+            <!-- contain site and transport type -->
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label for="site">Contain Site</label>
+                    <select name="site">
+                        <option value="-ALL-">-ALL-</option>
 
+                        {% for site in sites %}
+                        <option value="{{site.SiteName}}">{{site.SiteName}}</option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="col-xs-6" align=right>
+                    <label for="transtype">Transport Type</label>
+                    <select name="transittype">
+                        <option value="-ALL-">-ALL-</option>
+
+                        {% for type in types %}
+                        <option value="{{type.TransitType}}">{{type.TransitType}}</option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
 </html>

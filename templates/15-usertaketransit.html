@@ -21,92 +21,92 @@
 </head>
 
 <body>
-<div align=center class="container-fluid" style="width:60%; min-width:600px">
-    <form class="form-group" align=center style="width:60%; min-width:600px" action="/15-usertaketransit" method="post" enctype="multipart/form-data">
-        <h1>Take Transit</h1>
+    <div align=center class="container-fluid" style="width:60%; min-width:600px">
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/15-usertaketransit" method="post" enctype="multipart/form-data">
+            <h1>Take Transit</h1>
 
-        <!-- contain site and transport type -->
-        <div class="row">
-            <div class="col-xs-6" align=left>
-                <label for="site">Contain Site</label>
-                <select name="site">
-                    <option value="-ALL-">-ALL-</option>
+            <!-- contain site and transport type -->
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label for="site">Contain Site</label>
+                    <select name="site">
+                        <option value="-ALL-">-ALL-</option>
 
-                    {% for site in sites %}
+                        {% for site in sites %}
                         <option value="{{site.SiteName}}">{{site.SiteName}}</option>
-                    {% endfor %}
+                        {% endfor %}
 
-                </select>
-            </div>
+                    </select>
+                </div>
 
-            <div class="col-xs-6" align=right>
-                <label for="transtype">Transport Type</label>
-                <select name="transittype">
-                    <option value="-ALL-">-ALL-</option>
+                <div class="col-xs-6" align=right>
+                    <label for="transtype">Transport Type</label>
+                    <select name="transittype">
+                        <option value="-ALL-">-ALL-</option>
 
-                    {% for type in types %}
+                        {% for type in types %}
                         <option value="{{type.TransitType}}">{{type.TransitType}}</option>
-                    {% endfor %}
+                        {% endfor %}
 
-                </select>
+                    </select>
+                </div>
             </div>
-        </div>
 
-        <!-- price range and filter button -->
-        <div class="row">
-            <div class="col-xs-8" align=left>
-                <label for="range">Price Range</label>
-                <input type="number" class="yup" name="minPrice" id="minPrice" placeholder="min" min=0 step=0.1 style="width:75px;">
+            <!-- price range and filter button -->
+            <div class="row">
+                <div class="col-xs-8" align=left>
+                    <label for="range">Price Range</label>
+                    <input type="number" class="yup" name="minPrice" id="minPrice" placeholder="min" min=0 step=0.1 style="width:75px;">
 
-                <label for="dash"> -- </label>
-                <input type="number" class="yup" name="maxPrice" id="maxPrice" placeholder="max" min=0 step=0.1 style="width:75px;">
+                    <label for="dash"> -- </label>
+                    <input type="number" class="yup" name="maxPrice" id="maxPrice" placeholder="max" min=0 step=0.1 style="width:75px;">
 
+                </div>
+                <div class="col-xs-4" align=right>
+                    <button id="btnFilter" type="submit" style="width: 100px">Filter</a></button>
+                </div>
             </div>
-            <div class="col-xs-4" align=right>
-                <button id="btnFilter" type="submit" style="width: 100px">Filter</a></button>
-            </div>
-        </div>
-    </form>
+        </form>
 
-    <form class="form-group" align=center style="width:60%; min-width:600px" action="/15-usertaketransit/log_transit" method="post" enctype="multipart/form-data">
-        <!-- results table -->
-        <div align=center style="margin:20px">
-            <table class="table table-striped">
-            <tr>
-                <th>Route</th>
-                <th>Transport Type</th>
-                <th>Price</th>
-                <th># Connected Sites</th>
-            </tr>
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/15-usertaketransit/log_transit" method="post" enctype="multipart/form-data">
+            <!-- results table -->
+            <div align=center style="margin:20px">
+                <table class="table table-striped">
+                <tr>
+                    <th>Route</th>
+                    <th>Transport Type</th>
+                    <th>Price</th>
+                    <th># Connected Sites</th>
+                </tr>
 
-            {% for transit in transits %}
+                {% for transit in transits %}
                 <tr>
                     <td><input type="radio" name="chosen_transit" id="chosen_transit" value="{{transit}}"> {{transit.TransitRoute}}</td>
                     <td>{{transit.TransitType}}</td>
                     <td>{{transit.Price}}</td>
                     <td>{{transit.ConnectedSites}}</td>
                 </tr>
-            {% endfor %}
+                {% endfor %}
 
-            </table>
-        </div>
-
-        <!-- back button, log transit -->
-        <div class="row">
-            <div class="col-xs-3" align=right>
-                <button type="back"><a href="/back-button">Back</a></button>
+                </table>
             </div>
 
-            <div class="col-xs-6" align=center>
-                <label for="date">Transit Date</label>
-                <input type="date" name="dateLogged" required />
-            </div>
+            <!-- back button, log transit -->
+            <div class="row">
+                <div class="col-xs-3" align=right>
+                    <button type="back"><a href="/back-button">Back</a></button>
+                </div>
 
-            <div class="col-xs-3" align=left>
-                <button id="btnLogTransit" type="submit">Log Transit</a></button>
+                <div class="col-xs-6" align=center>
+                    <label for="date">Transit Date</label>
+                    <input type="date" name="dateLogged" required />
+                </div>
+
+                <div class="col-xs-3" align=left>
+                    <button id="btnLogTransit" type="submit">Log Transit</a></button>
+                </div>
             </div>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 </body>
 </html>

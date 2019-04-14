@@ -21,65 +21,76 @@
 </head>
 
 <body>
-<div align=center class="container-fluid" style="width:60%; min-width:600px">
-    <form class="form-group" align=center style="width:60%; min-width:600px" action="/18-adminmanuser/filter" method="post" enctype="multipart/form-data">
-        <h1>Take Transit</h1>
+    <div align=center class="container-fluid" style="width:60%; min-width:600px">
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/18-adminmanuser.html" method="post" enctype="multipart/form-data">
+            <h1>Take Transit</h1>
 
-        <!-- username, type, status -->
-        <div class="row">
-            <div class="col-xs-4" align=left>
-                <label for="uname">Username</label>
-                <input type="text" name="uname" id="uname" style="width:100px">
+            <!-- username, type, status -->
+            <div class="row">
+                <div class="col-xs-4" align=left>
+                    <label for="uname">Username</label>
+                    <input type="text" name="username" id="uname" style="width:100px">
+                </div>
+
+                <div class="col-xs-4" align=center>
+                    <label for="emptype">Type</label>
+                    <select name="type">
+                        <option value="-ALL-">-ALL-</option>
+                        <option value="User">User</option>
+                        <option value="Visitor">Visitor</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Manager">Manager</option>
+                    </select>
+                </div>
+
+                <div class="col-xs-4" align=right>
+                    <label for="status">Status</label>
+                    <select name="status">
+                        <option value="-ALL-">-ALL-</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Declined">Declined</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="col-xs-4" align=center>
-                <label for="emptype">Type</label>
-                <select name="emptype">
-                    <option value="-ALL-">-ALL-</option>
-                    <option value="User">User</option>
-                    <option value="Visitor">Visitor</option>
-                    <option value="Staff">Staff</option>
-                    <option value="Manager">Manager</option>
-                </select>
+            <!-- filter button -->
+            <button id="btnFilter" type="submit" style="width: 100px">Filter</a></button>
+        </form>
+
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/18-adminmanuser" method="post" enctype="multipart/form-data">
+            <!-- results table --->
+            <div align=center style="margin:20px">
+                <table class="table table-striped">
+                <tr>
+                    <th>Username</th>
+                    <th>Email Count</th>
+                    <th>User Type</th>
+                    <th>Status</th>
+                </tr>
+
+                {% for user in users %}
+                <tr>
+                    <td><input type="radio" name="chosen_transit" id="chosen_transit" value="{{user}}" required> {{user.Username}}</td>
+                    <td>{{user.EmailCount}}</td>
+                    <td>{{user.Type}}</td>
+                    <td>{{user.Status}}</td>
+                </tr>
+                {% endfor %}
+
+                </table>
             </div>
+            <div class="row" align=center>
+                <div class="col-xs-4" align=right>
+                    <button id="btnLogTransit" type="submit" style="width:100px" href="/18-adminmanuser/approve">Approve</a></button>
+                </div>
+                <div class="col-xs-4" align=left>
+                    <button id="btnLogTransit" type="submit" style="width:100px" href="/18-adminmanuser/decline">Decline</a></button>
+                </div>
+        </form>
 
-            <div class="col-xs-4" align=right>
-                <label for="status">Status</label>
-                <select name="status">
-                    <option value="-ALL-">-ALL-</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Declined">Declined</option>
-                </select>
-            </div>
-        </div>
+        <a class=" btn btn-default" href="/back-button" role="button">Back</a>
 
-        <button id="btnFilter" type="submit" style="width: 100px">Filter</a></button>
-    </form>
-
-    <div align=center style="margin:20px">
-        <table class="table table-striped">
-        <tr>
-            <th>Username</th>
-            <th>Email Count</th>
-            <th>User Type</th>
-            <th>Status</th>
-        </tr>
-
-        {% for employee in employees %}
-            <tr>
-                <td><input type="radio" name="chosen_transit" id="chosen_transit" value="{{employee}}"> {{employee.Username}}</td>
-                <td>{{employee.EmailCount}}</td>
-                <td>{{employee.Type}}</td>
-                <td>{{employee.Status}}</td>
-            </tr>
-        {% endfor %}
-
-        </table>
     </div>
-
-    <button id="btnLogTransit" type="submit" style="width:100px">Log Transit</a></button>
-
-</div>
 </body>
 </html>

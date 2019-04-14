@@ -19,101 +19,101 @@
 <title>Manage Profile</title>
 </head>
 <body>
-<div align=center class="container-fluid">
-<h1>Register Employee Visitor</h1>
+    <div align=center class="container-fluid">
+        <h1>Register Employee Visitor</h1>
 
-<form class="form-group" style="width:60%; min-width:600px" action="register_employee_visitor" method="post" enctype="multipart/form-data">
+        <form class="form-group" style="width:60%; min-width:600px" action="register_employee_visitor" method="post" enctype="multipart/form-data">
 
-    <div class="row">
-        <div class="col-xs-3" align=left>
-            <label for="fname">First Name</label>
-        </div>
-        <div class="col-xs-3" align=left>
-            <input type="text" name="firstname" id="fname" class="form-control" value="{{fname}}" required autofocus>
-        </div>
-        <div class="col-xs-3" align=left>
-            <label for="lname">Last Name</label>
-        </div>
-        <div class="col-xs-3" align=left>
-            <input type="text" name="lastname" id="lname" class="form-control" value="{{lname}}" required autofocus>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xs-3" align=left>
-            <label for="uname">Username</label>
-        </div>
-        <div class="col-xs-3" align=left>
-            <label for="unameCurrent">{{uname}}</label>
-        </div>
-        <div class="col-xs-3" align=left>
-            <label for="sname">Site Name</label>
-        </div>
-        <div class="col-xs-3" align=left>
-            <label for="snameCurrent">{{sname}}</label>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xs-3" align=left>
-            <label for="eid">Employee ID</label>
-        </div>
-        <div class="col-xs-3" align=left>
-            <label for="eidCurrent">{{eid}}</label>
-        </div>
-        <div class="col-xs-3" align=left>
-            <label for="phone">Phone</label>
-        </div>
-        <div class="col-xs-3" align=left>
-            <input type="text" name="phone" id="phone" class="form-control" value="{{phone}}" required autofocus>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xs-3" align=left>
-            <label for="address">Address</label>
-        </div>
-        <div class="col-xs-9" align=left>
-            <label for="addressCurrent">{{address}}</label>
-        </div>
-    </div>
-
-<!-- fix: allow multiple emails -->
-    <div class="row">
-        <div class="col-xs-3" align=left>
-            <label for="email">Email</label>
-        </div>
-        <div class="col-xs-9" align=left>
-            {% for email in emails %}
-                <div class="row">
-                    <div class="col-xs-9" align=left>
-                        <label for="email">{{email}}</label>
-                    </div>
-                    <div class="col-xs-3" align=left>
-                        <button id="remove {{email}}">Remove</button>
-                    </div>
-                </div>
-            {% endfor %}
             <div class="row">
-                <div class="col-xs-9" align=left>
-                    <input type="email" name="email" id="email-add" class="form-control" placeholder="Email" required autofocus>
+                <div class="col-xs-3" align=left>
+                    <label for="fname">First Name</label>
                 </div>
                 <div class="col-xs-3" align=left>
-                    <button type="add">Add Email</button></p>
+                    <input type="text" name="firstname" id="fname" class="form-control" value="{{fname}}" required autofocus>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="lname">Last Name</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <input type="text" name="lastname" id="lname" class="form-control" value="{{lname}}" required autofocus>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <input type="checkbox" name="isVisitor" id="isVisitor"> Visitor Account</input>
-    <br><br>
-    <div style="width:150px">
-        <button id="btnRegister" class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
-        <br>
-        <a class=" btn btn-default" href="/back-button" role="button">Back</a>
-    </div>
+            <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="uname">Username</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="unameCurrent">{{uname}}</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="sname">Site Name</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="snameCurrent">{{sname}}</label>
+                </div>
+            </div>
 
-</form>
-</div>
+            <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="eid">Employee ID</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="eidCurrent">{{eid}}</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="phone">Phone</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <input type="text" name="phone" id="phone" class="form-control" value="{{phone}}" required autofocus>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="address">Address</label>
+                </div>
+                <div class="col-xs-9" align=left>
+                    <label for="addressCurrent">{{address}}</label>
+                </div>
+            </div>
+
+        <!-- fix: allow multiple emails -->
+            <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="email">Email</label>
+                </div>
+                <div class="col-xs-9" align=left>
+                    {% for email in emails %}
+                        <div class="row">
+                            <div class="col-xs-9" align=left>
+                                <label for="email">{{email}}</label>
+                            </div>
+                            <div class="col-xs-3" align=left>
+                                <button id="remove {{email}}">Remove</button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="row">
+                        <div class="col-xs-9" align=left>
+                            <input type="email" name="email" id="email-add" class="form-control" placeholder="Email" required autofocus>
+                        </div>
+                        <div class="col-xs-3" align=left>
+                            <button type="add" href="/add_email">Add Email</button></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <input type="checkbox" name="isVisitor" id="isVisitor"> Visitor Account</input>
+            <br><br>
+            <div style="width:150px">
+                <button id="btnSubmit" class="btn btn-lg btn-primary btn-block" type="submit">Update</button>
+                <br>
+                <a class=" btn btn-default" href="/back-button" role="button">Back</a>
+            </div>
+
+        </form>
+    </div>
 </body>
 </html>
