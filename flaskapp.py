@@ -18,9 +18,9 @@ def main():
 
     #return user_take_transit();
     #return user_transit_history();
-    #return manage_profile();
+    return manage_profile();
     #return manage_user();
-    return manage_site();
+    #return manage_site();
     #return create_site();
     #return manage_transit();
     #return create_transit();
@@ -422,29 +422,16 @@ def to_visitor_view_visit_history():
 
 @app.route("/to_manage_profile", methods=['POST', 'GET'])
 def manage_profile():
-    #if request.method == 'POST':
+    if request.method == 'POST':
+        fname = request.form["firstname"];
+        lname = request.form["lastname"];
+        phone = request.form["phonenum"];
+        visitor = request.form["isvisitor"];
 
+        global _logged_user
+        update_employee(_logged_user, fname, lname, phone, visitor)
 
-    if request.method == 'GET':
-        #getting all employee information for this page except emails
-        global _logged_user;
-        response = get_employee_info(_logged_user);
-        info = response[0]
-        fname=info[0]
-        lname=info[1]
-        uname=info[2]
-        sname=info[3]
-        eid=info[4]
-        phone=info[5]
-        address=info[6] + ", " + info[7] + ", " + info[8] + " " + str(info[9])
-
-        response = get_employee_emails(_logged_user);
-
-        emailList = []
-        for item in response:
-            emailList.append(item);
-
-        return render_template('17-empmanageprofile.html', fname=fname, lname=lname, uname=uname, sname=sname, eid=eid, phone=phone, address=address, emails=emailList)
+    return manageProfileTemplate();
 
 @app.route("/to_manage_user", methods=['POST', 'GET'])
 def manage_user():
@@ -580,7 +567,7 @@ def log_transit():
         date = request.form["dateLogged"]
 
         global _logged_user
-        response = logTransit(_logged_user, transit, date)
+        logTransit(_logged_user, transit, date)
         # getting the sites for the dropdown
         response = getSiteNames()
 
@@ -701,8 +688,44 @@ def create_transit():
 
         return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList)
 
+@app.route("/remove_email", methods=['POST'])
+def delete_email():
+    email = request.form["email"];
+    deleteEmail(email);
 
+    return manageProfileTemplate();
 
+@app.route("/add-email", methods=['POST'])
+def addEmail():
+    email = request.form["email"];
+
+    global _logged_user
+    email_insert(_logged_user, email);
+
+    return manageProfileTemplate();
+
+def manageProfileTemplate():
+    #getting all employee information for this page except emails
+    global _logged_user;
+    response = get_employee_info(_logged_user);
+    info = response[0]
+    fname=info[0]
+    lname=info[1]
+    uname=info[2]
+    sname=info[3]
+    eid=info[4]
+    phone=info[5]
+    address=info[6] + ", " + info[7] + ", " + info[8] + " " + str(info[9])
+
+    response = get_employee_emails(_logged_user);
+
+    emailList = []
+    for item in response:
+        email={}
+        email['Email']=item[0];
+        emailList.append(email);
+
+    return render_template('17-empmanageprofile.html', fname=fname, lname=lname, uname=uname, sname=sname, eid=eid, phone=phone, address=address, emails=emailList)
 
 
 

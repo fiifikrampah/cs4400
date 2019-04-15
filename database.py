@@ -140,6 +140,8 @@ def user_insert(Username, Password, Status, Firstname, Lastname, UserType):
 #   2 - other violations
 
 def email_insert(Username, Email):
+    print(Username)
+    print(Email)
     query = "INSERT INTO useremail(Username, Email) VALUES(%s, %s)"
     try:
         print("log :: executing user insertion query\n")
@@ -322,7 +324,7 @@ def logTransit(user, transit, date):
         VALUES ('%s', '%s', '%s', '%s');
         """;
     response = _cursor.execute(query % (user, ttype, route, date))
-    return _cursor.fetchall();
+    _database.commit();
 
 # Delete user function:
 # applications: if an employee cannot be added to employee table due to duplicate phone number, delete them from user table and throw duplicate exception
@@ -521,6 +523,39 @@ def getFilteredTransitsM(site, type, route, minPrice, maxPrice):
         """
     response = _cursor.execute(query % (site, site, type, type, route, route, minPrice, minPrice, maxPrice, maxPrice))
     return _cursor.fetchall();
+
+def update_employee(user, fname, lname, phone, visitor):
+    query0 = """
+        UPDATE allusers
+        SET Firstname = '%s', Lastname = '%s'
+        WHERE Username = '%s';
+        """
+    response = _cursor.execute(query0 % (fname, lname, user))
+    _database.commit();
+
+    query1 = """
+        UPDATE employee
+        SET Phone = '%s'
+        WHERE Username = '%s';
+        """
+    response = _cursor.execute(query1 % (phone, user))
+    _database.commit();
+
+    # TODO UPDATE VISITOR
+    # visitor = 0 ... isVisitor = false
+    # visitor = 1 ... isVisitor = true
+
+def deleteEmail(email):
+    query = """
+        DELETE FROM useremail
+        WHERE Email = '%s';
+        """
+    response = _cursor.execute(query % (email))
+    _database.commit();
+
+
+
+
 
 
 

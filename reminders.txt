@@ -19,9 +19,8 @@ screen16-
     -filter by dates
 
 screen17-
-    -remove email button
-    -add email button
-    -update button
+    -visitor account is correctly checked when screen is loaded
+    -update visitor when update button is pressed
 
 screen18-
     -replace 'Employee' in the results table with the specific employee type that user is, and ensure filter works accordingly
