@@ -54,6 +54,24 @@ def login(username, password):
 
 	return login_response
 
+# Usernamefunction 
+# returns:
+#   0 if there was an error in logging in
+#   Username if user successfully logged in
+
+# def who_am_i(username, password):
+# 	# establish connection to DB
+# 	set_connection()
+
+# 	# execute the query 
+# 	hashed_password = hashlib.md5(password).hexdigest()
+# 	login_response = db_login_username(username, hashed_password)
+
+# 	# close the connection to the DB
+# 	close_connection()
+
+# 	return login_response
+
 
 # Function that check if user is an admin
 # 
@@ -93,4 +111,11 @@ def employeeid_generator():
 def emptype_checker(Username):
 	set_connection()
 	usertype_result = get_emptype(Username)
+	return usertype_result
+
+
+# Function to determine user type for back
+def usertype_checker(Username):
+	set_connection()
+	usertype_result = get_usertype(Username)
 	return usertype_result

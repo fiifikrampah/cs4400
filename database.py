@@ -84,6 +84,23 @@ def db_login(username, password):
     else:
         return 0
 
+# def db_login_username(username, password):
+#     query0 = "SELECT Username, Password FROM allusers WHERE Username= %s AND Password = %s AND Status != %s"
+#     response0 = _cursor.execute(query0 , (username, password, "Declined"))
+#     _cursor.fetchall()
+
+#     # if login is bad, error out
+#     if response0 == 0:
+#         # print("bad login")
+#         return 0
+#     elif response0 ==1:
+#         query1 = "SELECT Username from allusers WHERE Username = %s"
+#         response1 = _cursor.execute(query1, (username))
+#         return(_cursor.fetchone())[0]
+#     else:
+#         return 0
+
+
 # Function to hash all paswords stored in the database (Not needed because passwords in DB should already be hashed)
 # def hash_password():
 #     set_connection()
@@ -209,7 +226,7 @@ def getAllTransit():
         WHERE T.TransitRoute = C.TransitRoute
         """
     response = _cursor.execute(queryTransit)
-    return _cursor.fetchall();
+    return _cursor.fetchall()
 
 def getAllTransit2(user):
     queryTransit = """
@@ -232,7 +249,7 @@ def getFilteredTransit(site, type, minPrice, maxPrice):
     if(minPrice == ""):
         minPrice = -1
     if(maxPrice == ""):
-        maxPrice = -1;
+        maxPrice = -1
     minPrice = float(minPrice)
     maxPrice = float(maxPrice)
 
@@ -264,7 +281,7 @@ def getFilteredTransit(site, type, minPrice, maxPrice):
         AND (D.TransitType = '%s' OR '%s' = '-ALL-');
         """
     response = _cursor.execute(queryTransit % (site, site, minPrice, minPrice, maxPrice, maxPrice, type, type));
-    return _cursor.fetchall();
+    return _cursor.fetchall()
 
 def getFilteredTransit2(user, site, type, route, startDate, endDate):
     query = """
@@ -346,20 +363,16 @@ def get_emptype(Username):
     query = "SELECT EmployeeType FROM employee WHERE Username= %s"
     response = _cursor.execute(query, (Username))
     return(_cursor.fetchone())[0]
+
+
+# Function to determine type of employee
+#
+# return:
+# UserType
+def get_usertype(Username):
+    query = "SELECT UserType FROM allusers WHERE Username= %s"
+    response = _cursor.execute(query, (Username))
+    return(_cursor.fetchone())[0]
     
     
-    # if result in ['Admin']:
-    #     return 1
-    # elif result in ['Admin, Visitor']:
-    #     return 2
-    # elif result in ['Manager']:
-    #     return 3
-    # elif result in ['Manager, Visitor']:
-    #     return 4
-    # elif result in ['Staff']:
-    #     return 5
-    # elif result in ['Staff, Visitor']:
-    #     return 6
-    # else:
-    #     return 0
 

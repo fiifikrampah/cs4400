@@ -240,11 +240,11 @@ def to_login():
     """
     Takes user to login page after they click on sign out
     """
-    global logged_user
-    logged_user = ""
+    global _logged_user
+    _logged_user = ""
     return render_template("1-login.html", error = "")
 
-# This function signs the user in with given credentials
+# This function signs the user in with given credentials 
 # to the correct page based on their account type.
 # Makes call to python wrapper, and logs user in
 # or displays appropriate error message
@@ -257,52 +257,93 @@ def sign_in():
         _password = request.form["password"]
         # hash_password() --deprecated function
     	login_response = login(_name, _password)
+        
     	if login_response == 0:
+            global _logged_user
+            _logged_user = ""
             return render_template("1-login.html", error = "Cannot login, try again.")
         else:
-            global _logged_user
-            logged_user = _name
             if login_response in ['User']:
-                global _logged_userType
+                _logged_user = _name
                 _logged_userType = login_response
+                print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType) 
                 return render_template("7-userfunc.html", error = "")
             elif login_response in ['Visitor']:
-                global _logged_userType
+                _logged_user = _name
                 _logged_userType = login_response
+                print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                 return render_template("14-visitorfunc.html", error = "")
             elif login_response in ['Employee', 'Employee, Visitor', 'Admin', 'Admin, Visitor', 'Manager', 'Manager, Visitor', 'Staff', 'Staff, Visitor']:
                 emp_type = emptype_checker(_name)
-                global _logged_userType
                 _logged_userType = emp_type
-                return go_to_functionality_screen();
+                if _logged_userType in ['Employee', 'Employee, Visitor']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("7-userfunc.html", error = "")
+                elif _logged_userType in ['Admin']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("8-adminfunc.html", error = "")
+                elif _logged_userType in ['Admin, Visitor']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("9-adminvisitfunc.html", error = "")
+                elif _logged_userType in ['Manager']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("10-manfunc.html", error = "")
+                elif _logged_userType in ['Manager, Visitor']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("11-manvisitfunc.html", error = "")
+                elif _logged_userType in ['Staff']:
+                    _logged_user = _name
+                    print "logged person is: %s" % _logged_user
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("12-stafffunc.html", error = "")
+                elif _logged_userType in ['Staff, Visitor']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("13-staffvisitfunc.html", error = "")
+                else:
+                    _logged_user = ""
+                    return render_template("1-login.html", error = "Username or password is incorrect, please try again.")
+
             else:
-                global _logged_user
-                global _logged_userType
                 _logged_user = ""
                 _logged_userType = ""
                 return render_template("1-login.html", error = "Cannot login, try again.")
 
-@app.route("/back-button", methods = ['POST','GET'])
-def go_to_functionality_screen():
-    if request.method == 'POST':
-        global _logged_userType
-        if _logged_userType in ['Employee', 'Employee, Visitor']:
-            return render_template("7-userfunc.html", error = "")
-        elif _logged_userType in ['Admin']:
-            return render_template("8-adminfunc.html", error = "")
-        elif _logged_userType in ['Admin, Visitor']:
-            return render_template("9-adminvisitfunc.html", error = "")
-        elif _logged_userType in ['Manager']:
-            return render_template("10-manfunc.html", error = "")
-        elif _logged_userType in ['Manager, Visitor']:
-            return render_template("11-manvisitfunc.html", error = "")
-        elif _logged_userType in ['Staff']:
-            return render_template("12-stafffunc.html", error = "")
-        elif _logged_userType in ['Staff, Visitor']:
-            return render_template("13-staffvisitfunc.html", error = "")
-        else:
-            return render_template("1-login.html", error = "Username or password is incorrect, please try again.")
 
+@app.route("/back-button", methods = ['GET'])
+def go_to_functionality_screen():
+    if request.method == 'GET':
+        person = _logged_user
+        p_type = usertype_checker(_logged_user)
+
+        if p_type in ['Employee']:
+            emp_type = emptype_checker(_logged_user)
+            if emp_type in ['Admin']:
+                return render_template("8-adminfunc.html", error = "")
+            elif emp_type in ['Admin, Visitor']:
+                return render_template("9-adminvisitfunc.html", error = "")
+            elif emp_type in ['Manager']:
+                return render_template("10-manfunc.html", error = "")
+            elif emp_type in ['Manager, Visitor']:
+                return render_template("11-manvisitfunc.html", error = "")
+            elif emp_type in ['Staff']:
+                return render_template("12-stafffunc.html", error = "")
+            elif emp_type in ['Staff, Visitor']:
+                return render_template("13-staffvisitfunc.html", error = "")
+
+        elif p_type in ['User']:
+            return render_template("7-userfunc.html", error = "")
+        elif p_type in ['Visitor']:
+            return render_template("14-visitorfunc.html", error = "")
+
+        else:
+            print "Sorry an error occured."
+            return 1
 
 @app.route("/to_user_take_transit")
 def to_user_take_transit():
@@ -372,7 +413,7 @@ def manage_site():
     """
     return render_template('19-adminmansite.html', error="")
 
-
+# FIIFI FIX THIS:
 @app.route("/add_email", methods =['POST'])
 def add_email():
     emails = request.get_json()
@@ -380,11 +421,7 @@ def add_email():
     print emails  
 
 
-
-
-
-
-# IS THIS STILL NEEDED?
+# IS THIS STILL NEEDED? 
 @app.route("/back", methods=['GET'])
 def backButton():
 
@@ -421,7 +458,7 @@ def take_transit():
             transit={}
             transit['TransitRoute'] = item[0]
             transit['TransitType'] = item[1]
-            transit['Price'] = item[2];
+            transit['Price'] = item[2]
             transit['ConnectedSites'] = item[3]
             transitList.append(transit);
 
@@ -441,7 +478,7 @@ def take_transit():
             transit={}
             transit['TransitRoute'] = item[0]
             transit['TransitType'] = item[1]
-            transit['Price'] = item[2];
+            transit['Price'] = item[2]
             transit['ConnectedSites'] = item[3]
             transitList.append(transit);
 
