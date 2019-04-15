@@ -1,44 +1,125 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Emp Manage Profile</title>
+    <meta charset="UTF-8">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script src="../static/js/login.js"></script>
+
+    <!--<script src="../Scripts/login.js"></script>-->
+<title>Manage Profile</title>
 </head>
 <body>
+    <div align=center class="container-fluid">
+        <h1>Register Employee Visitor</h1>
 
-<h1>Manage Profile</h1>
+        <form class="form-group" style="width:60%; min-width:600px" action="/to_manage_profile" method="post" enctype="multipart/form-data">
 
-<p> <label for="fname">First Name</label>
-    <input type="text" name="fname" required> 
+            <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="fname">First Name</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <input type="text" name="firstname" class="form-control" value="{{fname}}" required autofocus>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="lname">Last Name</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <input type="text" name="lastname" class="form-control" value="{{lname}}" required autofocus>
+                </div>
+            </div>
 
-	<label for="lname">Last Name</label>
-    <input type="text" name="lname" required> </p>
+            <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="uname">Username</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="unameCurrent">{{uname}}</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="sname">Site Name</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="snameCurrent">{{sname}}</label>
+                </div>
+            </div>
 
-<p> <label for="uname">Username</label>
+            <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="eid">Employee ID</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="eidCurrent">{{eid}}</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="phone">Phone</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <input type="text" name="phonenum" class="form-control" value="{{phone}}" required autofocus>
+                </div>
+            </div>
 
-    <label for="sname">Site Name</label> </p>
+            <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="address">Address</label>
+                </div>
+                <div class="col-xs-9" align=left>
+                    <label for="addressCurrent">{{address}}</label>
+                </div>
+            </div>
+            <input type="hidden" name="isvisitor" value = "0">
+            <input type="checkbox" name="isvisitor" value="1"> Visitor Account</input>
+            <br><br>
+            <button id="btnSubmit" class="btn btn-lg btn-primary btn-block" style="width:100px" type="submit">Update</button>
+        </form>
 
-<p> <label for="id">Employee ID</label>
-    
+        <div class="row" style="width:60%; min-width:600px">
+            <div class="col-xs-3" align=left>
+                <label for="email">Email</label>
+            </div>
+            <div class="col-xs-9" align=left>
+                {% for email in emails %}
+                <form class="form-group" action="/remove_email" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-xs-9" align=left>
+                            <label for="email">{{email.Email}}</label>
+                        </div>
+                        <div class="col-xs-3" align=left>
+                            <button name="{{email.Email}}" type="submit">Remove</button>
+                        </div>
+                        <input type="hidden" name="email" value="{{email.Email}}">
+                    </div>
+                </form>
+                {% endfor %}
+                <form class="form-group" action="/add-email" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-xs-9" align=left>
+                            <input type="email" name="email" class="form-control" placeholder="Email" required autofocus>
+                        </div>
+                        <div class="col-xs-3" align=left>
+                            <button type="add">Add Email</button></p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-    <label for="phone">Phone</label>
-    <input type="text" name="phone" required> </p>
+        <br><br>
+        <div style="width:150px">
+            <br>
+            <a class=" btn btn-default" href="/back-button" role="button">Back</a>
+        </div>
 
-<p> <label for="pword">Address</label>
-</p>
-
-    <p> <label for="email">Email</label>
-    <input type="text" name="email" required><button type="add">Add</button> </p>
-
-
-    <p> <input type="checkbox" name="va" value = "VA">Visitor Account
-       
-
-    <p><button type="update"><a href="">Update</a></button>
-
-    <button type="back"><a href="2-registernavigation.html">Back</a></button>
-</p>
-
-
-
+    </div>
 </body>
 </html>

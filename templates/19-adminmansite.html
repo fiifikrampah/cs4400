@@ -17,9 +17,88 @@
 
     <!--<script src="../Scripts/login.js"></script>-->
 
-<title>Administrator Functionality</title>
+<title>Manage Site</title>
 </head>
 
+<body>
+    <div align=center class="container-fluid" style="width:60%; min-width:600px">
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_manage_site" method="post" enctype="multipart/form-data">
+            <h1>Manage Site</h1>
 
+            <!-- sitename, manager -->
+            <div class="row">
+                <div class="col-xs-6" align=right>
+                    <label for="Sname">Site</label>
+                    <select name="site">
+                        <option value="-ALL-">-ALL-</option>
 
+                        {% for site in siteNames %}
+                        <option value="{{site.SiteName}}">{{site.SiteName}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-xs-6" align=left>
+                    <label for="man">Manager</label>
+                    <select name="manager">
+                        <option value="-ALL-">-ALL-</option>
+
+                        {% for manager in managers %}
+                        <option value="{{manager.Username}}">{{manager.Username}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <!-- open everyday -->
+            <div class="row">
+                <div class="col-xs-12" align=center>
+                    <label for="eryday">Open Everyday</label>
+                    <select name="openeveryday">
+                        <option value="-ALL-">-ALL-</option>
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </div>
+            </div>
+            <br>
+
+            <button id="btnFilter" type="submit" style="width: 100px">Filter</a></button>
+        </form>
+
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_manage_site/edit" method="post" enctype="multipart/form-data">
+            <!-- table of site results -->
+            <div align=center style="margin:20px">
+                <table class="table table-striped">
+                <tr>
+                    <th>Name</th>
+                    <th>Manager</th>
+                    <th>Open Everyday</th>
+                </tr>
+
+                {% for site in sites %}
+                <tr>
+                    <td><input type="radio" name="chosen_transit" id="chosen_transit" value="{{site}}" required> {{site.Name}}</td>
+                    <td>{{site.Manager}}</td>
+                    <td>{{site.OpenEveryday}}</td>
+                </tr>
+                {% endfor %}
+
+                </table>
+            </div>
+
+            <!-- create, edit, and delete buttons -->
+            <div class="row" align=center>
+                <button type="submit" style="width:100px">Edit</a></button>
+                <button style="width:100px">Delete</button>
+            </div>
+        </form>
+
+        <form action="/to_create_site">
+            <button type="submit" >Create New Site</button>
+        </form>
+
+        <br>
+        <a class=" btn btn-default" href="/back-button" role="button">Back</a>
+    </div>
+</body>
 </html>

@@ -16,10 +16,19 @@ def main():
     """
     set_connection()
 
+    #return user_take_transit();
+    #return user_transit_history();
+    return manage_profile();
+    #return manage_user();
+    #return manage_site();
+    #return create_site();
+    #return manage_transit();
+    #return create_transit();
+
     #return transit_history();
     # return take_transit();
-    return render_template('1-login.html', error = "")
 
+    return render_template('1-login.html', error = "")
 
 @app.route("/to_register_navigation")
 def to_register_navigation():
@@ -27,7 +36,6 @@ def to_register_navigation():
     Takes user to register navigation page
     """
     return render_template('2-registernavigation.html', error="")
-
 
 @app.route("/to_user_register")
 def to_user_register():
@@ -49,8 +57,8 @@ def register_user():
         confirmed_pass = request.form["confirm_password"]
 
         # email = request.form["email"]
-        
-        
+
+
 
         # if constraint_email_format(email) == 0:
         #     return render_template("3-reguseronly.html", error="Email does not match format!")
@@ -72,16 +80,12 @@ def register_user():
             elif result == 2:
                 return render_template("3-reguseronly.html", error="Cannot register, try again")
 
-
-        
-
 @app.route("/to_visitor_register")
 def to_visitor_register():
     """
     Takes user to visitor register page
     """
     return render_template('4-regvisit.html', error="")
-
 
 @app.route("/register_visitor", methods = ['POST'])
 def register_visitor():
@@ -118,16 +122,12 @@ def register_visitor():
             elif result == 2:
                 return render_template("4-regvisit.html", error="Cannot register, try again")
 
-
-
-
 @app.route("/to_employee_register")
 def to_employee_register():
     """
     Takes user to employee register page
     """
     return render_template('5-regemp.html', error="")
-
 
 @app.route("/register_employee", methods = ['POST'])
 def register_employee():
@@ -177,7 +177,6 @@ def register_employee():
 
             else:
                 return render_template("5-regemp.html", error="Cannot register, try again")
-
 
 @app.route("/to_emp_visitor_register")
 def to_emp_visitor_register():
@@ -231,7 +230,7 @@ def register_employee_visitor():
 
             elif result1 == 1:
                 return render_template("6-regempvisit.html", error="Username has already been taken")
-                
+
             else:
                 return render_template("6-regempvisit.html", error="Cannot register, try again")
 
@@ -318,6 +317,10 @@ def sign_in():
 @app.route("/back-button", methods = ['GET'])
 def go_to_functionality_screen():
     if request.method == 'GET':
+# <<<<<<< HEAD
+#         global _logged_userType
+#         if _logged_userType in ['User']: #,'Employee', 'Employee, Visitor'
+# =======
         person = _logged_user
         p_type = usertype_checker(_logged_user)
 
@@ -337,27 +340,127 @@ def go_to_functionality_screen():
                 return render_template("13-staffvisitfunc.html", error = "")
 
         elif p_type in ['User']:
+
             return render_template("7-userfunc.html", error = "")
         elif p_type in ['Visitor']:
             return render_template("14-visitorfunc.html", error = "")
+
+
+@app.route("/to_user_take_transit", methods=['POST', 'GET'])
+def user_take_transit():
+    # getting the sites for the dropdown
+    response = getSiteNames()
+    siteList = []
+    for item in response:
+        site={}
+        site['SiteName'] = item[0]
+        siteList.append(site)
 
         else:
             print "Sorry an error occured."
             return 1
 
-@app.route("/to_user_take_transit")
-def to_user_take_transit():
-    """
-    Takes user to take transit page
-    """
-    return render_template('15-usertaketransit.html', error="")
 
-@app.route("/to_user_transit_history")
-def to_user_transit_history():
-    """
-    Takes user to view transit history page
-    """
-    return render_template('16-usertranshistory.html', error="")
+    # getting the transit types for the dropdown
+    response = getTransitTypes()
+    transitTypeList = []
+    for item in response:
+        tType={}
+        tType['TransitType'] = item[0]
+        transitTypeList.append(tType)
+
+    if request.method == 'GET':
+        # getting unfiltered transit when the page is first loaded
+        response = getAllTransit()
+
+        transitList = []
+        for item in response:
+            transit={}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+            transit['Price'] = item[2];
+            transit['ConnectedSites'] = item[3]
+            transitList.append(transit);
+
+        return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+    if request.method == 'POST':
+        #getting filtered transit when some of the options have been played with
+        site = request.form["site"]
+        transitType = request.form["transittype"]
+        minPrice = request.form["minPrice"]
+        maxPrice = request.form["maxPrice"]
+
+        response = getFilteredTransit(site, transitType, minPrice, maxPrice)
+
+        transitList = []
+        for item in response:
+            transit={}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+            transit['Price'] = item[2];
+            transit['ConnectedSites'] = item[3]
+            transitList.append(transit);
+
+        return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+@app.route("/to_user_transit_history", methods=['POST', 'GET'])
+def user_transit_history():
+    # getting the sites for the dropdown
+    response = getSiteNames()
+
+    siteList = []
+    for item in response:
+        site={}
+        site['SiteName'] = item[0]
+        siteList.append(site)
+
+    # getting the transit types for the dropdown
+    response = getTransitTypes()
+
+    transitTypeList = []
+    for item in response:
+        tType={}
+        tType['TransitType'] = item[0]
+        transitTypeList.append(tType)
+
+    if request.method == 'GET':
+        # getting unfiltered transit when the page is first loaded
+        global _logged_user
+        response = getAllTransit2(_logged_user)
+
+        transitList = []
+        for item in response:
+            transit={}
+            transit['Date'] = item[0]
+            transit['TransitRoute'] = item[1]
+            transit['TransitType'] = item[2];
+            transit['TransitPrice'] = item[3]
+            transitList.append(transit);
+
+        return render_template('16-usertranshistory.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+    if request.method == 'POST':
+        #getting filtered transit when some of the options have been played with
+        site = request.form["site"]
+        transitType = request.form["transittype"]
+        route = request.form["route"]
+        startDate = request.form["startdate"]
+        endDate = request.form["enddate"]
+
+        global _logged_user
+        response = getFilteredTransit2(_logged_user, site, transitType, route, startDate, endDate)
+
+        transitList = []
+        for item in response:
+            transit={}
+            transit['Date'] = item[0]
+            transit['TransitRoute'] = item[1]
+            transit['TransitType'] = item[2];
+            transit['TransitPrice'] = item[3]
+            transitList.append(transit);
+
+        return render_template('16-usertranshistory.html', sites=siteList, types=transitTypeList, transits=transitList)
 
 @app.route("/to_visitor_explore_event")
 def to_visitor_explore_event():
@@ -373,7 +476,6 @@ def to_visitor_explore_site():
     """
     return render_template('35-visitorexploresite.html', error="")
 
-
 @app.route("/to_visitor_view_visit_history")
 def to_visitor_view_visit_history():
     """
@@ -381,9 +483,18 @@ def to_visitor_view_visit_history():
     """
     return render_template('38-visitorexploresite.html', error="")
 
-
-@app.route("/to_manage_profile")
+@app.route("/to_manage_profile", methods=['POST', 'GET'])
 def manage_profile():
+
+    if request.method == 'POST':
+        fname = request.form["firstname"];
+        lname = request.form["lastname"];
+        phone = request.form["phonenum"];
+        visitor = request.form["isvisitor"];
+
+        global _logged_user
+        update_employee(_logged_user, fname, lname, phone, visitor)
+
     """
     Takes user to manage profile page
     """
@@ -421,16 +532,50 @@ def add_email():
     print emails  
 
 
+    return manageProfileTemplate();
+
+
+@app.route("/to_manage_user", methods=['POST', 'GET'])
+def manage_user():
+    if request.method == 'GET':
+        response = getAllUsersList();
+
+        userList=[]
+        for item in response:
+            user={}
+            user['Username']=item[0]
+            user['EmailCount']=item[1]
+            user['Type']=item[2]
+            user['Status']=item[3]
+            userList.append(user)
+
+        return render_template('18-adminmanuser.html', users=userList)
+
+    if request.method == 'POST':
+        username = request.form["username"]
+        type = request.form["type"]
+        status = request.form["status"]
+
+        response = getFilteredUsersList(username, type, status)
+
 # IS THIS STILL NEEDED? 
 @app.route("/back", methods=['GET'])
 def backButton():
 
-    #implement logic for sending user back to their corresponding functionality
-    return render_template("1-login.html", error="Cannot login, try again.")
 
+        userList=[]
+        for item in response:
+            user={}
+            user['Username']=item[0]
+            user['EmailCount']=item[1]
+            user['Type']=item[2]
+            user['Status']=item[3]
+            userList.append(user)
 
-@app.route("/15-usertaketransit", methods = ['POST', 'GET'])
-def take_transit():
+        return render_template('18-adminmanuser.html', users=userList)
+
+@app.route("/to_manage_transit", methods=['POST', 'GET'])
+def manage_transit():
     # getting the sites for the dropdown
     response = getSiteNames()
 
@@ -450,50 +595,110 @@ def take_transit():
         transitTypeList.append(tType)
 
     if request.method == 'GET':
+        response = getAllTransitsM();
+
+        transitList=[]
+        for item in response:
+            transit = {}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+
+            transit['TransitPrice'] = item[2]
+
+            transit['ConnectedSites'] = item[3]
+            transit['TransitLogged'] = item[4]
+            transitList.append(transit)
+
+        return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+    if request.method == 'POST':
+        site = request.form["site"]
+        type = request.form["type"]
+        route = request.form["route"]
+        minPrice = request.form["minPrice"]
+        maxPrice = request.form["maxPrice"]
+
+        response = getFilteredTransitsM(site, type, route, minPrice, maxPrice);
+
+        transitList=[]
+        for item in response:
+            transit = {}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+
+            transit['TransitPrice'] = item[2]
+
+            transit['ConnectedSites'] = item[3]
+            transit['TransitLogged'] = item[4]
+            transitList.append(transit)
+
+        return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+@app.route("/to_manage_site", methods=['POST', 'GET'])
+def manage_site():
+    if request.method == 'GET':
+        response = getSiteNames();
+        siteNameList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteNameList.append(site)
+
+        response = getManagerNames();
+        managerList = []
+        for item in response:
+            manager={}
+            manager['Username']=item[0]
+            managerList.append(manager)
+
+        response = getAllSites();
+        siteList = []
+        for item in response:
+            site={}
+            site['Name']=item[0]
+            site['Manager']=item[1]
+            site['OpenEveryday']=item[2]
+            siteList.append(site)
+
+        return render_template('19-adminmansite.html', siteNames=siteNameList, managers=managerList, sites=siteList)
+
+    if request.method == 'POST':
+        print("someday")
+
+@app.route("/add_email", methods =['POST'])
+def add_email():
+    emails = request.get_json()
+    # emails = request.get_json()
+    print emails
+
+@app.route("/to_user_take_transit/log_transit", methods=['POST'])
+def log_transit():
+    if request.method == 'POST':
+        transit = request.form["chosen_transit"]
+        date = request.form["dateLogged"]
+
+        global _logged_user
+        logTransit(_logged_user, transit, date)
+        # getting the sites for the dropdown
+        response = getSiteNames()
+
+        siteList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteList.append(site)
+
+        # getting the transit types for the dropdown
+        response = getTransitTypes()
+
+        transitTypeList = []
+        for item in response:
+            tType={}
+            tType['TransitType'] = item[0]
+            transitTypeList.append(tType)
+
         # getting unfiltered transit when the page is first loaded
         response = getAllTransit()
-
-        transitList = []
-        for item in response:
-            transit={}
-            transit['TransitRoute'] = item[0]
-            transit['TransitType'] = item[1]
-            transit['Price'] = item[2]
-            transit['ConnectedSites'] = item[3]
-            transitList.append(transit);
-
-        return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
-
-    if request.method == 'POST':
-        #getting filtered transit when some of the options have been played with
-        site = request.form["site"]
-        transitType = request.form["transittype"]
-        minPrice = request.form["minPrice"]
-        maxPrice = request.form["maxPrice"]
-
-        response = getFilteredTransit(site, transitType, minPrice, maxPrice)
-
-        transitList = []
-        for item in response:
-            transit={}
-            transit['TransitRoute'] = item[0]
-            transit['TransitType'] = item[1]
-            transit['Price'] = item[2]
-            transit['ConnectedSites'] = item[3]
-            transitList.append(transit);
-
-        return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
-
-"""
-@app.route("/15-usertaketransit/filter", methods = ['POST', 'GET'])
-def filter_take_transit():
-    if request.method == 'POST':
-        site = request.form["site"]
-        transitType = request.form["transittype"]
-        minPrice = request.form["minPrice"]
-        maxPrice = request.form["maxPrice"]
-
-        response = getFilteredTransit(site, transitType, minPrice, maxPrice)
 
         transitList = []
         for item in response:
@@ -505,31 +710,51 @@ def filter_take_transit():
             transitList.append(transit);
 
         return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
-"""
 
-@app.route("/15-usertaketransit/log_transit", methods=['POST'])
-def log_transit():
+@app.route("/to_create_site", methods=['POST', 'GET'])
+def create_site():
+    if request.method == 'GET':
+
+        return render_template('21-admincreatesite.html')
     if request.method == 'POST':
-        transit = request.form["chosen_transit"]
-        date = request.form["dateLogged"]
+        # TODO actually create the site
 
-        response = logTransit(_logged_user, transit, date)
-        return take_transit();
+        # sends back to the manage sites page
+        response = getSiteNames();
+        siteNameList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteNameList.append(site)
 
-@app.route("/16-usertranshistory", methods=['POST','GET'])
-def transit_history():
-    # getting the sites for the dropdown
-    response = getSiteNames()
+        response = getManagerNames();
+        managerList = []
+        for item in response:
+            manager={}
+            manager['Username']=item[0]
+            managerList.append(manager)
 
-    siteList = []
+        response = getAllSites();
+        siteList = []
+        for item in response:
+            site={}
+            site['Name']=item[0]
+            site['Manager']=item[1]
+            site['OpenEveryday']=item[2]
+            siteList.append(site)
+
+        return render_template('19-adminmansite.html', siteNames=siteNameList, managers=managerList, sites=siteList)
+
+@app.route("/to_create_transit", methods=['POST', 'GET'])
+def create_transit():
+    response = getSiteNames();
+    siteNameList = []
     for item in response:
         site={}
         site['SiteName'] = item[0]
-        siteList.append(site)
+        siteNameList.append(site)
 
-    # getting the transit types for the dropdown
     response = getTransitTypes()
-
     transitTypeList = []
     for item in response:
         tType={}
@@ -537,40 +762,86 @@ def transit_history():
         transitTypeList.append(tType)
 
     if request.method == 'GET':
-        # getting unfiltered transit when the page is first loaded
-        response = getAllTransit2(_logged_user)
-
-        transitList = []
-        for item in response:
-            transit={}
-            transit['Date'] = item[0]
-            transit['TransitRoute'] = item[1]
-            transit['TransitType'] = item[2];
-            transit['TransitPrice'] = item[3]
-            transitList.append(transit);
-
-        return render_template('16-usertranshistory.html', sites=siteList, types=transitTypeList, transits=transitList)
+        return render_template("24-admincreatetransit.html", sites=siteNameList, types=transitTypeList)
 
     if request.method == 'POST':
-        #getting filtered transit when some of the options have been played with
-        site = request.form["site"]
-        transitType = request.form["transittype"]
-        route = request.form["route"]
-        startDate = request.form["startDate"]
-        endDate = request.form["endDate"]
+        # TODO actually create the site
 
-        response = getFilteredTransit2(site, transitType, route, startDate, endDate)
+        # getting the sites for the dropdown
+        response = getSiteNames()
 
-        transitList = []
+        siteList = []
         for item in response:
-            transit={}
-            transit['Date'] = item[0]
-            transit['TransitRoute'] = item[1]
-            transit['TransitType'] = item[2];
-            transit['TransitPrice'] = item[3]
-            transitList.append(transit);
+            site={}
+            site['SiteName'] = item[0]
+            siteList.append(site)
 
-        return render_template('16-usertranshistory.html', sites=siteList, types=transitTypeList, transits=transitList)
+        # getting the transit types for the dropdown
+        response = getTransitTypes()
+
+        transitTypeList = []
+        for item in response:
+            tType={}
+            tType['TransitType'] = item[0]
+            transitTypeList.append(tType)
+
+        response = getAllTransitsM();
+
+        transitList=[]
+        for item in response:
+            transit = {}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+            transit['TransitPrice'] = item[2]
+            transit['ConnectedSites'] = item[3]
+            transit['TransitLogged'] = item[4]
+            transitList.append(transit)
+
+        return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+@app.route("/remove_email", methods=['POST'])
+def delete_email():
+    email = request.form["email"];
+    deleteEmail(email);
+
+    return manageProfileTemplate();
+
+@app.route("/add-email", methods=['POST'])
+def addEmail():
+    email = request.form["email"];
+
+    global _logged_user
+    email_insert(_logged_user, email);
+
+    return manageProfileTemplate();
+
+def manageProfileTemplate():
+    #getting all employee information for this page except emails
+    global _logged_user;
+    response = get_employee_info(_logged_user);
+    info = response[0]
+    fname=info[0]
+    lname=info[1]
+    uname=info[2]
+    sname=info[3]
+    eid=info[4]
+    phone=info[5]
+    address=info[6] + ", " + info[7] + ", " + info[8] + " " + str(info[9])
+
+    response = get_employee_emails(_logged_user);
+
+    emailList = []
+    for item in response:
+        email={}
+        email['Email']=item[0];
+        emailList.append(email);
+
+    return render_template('17-empmanageprofile.html', fname=fname, lname=lname, uname=uname, sname=sname, eid=eid, phone=phone, address=address, emails=emailList)
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run()
