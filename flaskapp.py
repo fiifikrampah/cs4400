@@ -18,7 +18,7 @@ def main():
 
     #return user_take_transit();
     #return user_transit_history();
-    return manage_profile();
+    # return manage_profile();
     #return manage_user();
     #return manage_site();
     #return create_site();
@@ -317,10 +317,7 @@ def sign_in():
 @app.route("/back-button", methods = ['GET'])
 def go_to_functionality_screen():
     if request.method == 'GET':
-# <<<<<<< HEAD
-#         global _logged_userType
-#         if _logged_userType in ['User']: #,'Employee', 'Employee, Visitor'
-# =======
+
         person = _logged_user
         p_type = usertype_checker(_logged_user)
 
@@ -356,9 +353,9 @@ def user_take_transit():
         site['SiteName'] = item[0]
         siteList.append(site)
 
-        else:
-            print "Sorry an error occured."
-            return 1
+        # else:
+        #     print "Sorry an error occured."
+        #     return 1
 
 
     # getting the transit types for the dropdown
@@ -448,7 +445,7 @@ def user_transit_history():
         startDate = request.form["startdate"]
         endDate = request.form["enddate"]
 
-        global _logged_user
+        # global _logged_user
         response = getFilteredTransit2(_logged_user, site, transitType, route, startDate, endDate)
 
         transitList = []
@@ -501,38 +498,38 @@ def manage_profile():
     return render_template('17-empmanageprofile.html', error="")
 
 
-@app.route("/to_manage_user")
-def manage_user():
-    """
-    Takes user to manage user page
-    """
-    return render_template('18-adminmanuser.html', error="")
+# @app.route("/to_manage_user")
+# def manage_user():
+#     """
+#     Takes user to manage user page
+#     """
+#     return render_template('18-adminmanuser.html', error="")
 
 
-@app.route("/to_manage_transit")
-def manage_transit():
-    """
-    Takes user to manage transit page
-    """
-    return render_template('22-adminmantransit.html', error="")
+# @app.route("/to_manage_transit")
+# def manage_transit():
+#     """
+#     Takes user to manage transit page
+#     """
+#     return render_template('22-adminmantransit.html', error="")
 
 
-@app.route("/to_manage_site")
-def manage_site():
-    """
-    Takes user to manage site page
-    """
-    return render_template('19-adminmansite.html', error="")
+# @app.route("/to_manage_site")
+# def manage_site():
+#     """
+#     Takes user to manage site page
+#     """
+#     return render_template('19-adminmansite.html', error="")
 
 # FIIFI FIX THIS:
-@app.route("/add_email", methods =['POST'])
-def add_email():
-    emails = request.get_json()
-    # emails = request.get_json()
-    print emails  
+# @app.route("/add_email", methods =['POST'])
+# def add_email():
+#     emails = request.get_json()
+#     # emails = request.get_json()
+#     print emails  
 
 
-    return manageProfileTemplate();
+#     return manageProfileTemplate();
 
 
 @app.route("/to_manage_user", methods=['POST', 'GET'])

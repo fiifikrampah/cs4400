@@ -50,7 +50,7 @@ def login(username, password):
 	login_response = db_login(username, hashed_password)
 
 	# close the connection to the DB
-	close_connection()
+	# close_connection()
 
 	return login_response
 
