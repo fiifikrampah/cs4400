@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script src="../static/js/login.js"></script>
+
+    <!--<script src="../Scripts/login.js"></script>-->
+
+<title>Manage Transit</title>
+</head>
+
+<body>
+    <div align=center class="container-fluid" style="width:60%; min-width:600px">
+        <h1>Create Transit</h1>
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_create_transit" method="post" enctype="multipart/form-data">
+            <!-- contain site and transport type -->
+            <div class="row">
+                <div class="col-xs-5" align=left>
+                    <label for="type">Transport Type</label>
+                    <select name="type">
+                        {% for type in types %}
+                        <option value="{{type.TransitType}}">{{type.TransitType}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-xs-4" align=center>
+                    <label for="route">Route</label>
+                    <input type="text" name="route" style="width:100px" required autofocus>
+                </div>
+                <div class="col-xs-3" align=right>
+                    <label for="price">Price</label>
+                    <input type="number" name="price" min=0 step=0.1 style="width:40px;" required autofocus>
+                </div>
+            </div>
+
+            <div class="row" align=left>
+                <label for="consites">Connected Sites</label>
+            </div>
+
+            <div class="row" align=center>
+                <div style="width:250px">
+                    {% for site in sites %}
+                    <input type="checkbox" name="{{site.SiteName}}"> {{site.SiteName}}</input>
+                    <br>
+                    {% endfor %}
+                </div>
+            </div>
+            <br>
+            <button type="submit" name="create">Create</button>
+        </form>
+
+        <a class=" btn btn-default" href="/to_manage_transit" role="button">Back</a>
+
+    </div>
+</body>
+</html>

@@ -20,85 +20,88 @@
     <title>User Transit History</title>
 </head>
 <body>
-<div align=center class="container-fluid" style="width:60%; min-width:600px">
-    <form class="form-group" align=center style="width:60%; min-width:600px" action="/filter" method="post" enctype="multipart/form-data">
-        <h1>Transit History</h1>
+    <div align=center class="container-fluid" style="width:60%; min-width:600px">
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_user_transit_history" method="post" enctype="multipart/form-data">
+            <h1>Transit History</h1>
 
-        <!-- contain site and transport type -->
-        <div class="row">
-            <div class="col-xs-6" align=left>
-                <label for="site">Contain Site</label>
-                <select name="site">
-                    <option value="0">-ALL-</option>
+            <!-- contain site and transport type -->
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label for="site">Contain Site</label>
+                    <select name="site">
+                        <option value="-ALL-">-ALL-</option>
 
-                    {% for site in sites %}
+                        {% for site in sites %}
                         <option value="{{site.SiteName}}">{{site.SiteName}}</option>
-                    {% endfor %}
+                        {% endfor %}
 
-                </select>
-            </div>
+                    </select>
+                </div>
 
-            <div class="col-xs-6" align=right>
-                <label for="transtype">Transport Type</label>
-                <select name="transittype">
-                    <option value="az">-ALL-</option>
+                <div class="col-xs-6" align=right>
+                    <label for="transtype">Transport Type</label>
+                    <select name="transittype">
+                        <option value="-ALL-">-ALL-</option>
 
-                    {% for type in types %}
+                        {% for type in types %}
                         <option value="{{type.TransitType}}">{{type.TransitType}}</option>
-                    {% endfor %}
+                        {% endfor %}
 
-                </select>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-xs-4" align=left>
-                <label for="route">Route</label>
-                <input type = "text" id = "rt"/>
-            </div>
-            <div class="col-xs-4" align=center>
-                <label for="sd">Start Date</label>
-                <input type = "date" id = "start"/>
-            </div>
-            <div class="col-xs-4" align=right>
-                <label for="ed">End Date</label>
-                <input type = "date" id = "end"/>
+                    </select>
+                </div>
             </div>
 
-        </div>
+            <!-- route, start and end date -->
+            <div class="row">
+                <div class="col-xs-4" align=left>
+                    <label for="route">Route</label>
+                    <input type = "text" name="route"/>
+                </div>
+                <div class="col-xs-4" align=center>
+                    <label for="sd">Start Date</label>
+                    <input type = "date" name="startdate"/>
+                </div>
+                <div class="col-xs-4" align=right>
+                    <label for="ed">End Date</label>
+                    <input type = "date" name="enddate"/>
+                </div>
 
-        <div class="row" align=center>
-            <button type="Filter"><a href="">Filter</a></button>
-        </div>
-    </form>
+            </div>
 
-    <p>
-        <!-- results table -->
-        <div align=center style="margin:20px">
-            <table class="table table-striped">
-            <tr>
-                <th>Date</th>
-                <th>Route</th>
-                <th>TransportType</th>
-                <th>Price</th>
-            </tr>
+            <div class="row" align=center>
+                <button type="submit" name="filter">Filter</button>
+            </div>
+        </form>
 
-            {% for transit in transits %}
+        <p>
+            <!-- results table -->
+            <div align=center style="margin:20px">
+                <table class="table table-striped">
                 <tr>
-                    <td><input type="radio" name="transit" value="{{transit}}"> {{transit.Date}}</td>
+                    <th>Date</th>
+                    <th>Route</th>
+                    <th>TransportType</th>
+                    <th>Price</th>
+                </tr>
+
+                {% for transit in transits %}
+                <tr>
+                    <td>{{transit.Date}}</td>
                     <td>{{transit.TransitRoute}}</td>
                     <td>{{transit.TransitType}}</td>
-                    <td>{{transit.Price}}</td>
+                    <td>{{transit.TransitPrice}}</td>
                 </tr>
-            {% endfor %}
+                {% endfor %}
 
-            </table>
-        </div>
-    </table>
-    </p>
+                </table>
+            </div>
+        </table>
+        </p>
 
-    <p> <button type="back"><a href="2-registernavigation.html">Back</a></button>
+
+    <p> <button type="back"><a href="/back-button">Back</a></button>
     </p>
 </div>
+
 </body>
 </html>

@@ -16,10 +16,19 @@ def main():
     """
     set_connection()
 
+    #return user_take_transit();
+    #return user_transit_history();
+    # return manage_profile();
+    #return manage_user();
+    #return manage_site();
+    #return create_site();
+    #return manage_transit();
+    #return create_transit();
+
     #return transit_history();
     # return take_transit();
-    return render_template('1-login.html', error = "")
 
+    return render_template('1-login.html', error = "")
 
 @app.route("/to_register_navigation")
 def to_register_navigation():
@@ -27,7 +36,6 @@ def to_register_navigation():
     Takes user to register navigation page
     """
     return render_template('2-registernavigation.html', error="")
-
 
 @app.route("/to_user_register")
 def to_user_register():
@@ -49,8 +57,8 @@ def register_user():
         confirmed_pass = request.form["confirm_password"]
 
         # email = request.form["email"]
-        
-        
+
+
 
         # if constraint_email_format(email) == 0:
         #     return render_template("3-reguseronly.html", error="Email does not match format!")
@@ -72,16 +80,12 @@ def register_user():
             elif result == 2:
                 return render_template("3-reguseronly.html", error="Cannot register, try again")
 
-
-        
-
 @app.route("/to_visitor_register")
 def to_visitor_register():
     """
     Takes user to visitor register page
     """
     return render_template('4-regvisit.html', error="")
-
 
 @app.route("/register_visitor", methods = ['POST'])
 def register_visitor():
@@ -118,16 +122,12 @@ def register_visitor():
             elif result == 2:
                 return render_template("4-regvisit.html", error="Cannot register, try again")
 
-
-
-
 @app.route("/to_employee_register")
 def to_employee_register():
     """
     Takes user to employee register page
     """
     return render_template('5-regemp.html', error="")
-
 
 @app.route("/register_employee", methods = ['POST'])
 def register_employee():
@@ -177,7 +177,6 @@ def register_employee():
 
             else:
                 return render_template("5-regemp.html", error="Cannot register, try again")
-
 
 @app.route("/to_emp_visitor_register")
 def to_emp_visitor_register():
@@ -231,7 +230,7 @@ def register_employee_visitor():
 
             elif result1 == 1:
                 return render_template("6-regempvisit.html", error="Username has already been taken")
-                
+
             else:
                 return render_template("6-regempvisit.html", error="Cannot register, try again")
 
@@ -240,11 +239,11 @@ def to_login():
     """
     Takes user to login page after they click on sign out
     """
-    global logged_user
-    logged_user = ""
+    global _logged_user
+    _logged_user = ""
     return render_template("1-login.html", error = "")
 
-# This function signs the user in with given credentials
+# This function signs the user in with given credentials 
 # to the correct page based on their account type.
 # Makes call to python wrapper, and logs user in
 # or displays appropriate error message
@@ -257,155 +256,110 @@ def sign_in():
         _password = request.form["password"]
         # hash_password() --deprecated function
     	login_response = login(_name, _password)
+        
     	if login_response == 0:
+            global _logged_user
+            _logged_user = ""
             return render_template("1-login.html", error = "Cannot login, try again.")
         else:
-            global _logged_user
-            logged_user = _name
             if login_response in ['User']:
-                global _logged_userType
+                _logged_user = _name
                 _logged_userType = login_response
+                print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType) 
                 return render_template("7-userfunc.html", error = "")
             elif login_response in ['Visitor']:
-                global _logged_userType
+                _logged_user = _name
                 _logged_userType = login_response
+                print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                 return render_template("14-visitorfunc.html", error = "")
             elif login_response in ['Employee', 'Employee, Visitor', 'Admin', 'Admin, Visitor', 'Manager', 'Manager, Visitor', 'Staff', 'Staff, Visitor']:
                 emp_type = emptype_checker(_name)
-                global _logged_userType
                 _logged_userType = emp_type
-                return go_to_functionality_screen();
+                if _logged_userType in ['Employee', 'Employee, Visitor']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("7-userfunc.html", error = "")
+                elif _logged_userType in ['Admin']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("8-adminfunc.html", error = "")
+                elif _logged_userType in ['Admin, Visitor']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("9-adminvisitfunc.html", error = "")
+                elif _logged_userType in ['Manager']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("10-manfunc.html", error = "")
+                elif _logged_userType in ['Manager, Visitor']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("11-manvisitfunc.html", error = "")
+                elif _logged_userType in ['Staff']:
+                    _logged_user = _name
+                    print "logged person is: %s" % _logged_user
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("12-stafffunc.html", error = "")
+                elif _logged_userType in ['Staff, Visitor']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("13-staffvisitfunc.html", error = "")
+                else:
+                    _logged_user = ""
+                    return render_template("1-login.html", error = "Username or password is incorrect, please try again.")
+
             else:
-                global _logged_user
-                global _logged_userType
                 _logged_user = ""
                 _logged_userType = ""
                 return render_template("1-login.html", error = "Cannot login, try again.")
 
-@app.route("/back-button", methods = ['POST','GET'])
+
+@app.route("/back-button", methods = ['GET'])
 def go_to_functionality_screen():
-    if request.method == 'POST':
-        global _logged_userType
-        if _logged_userType in ['Employee', 'Employee, Visitor']:
+    if request.method == 'GET':
+
+        person = _logged_user
+        p_type = usertype_checker(_logged_user)
+
+        if p_type in ['Employee']:
+            emp_type = emptype_checker(_logged_user)
+            if emp_type in ['Admin']:
+                return render_template("8-adminfunc.html", error = "")
+            elif emp_type in ['Admin, Visitor']:
+                return render_template("9-adminvisitfunc.html", error = "")
+            elif emp_type in ['Manager']:
+                return render_template("10-manfunc.html", error = "")
+            elif emp_type in ['Manager, Visitor']:
+                return render_template("11-manvisitfunc.html", error = "")
+            elif emp_type in ['Staff']:
+                return render_template("12-stafffunc.html", error = "")
+            elif emp_type in ['Staff, Visitor']:
+                return render_template("13-staffvisitfunc.html", error = "")
+
+        elif p_type in ['User']:
+
             return render_template("7-userfunc.html", error = "")
-        elif _logged_userType in ['Admin']:
-            return render_template("8-adminfunc.html", error = "")
-        elif _logged_userType in ['Admin, Visitor']:
-            return render_template("9-adminvisitfunc.html", error = "")
-        elif _logged_userType in ['Manager']:
-            return render_template("10-manfunc.html", error = "")
-        elif _logged_userType in ['Manager, Visitor']:
-            return render_template("11-manvisitfunc.html", error = "")
-        elif _logged_userType in ['Staff']:
-            return render_template("12-stafffunc.html", error = "")
-        elif _logged_userType in ['Staff, Visitor']:
-            return render_template("13-staffvisitfunc.html", error = "")
-        else:
-            return render_template("1-login.html", error = "Username or password is incorrect, please try again.")
+        elif p_type in ['Visitor']:
+            return render_template("14-visitorfunc.html", error = "")
 
 
-@app.route("/to_user_take_transit")
-def to_user_take_transit():
-    """
-    Takes user to take transit page
-    """
-    return render_template('15-usertaketransit.html', error="")
-
-@app.route("/to_user_transit_history")
-def to_user_transit_history():
-    """
-    Takes user to view transit history page
-    """
-    return render_template('16-usertranshistory.html', error="")
-
-@app.route("/to_visitor_explore_event")
-def to_visitor_explore_event():
-    """
-    Takes user to explore event page
-    """
-    return render_template('33-visitorexploreevent.html', error="")
-
-@app.route("/to_visitor_explore_site")
-def to_visitor_explore_site():
-    """
-    Takes user to explore site page
-    """
-    return render_template('35-visitorexploresite.html', error="")
-
-
-@app.route("/to_visitor_view_visit_history")
-def to_visitor_view_visit_history():
-    """
-    Takes user to view visit history page
-    """
-    return render_template('38-visitorexploresite.html', error="")
-
-
-@app.route("/to_manage_profile")
-def manage_profile():
-    """
-    Takes user to manage profile page
-    """
-    return render_template('17-empmanageprofile.html', error="")
-
-
-@app.route("/to_manage_user")
-def manage_user():
-    """
-    Takes user to manage user page
-    """
-    return render_template('18-adminmanuser.html', error="")
-
-
-@app.route("/to_manage_transit")
-def manage_transit():
-    """
-    Takes user to manage transit page
-    """
-    return render_template('22-adminmantransit.html', error="")
-
-
-@app.route("/to_manage_site")
-def manage_site():
-    """
-    Takes user to manage site page
-    """
-    return render_template('19-adminmansite.html', error="")
-
-
-@app.route("/add_email", methods =['POST'])
-def add_email():
-    emails = request.get_json()
-    # emails = request.get_json()
-    print emails  
-
-
-
-
-
-
-# IS THIS STILL NEEDED?
-@app.route("/back", methods=['GET'])
-def backButton():
-
-    #implement logic for sending user back to their corresponding functionality
-    return render_template("1-login.html", error="Cannot login, try again.")
-
-
-@app.route("/15-usertaketransit", methods = ['POST', 'GET'])
-def take_transit():
+@app.route("/to_user_take_transit", methods=['POST', 'GET'])
+def user_take_transit():
     # getting the sites for the dropdown
     response = getSiteNames()
-
     siteList = []
     for item in response:
         site={}
         site['SiteName'] = item[0]
         siteList.append(site)
 
+        # else:
+        #     print "Sorry an error occured."
+        #     return 1
+
+
     # getting the transit types for the dropdown
     response = getTransitTypes()
-
     transitTypeList = []
     for item in response:
         tType={}
@@ -447,40 +401,8 @@ def take_transit():
 
         return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
 
-"""
-@app.route("/15-usertaketransit/filter", methods = ['POST', 'GET'])
-def filter_take_transit():
-    if request.method == 'POST':
-        site = request.form["site"]
-        transitType = request.form["transittype"]
-        minPrice = request.form["minPrice"]
-        maxPrice = request.form["maxPrice"]
-
-        response = getFilteredTransit(site, transitType, minPrice, maxPrice)
-
-        transitList = []
-        for item in response:
-            transit={}
-            transit['TransitRoute'] = item[0]
-            transit['TransitType'] = item[1]
-            transit['Price'] = item[2];
-            transit['ConnectedSites'] = item[3]
-            transitList.append(transit);
-
-        return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
-"""
-
-@app.route("/15-usertaketransit/log_transit", methods=['POST'])
-def log_transit():
-    if request.method == 'POST':
-        transit = request.form["chosen_transit"]
-        date = request.form["dateLogged"]
-
-        response = logTransit(_logged_user, transit, date)
-        return take_transit();
-
-@app.route("/16-usertranshistory", methods=['POST','GET'])
-def transit_history():
+@app.route("/to_user_transit_history", methods=['POST', 'GET'])
+def user_transit_history():
     # getting the sites for the dropdown
     response = getSiteNames()
 
@@ -501,6 +423,7 @@ def transit_history():
 
     if request.method == 'GET':
         # getting unfiltered transit when the page is first loaded
+        global _logged_user
         response = getAllTransit2(_logged_user)
 
         transitList = []
@@ -519,10 +442,11 @@ def transit_history():
         site = request.form["site"]
         transitType = request.form["transittype"]
         route = request.form["route"]
-        startDate = request.form["startDate"]
-        endDate = request.form["endDate"]
+        startDate = request.form["startdate"]
+        endDate = request.form["enddate"]
 
-        response = getFilteredTransit2(site, transitType, route, startDate, endDate)
+        # global _logged_user
+        response = getFilteredTransit2(_logged_user, site, transitType, route, startDate, endDate)
 
         transitList = []
         for item in response:
@@ -534,6 +458,387 @@ def transit_history():
             transitList.append(transit);
 
         return render_template('16-usertranshistory.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+@app.route("/to_visitor_explore_event")
+def to_visitor_explore_event():
+    """
+    Takes user to explore event page
+    """
+    return render_template('33-visitorexploreevent.html', error="")
+
+@app.route("/to_visitor_explore_site")
+def to_visitor_explore_site():
+    """
+    Takes user to explore site page
+    """
+    return render_template('35-visitorexploresite.html', error="")
+
+@app.route("/to_visitor_view_visit_history")
+def to_visitor_view_visit_history():
+    """
+    Takes user to view visit history page
+    """
+    return render_template('38-visitorexploresite.html', error="")
+
+@app.route("/to_manage_profile", methods=['POST', 'GET'])
+def manage_profile():
+
+    if request.method == 'POST':
+        fname = request.form["firstname"];
+        lname = request.form["lastname"];
+        phone = request.form["phonenum"];
+        visitor = request.form["isvisitor"];
+
+        global _logged_user
+        update_employee(_logged_user, fname, lname, phone, visitor)
+
+    """
+    Takes user to manage profile page
+    """
+    return render_template('17-empmanageprofile.html', error="")
+
+
+# @app.route("/to_manage_user")
+# def manage_user():
+#     """
+#     Takes user to manage user page
+#     """
+#     return render_template('18-adminmanuser.html', error="")
+
+
+# @app.route("/to_manage_transit")
+# def manage_transit():
+#     """
+#     Takes user to manage transit page
+#     """
+#     return render_template('22-adminmantransit.html', error="")
+
+
+# @app.route("/to_manage_site")
+# def manage_site():
+#     """
+#     Takes user to manage site page
+#     """
+#     return render_template('19-adminmansite.html', error="")
+
+# FIIFI FIX THIS:
+# @app.route("/add_email", methods =['POST'])
+# def add_email():
+#     emails = request.get_json()
+#     # emails = request.get_json()
+#     print emails  
+
+
+#     return manageProfileTemplate();
+
+
+@app.route("/to_manage_user", methods=['POST', 'GET'])
+def manage_user():
+    if request.method == 'GET':
+        response = getAllUsersList();
+
+        userList=[]
+        for item in response:
+            user={}
+            user['Username']=item[0]
+            user['EmailCount']=item[1]
+            user['Type']=item[2]
+            user['Status']=item[3]
+            userList.append(user)
+
+        return render_template('18-adminmanuser.html', users=userList)
+
+    if request.method == 'POST':
+        username = request.form["username"]
+        type = request.form["type"]
+        status = request.form["status"]
+
+        response = getFilteredUsersList(username, type, status)
+
+# IS THIS STILL NEEDED? 
+@app.route("/back", methods=['GET'])
+def backButton():
+
+
+        userList=[]
+        for item in response:
+            user={}
+            user['Username']=item[0]
+            user['EmailCount']=item[1]
+            user['Type']=item[2]
+            user['Status']=item[3]
+            userList.append(user)
+
+        return render_template('18-adminmanuser.html', users=userList)
+
+@app.route("/to_manage_transit", methods=['POST', 'GET'])
+def manage_transit():
+    # getting the sites for the dropdown
+    response = getSiteNames()
+
+    siteList = []
+    for item in response:
+        site={}
+        site['SiteName'] = item[0]
+        siteList.append(site)
+
+    # getting the transit types for the dropdown
+    response = getTransitTypes()
+
+    transitTypeList = []
+    for item in response:
+        tType={}
+        tType['TransitType'] = item[0]
+        transitTypeList.append(tType)
+
+    if request.method == 'GET':
+        response = getAllTransitsM();
+
+        transitList=[]
+        for item in response:
+            transit = {}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+
+            transit['TransitPrice'] = item[2]
+
+            transit['ConnectedSites'] = item[3]
+            transit['TransitLogged'] = item[4]
+            transitList.append(transit)
+
+        return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+    if request.method == 'POST':
+        site = request.form["site"]
+        type = request.form["type"]
+        route = request.form["route"]
+        minPrice = request.form["minPrice"]
+        maxPrice = request.form["maxPrice"]
+
+        response = getFilteredTransitsM(site, type, route, minPrice, maxPrice);
+
+        transitList=[]
+        for item in response:
+            transit = {}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+
+            transit['TransitPrice'] = item[2]
+
+            transit['ConnectedSites'] = item[3]
+            transit['TransitLogged'] = item[4]
+            transitList.append(transit)
+
+        return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+@app.route("/to_manage_site", methods=['POST', 'GET'])
+def manage_site():
+    if request.method == 'GET':
+        response = getSiteNames();
+        siteNameList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteNameList.append(site)
+
+        response = getManagerNames();
+        managerList = []
+        for item in response:
+            manager={}
+            manager['Username']=item[0]
+            managerList.append(manager)
+
+        response = getAllSites();
+        siteList = []
+        for item in response:
+            site={}
+            site['Name']=item[0]
+            site['Manager']=item[1]
+            site['OpenEveryday']=item[2]
+            siteList.append(site)
+
+        return render_template('19-adminmansite.html', siteNames=siteNameList, managers=managerList, sites=siteList)
+
+    if request.method == 'POST':
+        print("someday")
+
+@app.route("/add_email", methods =['POST'])
+def add_email():
+    emails = request.get_json()
+    # emails = request.get_json()
+    print emails
+
+@app.route("/to_user_take_transit/log_transit", methods=['POST'])
+def log_transit():
+    if request.method == 'POST':
+        transit = request.form["chosen_transit"]
+        date = request.form["dateLogged"]
+
+        global _logged_user
+        logTransit(_logged_user, transit, date)
+        # getting the sites for the dropdown
+        response = getSiteNames()
+
+        siteList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteList.append(site)
+
+        # getting the transit types for the dropdown
+        response = getTransitTypes()
+
+        transitTypeList = []
+        for item in response:
+            tType={}
+            tType['TransitType'] = item[0]
+            transitTypeList.append(tType)
+
+        # getting unfiltered transit when the page is first loaded
+        response = getAllTransit()
+
+        transitList = []
+        for item in response:
+            transit={}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+            transit['Price'] = item[2];
+            transit['ConnectedSites'] = item[3]
+            transitList.append(transit);
+
+        return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+@app.route("/to_create_site", methods=['POST', 'GET'])
+def create_site():
+    if request.method == 'GET':
+
+        return render_template('21-admincreatesite.html')
+    if request.method == 'POST':
+        # TODO actually create the site
+
+        # sends back to the manage sites page
+        response = getSiteNames();
+        siteNameList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteNameList.append(site)
+
+        response = getManagerNames();
+        managerList = []
+        for item in response:
+            manager={}
+            manager['Username']=item[0]
+            managerList.append(manager)
+
+        response = getAllSites();
+        siteList = []
+        for item in response:
+            site={}
+            site['Name']=item[0]
+            site['Manager']=item[1]
+            site['OpenEveryday']=item[2]
+            siteList.append(site)
+
+        return render_template('19-adminmansite.html', siteNames=siteNameList, managers=managerList, sites=siteList)
+
+@app.route("/to_create_transit", methods=['POST', 'GET'])
+def create_transit():
+    response = getSiteNames();
+    siteNameList = []
+    for item in response:
+        site={}
+        site['SiteName'] = item[0]
+        siteNameList.append(site)
+
+    response = getTransitTypes()
+    transitTypeList = []
+    for item in response:
+        tType={}
+        tType['TransitType'] = item[0]
+        transitTypeList.append(tType)
+
+    if request.method == 'GET':
+        return render_template("24-admincreatetransit.html", sites=siteNameList, types=transitTypeList)
+
+    if request.method == 'POST':
+        # TODO actually create the site
+
+        # getting the sites for the dropdown
+        response = getSiteNames()
+
+        siteList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteList.append(site)
+
+        # getting the transit types for the dropdown
+        response = getTransitTypes()
+
+        transitTypeList = []
+        for item in response:
+            tType={}
+            tType['TransitType'] = item[0]
+            transitTypeList.append(tType)
+
+        response = getAllTransitsM();
+
+        transitList=[]
+        for item in response:
+            transit = {}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+            transit['TransitPrice'] = item[2]
+            transit['ConnectedSites'] = item[3]
+            transit['TransitLogged'] = item[4]
+            transitList.append(transit)
+
+        return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+@app.route("/remove_email", methods=['POST'])
+def delete_email():
+    email = request.form["email"];
+    deleteEmail(email);
+
+    return manageProfileTemplate();
+
+@app.route("/add-email", methods=['POST'])
+def addEmail():
+    email = request.form["email"];
+
+    global _logged_user
+    email_insert(_logged_user, email);
+
+    return manageProfileTemplate();
+
+def manageProfileTemplate():
+    #getting all employee information for this page except emails
+    global _logged_user;
+    response = get_employee_info(_logged_user);
+    info = response[0]
+    fname=info[0]
+    lname=info[1]
+    uname=info[2]
+    sname=info[3]
+    eid=info[4]
+    phone=info[5]
+    address=info[6] + ", " + info[7] + ", " + info[8] + " " + str(info[9])
+
+    response = get_employee_emails(_logged_user);
+
+    emailList = []
+    for item in response:
+        email={}
+        email['Email']=item[0];
+        emailList.append(email);
+
+    return render_template('17-empmanageprofile.html', fname=fname, lname=lname, uname=uname, sname=sname, eid=eid, phone=phone, address=address, emails=emailList)
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run()

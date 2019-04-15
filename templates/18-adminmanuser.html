@@ -1,62 +1,96 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>user transit history</title>
+    <meta charset="UTF-8">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script src="../static/js/login.js"></script>
+
+    <!--<script src="../Scripts/login.js"></script>-->
+
+    <title>Manage User</title>
 </head>
+
 <body>
+    <div align=center class="container-fluid" style="width:60%; min-width:600px">
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_manage_user" method="post" enctype="multipart/form-data">
+            <h1>Take Transit</h1>
 
-<h1>Transit History</h1>
+            <!-- username, type, status -->
+            <div class="row">
+                <div class="col-xs-4" align=left>
+                    <label for="uname">Username</label>
+                    <input type="text" name="username" id="uname" style="width:100px">
+                </div>
 
-<p> 
+                <div class="col-xs-4" align=center>
+                    <label for="emptype">Type</label>
+                    <select name="type">
+                        <option value="-ALL-">-ALL-</option>
+                        <option value="User">User</option>
+                        <option value="Visitor">Visitor</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Manager">Manager</option>
+                    </select>
+                </div>
 
-    <label for="transtype">Transport Type</label><select name="transtype">
-    <option value="az">-ALL-</option>
-    <option value="al">MARTA</option>
-    <option value="ak">Bus</option>
-    <option value="ar">Bike</option>
-  
-  </select>
+                <div class="col-xs-4" align=right>
+                    <label for="status">Status</label>
+                    <select name="status">
+                        <option value="-ALL-">-ALL-</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Declined">Declined</option>
+                    </select>
+                </div>
+            </div>
 
-    <label for="site">Contain Site</label><select name="site">
-    <option value="az">-ALL-</option>
-    <option value="al">Atlanta Betline center</option>
-    <option value="ak">Gordon-White Park</option>
-    <option value="ar">Historic Fourth Ward Park</option>
-    <option value="ca">Inman Park</option>
-    <option value="co">Piedmont Park</option>
-    <option value="ct">Rose Circle Park</option>
-    <option value="de">Westview Cemetery</option>
-  </select>
-    
+            <!-- filter button -->
+            <button id="btnFilter" type="submit" style="width: 100px">Filter</a></button>
+        </form>
 
-   
-</p>
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_manage_user/edit" method="post" enctype="multipart/form-data">
+            <!-- results table -->
+            <div align=center style="margin:20px">
+                <table class="table table-striped">
+                <tr>
+                    <th>Username</th>
+                    <th>Email Count</th>
+                    <th>User Type</th>
+                    <th>Status</th>
+                </tr>
 
+                {% for user in users %}
+                <tr>
+                    <td><input type="radio" name="chosen_transit" id="chosen_transit" value="{{user}}" required> {{user.Username}}</td>
+                    <td>{{user.EmailCount}}</td>
+                    <td>{{user.Type}}</td>
+                    <td>{{user.Status}}</td>
+                </tr>
+                {% endfor %}
 
-<p> <label for="route">Route</label>
-    <input type = "text" id = "rt"/>
-    <label for="sd">Start Date</label>
-    <input type = "date" id = "start"/>
-    <label for="ed"> End Date </label>
-    <input type = "date" id = "end"/>
+                </table>
+            </div>
+            <div class="row" align=center>
+                <div class="col-xs-4" align=right>
+                    <button id="btnLogTransit" type="submit" style="width:100px" href="/18-adminmanuser/approve">Approve</a></button>
+                </div>
+                <div class="col-xs-4" align=left>
+                    <button id="btnLogTransit" type="submit" style="width:100px" href="/18-adminmanuser/decline">Decline</a></button>
+                </div>
+        </form>
 
- </p> 
+        <a class=" btn btn-default" href="/back-button" role="button">Back</a>
 
- <p>  
-
-<button type="Filter"><a href="">Filter</a></button>
-</p>
-
-<p> 
-    <table border = "1">
-    <tr>
-        <th>Date</th>
-        <th>Route</th>
-        <th>Transit Type</th>
-        <th>Price</th>
-    </tr>
-</table>
-</p>
-
-<p> <button type="back"><a href="2-registernavigation.html">Back</a></button>
-</p>
+    </div>
+</body>
+</html>
