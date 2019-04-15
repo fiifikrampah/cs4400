@@ -490,6 +490,7 @@ def manage_profile():
         visitor = request.form["isvisitor"];
 
         global _logged_user
+        
         update_employee(_logged_user, fname, lname, phone, visitor)
 
     """
