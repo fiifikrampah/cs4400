@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>man create event</title>
+<style>
+.button {
+  background-color: #008CBA;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+
+<style>
+        body{
+            max-width: 1180px;
+            width: 98%;
+            margin: 0px auto;
+            text-align: center;
+        }
+</style>
+
+</head>
+<body>
+
+<h1>Create Event</h1>
+
+
+<p>
+
+<label for="us">Name</label>
+   <input type="text" name="sname" required></p>
+
+<p>
+    <label for="pr">Price ($)</label>
+     <input type="number" name="pr" min="0" step="0.01" required>
+
+
+<label for="msr">Minimum Staff Required</label>
+       <input type="number" name="msr" min="0" required>
+
+<label for="cap">Capacity</label>
+      <input type="number" name="cap" min="0" required>
+</p>
+
+
+<p>
+
+<label for="sd">Start Date</label>
+     <input type="date" name="sd" required>
+  
+<label for="ed">End Date</label>
+     <input type="date" name="ed" required>
+ 
+  </p>
+
+<p>
+<label for="des">Description</label> 
+     <textarea rows="4" cols="50" name="des"></textarea>
+ 
+</p>
+
+
+<p> 
+   <label for="cons">Assign Staff</label><select multiple name="cons"> <!--not hardcoded-->
+    <option value="az">-ALL-</option>
+   
+  
+  </select></p>
+
+<p> <a href="25.html" class="button">Back</a>
+  <a href="" class="button">Create</a>
+</p>

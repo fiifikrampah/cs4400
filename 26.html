@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>man view/edit event</title>
+<style>
+.button {
+  background-color: #008CBA;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+
+<style>
+        body{
+            max-width: 1180px;
+            width: 98%;
+            margin: 0px auto;
+            text-align: center;
+        }
+</style>
+
+</head>
+<body>
+
+<h1>View/Edit Event</h1>
+
+
+<p>
+
+<label for="us">Name</label>
+  
+
+    <label for="pr">Price ($)</label>
+
+</p>
+
+
+<p>
+
+<label for="sd">Start Date</label>
+  
+<label for="ed">End Date</label>
+ 
+  </p>
+
+<p>
+
+<label for="msr">Minimum Staff Required</label>
+  
+<label for="cap">Capacity</label>
+ 
+</p>
+
+
+<p> 
+   <label for="cons">Staff Assigned</label><select multiple name="cons"> <!--not hardcoded-->
+    <option value="az">-ALL-</option>
+   
+  
+  </select></p>
+
+<p>
+
+<label for="des">Description</label> </p>
+  
+
+  <p>
+<label for="dr">Daily Visits Range</label>
+    <input type="number" name="dr" min="0" required>
+    <label for="do">--</label>
+    <input type="number" name="do" min="0" required>
+
+    <label for="tvr">Daily Revenue Range</label>
+    <input type="number" name="tvr" min="0" step="0.01" required>
+    <label for="tvo">--</label>
+    <input type="number" name="tvo" min="0" step="0.01" required>
+  </p>
+
+
+
+
+<p> 
+
+
+<a href="" class="button">Filter</a>
+<a href="" class="button">Update</a>
+
+</p>
+
+<p> 
+    <table border = "1" align="center" style="margin: 0px auto;">
+    <tr>
+        <th>Date</th>
+        <th>Daily Visits</th>
+        <th>Daily Revenue ($)</th>
+    </tr>
+</table>
+</p>
+
+<p> <a href="25.html" class="button">Back</a>
+</p>

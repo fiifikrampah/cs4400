@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>admin manage transit</title>
+<style>
+.button {
+  background-color: #008CBA;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+
+<style>
+        body{
+            max-width: 1180px;
+            width: 98%;
+            margin: 0px auto;
+            text-align: center;
+        }
+</style>
+
+</head>
+<body>
+
+<h1>Manage Event</h1>
+
+
+<p>
+
+<label for="us">Name</label>
+    <input type="text" name="sname" required>
+
+    <label for="dk">Description Keyword</label>
+    <input type="text" name="dk" required>
+</p>
+
+
+<p>
+
+<label for="sd">Start Date</label>
+    <input type="date" name="sd" required>
+
+    <label for="ed">End Date</label>
+    <input type="date" name="ed" required>
+  </p>
+
+
+  <p>
+<label for="dr">Duration Range</label>
+    <input type="number" name="dr" min="0" required>
+    <label for="do">--</label>
+    <input type="number" name="do" min="0" required>
+
+    <label for="tvr">Total Visits Range</label>
+    <input type="number" name="tvr" min="0" required>
+    <label for="tvo">--</label>
+    <input type="number" name="tvo" min="0" required>
+  </p>
+
+  <p>
+    <label for="trr">Total Revenue Range</label>
+    <input type="number" name="trrpr" min="0" step="0.01" required>
+    <label for="trro">--</label>
+    <input type="number" name="trro" min="0" step="0.01" required>
+  </p>
+
+
+<p> 
+
+
+<a href="" class="button">Filter</a>
+<a href="27.html" class="button">Create</a>
+<a href="26.html" class="button">View/Edit</a>
+<a href="" class="button">Delete</a>
+</p>
+
+<p> 
+    <table border = "1" align="center" style="margin: 0px auto;">
+    <tr>
+        <th>Name</th>
+        <th>Staff Count</th>
+        <th>Duration (days)</th>
+        <th>Total Visits</th>
+        <th>Total Revenue ($)</th>
+    </tr>
+</table>
+</p>
+
+<p> <a href="10.html" class="button">Back</a>
+  <a href="11.html" class="button">Back</a>
+</p>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> admin manage user</title>
+
+<style>
+.button {
+  background-color: #008CBA;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+<style>
+        body{
+            max-width: 1180px;
+            width: 98%;
+            margin: 0px auto;
+            text-align: center;
+        }
+</style>
+</head>
+<body>
+
+<h1>Manage User</h1>
+
+<p> <label for="us">Username</label>
+    <input type="text" name="fname" required> 
+
+    <label for="type">Type</label><select name="type">
+    <option value="az">-Select One-</option>
+    <option value="al">User</option>
+    <option value="ak">Visitor</option>
+    <option value="ar">Staff</option>
+    <option value="ar">Manager</option></select>
+
+
+    <label for="stat">Status</label><select name="stat">
+    <option value="az">-Select One-</option>
+    <option value="al">Approved</option>
+    <option value="ak">Pending</option>
+    <option value="ar">Declined</option>
+  
+  </select>
+ 
+</p>
+
+<p> <a href="#" class="button">Filter</a>
+<a href="#" class="button">Approve</a>
+<a href="#" class="button">Decline</a>
+</p>
+
+<p> 
+    <table border = "1" align="center">
+    <tr>
+        <th>Username</th>
+        <th>Email Count</th>
+        <th>User Type</th>
+        <th>Status</th>
+    </tr>
+</table>
+</p>
+
+<p> <a href="8.html" class="button">Back</a>
+  <a href="9.html" class="button">Back</a>
+</p>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Register Emp Only</title>
+<style>
+.button {
+  background-color: #008CBA;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+<style>
+        body{
+            max-width: 1180px;
+            width: 98%;
+            margin: 0px auto;
+            text-align: center;
+        }
+</style>
+</head>
+<body>
+
+<h1>Register Employee</h1>
+
+<p> <label for="fname">First Name</label>
+    <input type="text" name="fname" required> 
+
+	<label for="lname">Last Name</label>
+    <input type="text" name="lname" required> </p>
+
+<p> <label for="uname">Username</label>
+
+    <input type="text" name="uname" required> <label for="utype">User Type</label>
+    <select name="utype">
+    <option value="man">Manager</option>
+    <option value="st">Staff</option>
+    </select> </p>
+
+<p> <label for="pword">Password</label>
+    <input type="Password" name="pword" required> 
+
+<label for="cpword">Confirm Password</label>
+    <input type="Password" name="cpword" required> </p>
+
+  <p>  <label for="phone">Phone</label>
+    <input type="tel" name="phone" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"> 
+
+    <label for="address">Address</label>
+    <input type="text" name="address" required> </p>
+
+<p> <label for="city">City</label><input type="text" name="city" required> 
+    <label for="state">State</label><select name="state">
+    <option value="al">AL</option>
+    <option value="ak">AK</option>
+    <option value="az">AZ</option>
+    <option value="ar">AR</option>
+    <option value="ca">CA</option>
+    <option value="co">CO</option>
+    <option value="ct">CT</option>
+    <option value="de">DE</option>
+    <option value="fl">FL</option>
+    <option value="ga">GA</option>
+    <option value="hi">HI</option>
+    <option value="id">ID</option>
+    <option value="il">IL</option>
+    <option value="in">IN</option>
+    <option value="ia">IA</option>
+    <option value="ks">KS</option>
+    <option value="ky">KY</option>
+    <option value="la">LA</option>
+    <option value="me">ME</option>
+    <option value="md">MD</option>
+    <option value="ma">MA</option>
+    <option value="mi">MI</option>
+    <option value="mn">MN</option>
+    <option value="ms">MS</option>
+    <option value="mo">MO</option>
+    <option value="mt">MT</option>
+    <option value="ne">NE</option>
+    <option value="nv">NV</option>
+    <option value="nh">NH</option>
+    <option value="nj">NJ</option>
+    <option value="nm">NM</option>
+    <option value="ny">NY</option>
+    <option value="nc">NC</option>
+    <option value="nd">ND</option>
+    <option value="oh">OH</option>
+    <option value="ok">OK</option>
+    <option value="or">OR</option>
+    <option value="pa">PA</option>
+    <option value="ri">RI</option>
+    <option value="sc">SC</option>
+    <option value="sd">SD</option>
+    <option value="tn">TN</option>
+    <option value="tx">TX</option>
+    <option value="ut">UT</option>
+    <option value="vt">VT</option>
+    <option value="va">VA</option>
+    <option value="wa">WA</option>
+    <option value="wv">WV</option>
+    <option value="wi">WI</option>
+    <option value="wy">WY</option>
+   <option value="other">Other</option>
+  </select>
+
+    <label for="zip">Zipcode</label>
+    <input type="number" name="zip" pattern="[0-9]{5}" required> 
+
+</p>
+
+    <p> <label for="email">Email</label>
+
+       <!-- <p> <a href="" class="button">Remove</a></p> -->
+
+
+    <input type="email" name="email" required><a href="" class="button">Add</a> </p>
+
+    <p><a href="2.html" class="button">Back</a>
+  <a href="1.html" class="button">Register</a></p>
+
+
+
+</body>
+</html>

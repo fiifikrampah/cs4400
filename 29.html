@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>man site report</title>
+<style>
+.button {
+  background-color: #008CBA;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+
+<style>
+        body{
+            max-width: 1180px;
+            width: 98%;
+            margin: 0px auto;
+            text-align: center;
+        }
+</style>
+
+</head>
+<body>
+
+<h1>Site Report</h1>
+
+
+<p>
+
+<label for="sd">Start Date</label>
+<input type="date" name="fname" required>
+
+<label for="ed">End Date</label>
+<input type="date" name="fname" required> 
+</p>
+
+
+  <p>
+<label for="ecr">Event Count Range</label>
+    <input type="number" name="ecr" min="0" required>
+    <label for="do">--</label>
+    <input type="number" name="do" min="0" required>
+
+    <label for="scr">Staff Count Range</label>
+    <input type="number" name="scr" min="0" required>
+    <label for="tvo">--</label>
+    <input type="number" name="tvo" min="0" required>
+  </p>
+
+
+  <p>
+<label for="tvr">Total Visits Range</label>
+    <input type="number" name="tvr" min="0" required>
+    <label for="dot">--</label>
+    <input type="number" name="dot" min="0" required>
+
+    <label for="trr">Total Revenue Range</label>
+    <input type="number" name="trr" min="0" required>
+    <label for="tro">--</label>
+    <input type="number" name="tro" min="0" required>
+  </p>
+
+<p> 
+
+
+<a href="" class="button">Filter</a>
+<a href="30.html" class="button">Daily Detail</a>
+
+</p>
+
+<p> 
+    <table border = "1" align="center" style="margin: 0px auto;">
+    <tr>
+        <th>Date</th>
+        <th>Event Count</th>
+        <th>Staff Count</th>
+        <th>Total Visits</th>
+        <th>Total Revenue ($)</th>
+    </tr>
+</table>
+</p>
+
+<p> <a href="10.html" class="button">Back</a>
+  <a href="11.html" class="button">Back</a>
+</p>

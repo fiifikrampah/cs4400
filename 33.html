@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>visit explore event</title>
+<style>
+.button {
+  background-color: #008CBA;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+
+<style>
+        body{
+            max-width: 1180px;
+            width: 98%;
+            margin: 0px auto;
+            text-align: center;
+        }
+</style>
+
+</head>
+<body>
+
+<h1>Explore Event</h1>
+
+
+<p>
+
+<label for="us"> Name</label>
+    <input type="text" name="sname" required>
+
+    <label for="dk">Description Keyword</label>
+    <input type="text" name="dk" required>
+</p>
+
+<p>
+
+   <label for="cons">Site Name</label><select name="cons">
+    <option value="az">-ALL-</option>
+    <option value="al">Atlanta Betline center</option>
+    <option value="ak">Gordon-White Park</option>
+    <option value="ar">Historic Fourth Ward Park</option>
+    <option value="ca">Inman Park</option>
+    <option value="co">Piedmont Park</option>
+    <option value="ct">Rose Circle Park</option>
+    <option value="de">Westview Cemetery</option>
+  
+  </select>
+</p>
+
+<p>
+<label for="sd">Start Date</label>
+    <input type="date" name="sd" required>
+
+    <label for="ed">End Date</label>
+    <input type="date" name="ed" required>
+</p>
+
+  <p>
+<label for="dr">Total Visits Range</label>
+    <input type="number" name="dr" min="0" required>
+    <label for="do">--</label>
+    <input type="number" name="do" min="0" required>
+
+    <label for="tvr">Ticket Price Range</label>
+    <input type="number" name="tvr" min="0" step="0.01" required>
+    <label for="tvo">--</label>
+    <input type="number" name="tvo" min="0" step="0.01" required>
+  </p>
+
+<p>
+<input type="checkbox" name="iv" value = "IV" required>Include Visited
+<input type="checkbox" name="so" value = "SO" required>Include Sold Out Event
+</p>
+
+<p> 
+
+
+<a href="" class="button">Filter</a>
+<a href="34.html" class="button">Event Detail</a>
+
+</p>
+
+<p> 
+    <table border = "1" align="center" style="margin: 0px auto;">
+    <tr>
+        <th>Event Name</th>
+        <th>Site Name</th>
+        <th>Ticket Price</th>
+        <th>Tickets Remaining</th>
+        <th>Total Visits</th>
+        <th>My Visits</th>
+    </tr>
+</table>
+</p>
+
+<p> <a href="9.html" class="button">Back</a>
+  <a href="11.html" class="button">Back</a>
+  <a href="13.html" class="button">Back</a>
+  <a href="14.html" class="button">Back</a>
+</p>

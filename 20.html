@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> admin edit site</title>
+<style>
+.button {
+  background-color: #008CBA;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+<style>
+        body{
+            max-width: 1180px;
+            width: 98%;
+            margin: 0px auto;
+            text-align: center;
+        }
+</style>
+</head>
+<body>
+
+<h1>Edit Site</h1>
+
+<p> <label for="us">Name</label>
+    <input type="text" name="sname" required>
+
+    <label for="zip">Zipcode</label>
+    <input type="number" name="zip" pattern="[0-9]{5}" required> </p>
+
+<p>    <label for="ad">Address</label>
+    <input type="text" name="ad" required> <p>
+
+<p> 
+    <label for="man">Manager</label><select name="man"> <!--not hardcoded-->
+    <option value="az">-Select One-</option>
+   
+
+    <input type="checkbox" name="oe" value = "OE">Open Everyday </p>
+
+<p> <a href="19.html" class="button">Back</a>
+<a href="#" class="button">Update</a></p>    
+

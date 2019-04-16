@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> admin manage site</title>
+<style>
+.button {
+  background-color: #008CBA;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+<style>
+        body{
+            max-width: 1180px;
+            width: 98%;
+            margin: 0px auto;
+            text-align: center;
+        }
+</style>
+</head>
+<body>
+
+<h1>Manage Site</h1>
+
+<p> 
+
+    <label for="site">Site</label><select name="site" required=""> <!--should not be hardcoded-->
+    <option value="az">-ALL-</option>
+    <option value="al">Atlanta Betline center</option>
+    <option value="ak">Gordon-White Park</option>
+    <option value="ar">Historic Fourth Ward Park</option>
+    <option value="ca">Inman Park</option>
+    <option value="co">Piedmont Park</option>
+    <option value="ct">Rose Circle Park</option>
+    <option value="de">Westview Cemetery</option>
+  </select>
+
+
+    <label for="stat">Manager</label><select name="stat"> <!--should not be hardcoded-->
+    <option value="az">-ALL-</option>
+    <option value="al">Approved</option>
+    <option value="ak">Pending</option>
+    <option value="ar">Declined</option>
+  
+  </select>
+ 
+</p>
+
+<p>
+   <label for="oe">Open Everyday</label><select name="oe">
+    <option value="so">-Select One-</option>
+    <option value="yes">Yes</option>
+    <option value="no">No</option>
+  </select>
+  </p>
+
+<p> <a href="#" class="button">Filter</a>
+<a href="21.html" class="button">Create</a>
+<a href="20.html" class="button">Edit</a>
+<a href="#" class="button">Delete</a>
+</p>
+
+<p> 
+    <table border = "1" align="center">
+    <tr>
+        <th>Name</th>
+        <th>Manager</th>
+        <th>Open Everyday</th>
+    </tr>
+</table>
+</p>
+
+<p> <a href="8.html" class="button">Back</a>
+  <a href="9.html" class="button">Back</a>
+</p>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>visit explore event</title>
+<style>
+.button {
+  background-color: #008CBA;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+
+<style>
+        body{
+            max-width: 1180px;
+            width: 98%;
+            margin: 0px auto;
+            text-align: center;
+        }
+</style>
+
+</head>
+<body>
+
+<h1>Explore Event</h1>
+
+
+<p>
+
+  <label for="cons">Name</label><select name="cons"> <!--not hardcoded-->
+    <option value="az">-ALL-</option>
+
+  
+  </select>
+
+    <label for="oe">Open Everyday</label><select name="oe">
+    <option value="az">-ALL-</option>
+    <option value="al">No</option>
+    <option value="ak">Yes</option>
+  
+  </select>
+
+</p>
+
+<p>
+<label for="sd">Start Date</label>
+    <input type="date" name="sd" required>
+
+    <label for="ed">End Date</label>
+    <input type="date" name="ed" required>
+</p>
+
+  <p>
+<label for="dr">Total Visits Range</label>
+    <input type="number" name="dr" min="0" required>
+    <label for="do">--</label>
+    <input type="number" name="do" min="0" required>
+
+    <label for="tvr">Event Count Range</label>
+    <input type="number" name="tvr" min="0" required>
+    <label for="tvo">--</label>
+    <input type="number" name="tvo" min="0" required>
+  </p>
+
+<p>
+<input type="checkbox" name="iv" value = "IV" required>Include Visited
+</p>
+
+<p> 
+
+
+<a href="" class="button">Filter</a>
+<a href="37.html" class="button">Site Detail</a>
+<a href="36.html" class="button">Transit Detail</a>
+
+</p>
+
+<p> 
+    <table border = "1" align="center" style="margin: 0px auto;">
+    <tr>
+
+        <th>Site Name</th>
+        <th>Event Count</th>
+        <th>Total Visits</th>
+        <th>My Visits</th>
+    </tr>
+</table>
+</p>
+
+<p> <a href="9.html" class="button">Back</a>
+  <a href="11.html" class="button">Back</a>
+  <a href="13.html" class="button">Back</a>
+  <a href="14.html" class="button">Back</a>
+</p>
