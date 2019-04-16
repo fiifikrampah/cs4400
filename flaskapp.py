@@ -317,7 +317,6 @@ def sign_in():
 @app.route("/back-button", methods = ['GET'])
 def go_to_functionality_screen():
     if request.method == 'GET':
-
         person = _logged_user
         p_type = usertype_checker(_logged_user)
 
@@ -345,6 +344,7 @@ def go_to_functionality_screen():
 
 @app.route("/to_user_take_transit", methods=['POST', 'GET'])
 def user_take_transit():
+
     # getting the sites for the dropdown
     response = getSiteNames()
     siteList = []
@@ -353,11 +353,7 @@ def user_take_transit():
         site['SiteName'] = item[0]
         siteList.append(site)
 
-        # else:
-        #     print "Sorry an error occured."
-        #     return 1
-
-
+        
     # getting the transit types for the dropdown
     response = getTransitTypes()
     transitTypeList = []
@@ -400,6 +396,12 @@ def user_take_transit():
             transitList.append(transit);
 
         return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+        
+   
+
+
+
 
 @app.route("/to_user_transit_history", methods=['POST', 'GET'])
 def user_transit_history():
@@ -453,7 +455,7 @@ def user_transit_history():
             transit={}
             transit['Date'] = item[0]
             transit['TransitRoute'] = item[1]
-            transit['TransitType'] = item[2];
+            transit['TransitType'] = item[2]
             transit['TransitPrice'] = item[3]
             transitList.append(transit);
 
@@ -670,43 +672,50 @@ def add_email():
 
 @app.route("/to_user_take_transit/log_transit", methods=['POST'])
 def log_transit():
-    if request.method == 'POST':
-        transit = request.form["chosen_transit"]
-        date = request.form["dateLogged"]
+    try:
+        if request.method == 'POST':
+            transit = request.form["chosen_transit"]
+            date = request.form["dateLogged"]
 
-        global _logged_user
-        logTransit(_logged_user, transit, date)
-        # getting the sites for the dropdown
-        response = getSiteNames()
+            global _logged_user
+            logTransit(_logged_user, transit, date)
+            # getting the sites for the dropdown
+            response = getSiteNames()
 
-        siteList = []
-        for item in response:
-            site={}
-            site['SiteName'] = item[0]
-            siteList.append(site)
+            siteList = []
+            for item in response:
+                site={}
+                site['SiteName'] = item[0]
+                siteList.append(site)
 
-        # getting the transit types for the dropdown
-        response = getTransitTypes()
+            # getting the transit types for the dropdown
+            response = getTransitTypes()
 
-        transitTypeList = []
-        for item in response:
-            tType={}
-            tType['TransitType'] = item[0]
-            transitTypeList.append(tType)
+            transitTypeList = []
+            for item in response:
+                tType={}
+                tType['TransitType'] = item[0]
+                transitTypeList.append(tType)
 
-        # getting unfiltered transit when the page is first loaded
-        response = getAllTransit()
+            # getting unfiltered transit when the page is first loaded
+            response = getAllTransit()
 
-        transitList = []
-        for item in response:
-            transit={}
-            transit['TransitRoute'] = item[0]
-            transit['TransitType'] = item[1]
-            transit['Price'] = item[2];
-            transit['ConnectedSites'] = item[3]
-            transitList.append(transit);
+            transitList = []
+            for item in response:
+                transit={}
+                transit['TransitRoute'] = item[0]
+                transit['TransitType'] = item[1]
+                transit['Price'] = item[2];
+                transit['ConnectedSites'] = item[3]
+                transitList.append(transit);
 
-        return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+            return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+    except Exception as e:
+        print("---> " + str(e) + '\n')  # print exception message
+        if str(e)[1:5] == "1062":
+            # violates primary key constraint
+            return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList, error= "Sorry that transit has already been logged for chosen date!")
+            
 
 @app.route("/to_create_site", methods=['POST', 'GET'])
 def create_site():
