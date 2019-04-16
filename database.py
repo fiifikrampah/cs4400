@@ -230,6 +230,11 @@ def getAllTransit():
     response = _cursor.execute(queryTransit)
     return _cursor.fetchall()
 
+
+
+def getAllTransitASC():
+    
+
 def getAllTransit2(user):
     queryTransit = """
         SELECT CAST(TransitDate AS DATE), TransitRoute, TransitType, TransitPrice
@@ -715,18 +720,18 @@ def get_site_info(sitename):
     query = """
         SELECT *
         FROM site
-        WHERE SiteName = '%s'
+        WHERE SiteName = %s
         """
-    response = _cursor.execute(query % (sitename))
+    response = _cursor.execute(query , (sitename))
     return _cursor.fetchall();
 
 def update_site(oldname, name, zip, address, manager, everyday):
     query = """
         UPDATE site
-        SET SiteName = '%s', SiteAddress = '%s', SiteZipcode = '%s', OpenEveryday = '%s', ManagerUsername = '%s'
-        WHERE Sitename = '%s';
+        SET SiteName = %s, SiteAddress = %s, SiteZipcode = %s, OpenEveryday = %s, ManagerUsername = %s
+        WHERE Sitename = %s;
         """
-    response = _cursor.execute(query % (name, address, zip, everyday, manager, oldname));
+    response = _cursor.execute(query, (name, address, zip, everyday, manager, oldname));
     _database.commit();
 
 def getUnassignedManagers():
@@ -744,18 +749,18 @@ def getUnassignedManagers():
 
 def add_site(name, address, zip, everyday, manager):
     query = """
-        INSERT INTO site
-        VALUES ('%s', '%s', '%s', '%s', '%s')
+        INSERT INTO site (SiteName, SiteAddress, SiteZipcode, OpenEveryday, ManagerUsername)
+        VALUES (%s, %s, %s, %s, %s)
         """
-    response = _cursor.execute(query % (name, address, zip, everyday, manager))
+    response = _cursor.execute(query,(name, address, zip, everyday, manager))
     _database.commit();
 
 def removesite(name):
     query = """
         DELETE FROM site
-        WHERE SiteName = '%s'
+        WHERE SiteName = %s
         """
-    response = _cursor.execute(query % (name))
+    response = _cursor.execute(query ,(name))
     _database.commit();
 
 

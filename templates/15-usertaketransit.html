@@ -68,16 +68,46 @@
             </div>
         </form>
 
-        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_user_take_transit/log_transit" method="post" enctype="multipart/form-data">
+        <form class="form-group" align=center style="width:80%; min-width:600px" action="/to_user_take_transit/log_transit" method="post" enctype="multipart/form-data">
             <!-- results table -->
             <div align=center style="margin:20px">
                 <table class="table table-striped">
+                    <thead>
                 <tr>
-                    <th>Route</th>
-                    <th>Transport Type</th>
-                    <th>Price</th>
-                    <th># Connected Sites</th>
+                    <td>Route
+                    </td>
+                    <td>Transport Type
+                            <button type="submit" class="btn btn-default btn-xs" aria-label="Left Align" name="TransitType" value="TransitType ASC">
+                  <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                </button>
+                <button type="submit" class="btn btn-default btn-xs" aria-label="Left Align" name="TransitType" value="TransitType DESC">
+                  <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                </button>
+
+                    </td>
+
+                    <td>Price
+                         <button type="submit" class="btn btn-default btn-xs" aria-label="Left Align" name="price" value="Price ASC">
+                  <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                </button>
+                <button type="submit" class="btn btn-default btn-xs" aria-label="Left Align" name="price" value="Price DESC">
+                  <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                </button>
+
+                    </td>
+                    <td># Connected Sites
+                          <button type="submit" class="btn btn-default btn-xs" aria-label="Left Align" name="ConnectedSites" value="ConnectedSites ASC">
+                  <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                </button>
+                <button type="submit" class="btn btn-default btn-xs" aria-label="Left Align" name="price" value="ConnectedSites DESC">
+                  <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                </button>
+
+                    </td>
+                    
+                    
                 </tr>
+                </thead>
 
                 {% for transit in transits %}
                 <tr>

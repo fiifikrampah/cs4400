@@ -24,7 +24,7 @@ def main():
 
     # return manage_profile();
 
-    #return manage_user();
+    # return manage_user();
     #return manage_site();
     #return create_site();
     #return manage_transit();
@@ -993,6 +993,17 @@ def create_event():
         type = request.form["type"]
         price = request.form["price"]
 
+
+@app.route("/to_manage_staff", methods=['POST','GET'])
+def manage_staff():
+    response = getSiteNames();
+    siteNameList = []
+    for item in response:
+        site={}
+        site['SiteName'] = item[0]
+        siteNameList.append(site)
+
+        
 
 
 
