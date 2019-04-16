@@ -15,28 +15,21 @@ Reminders of tasks - Nicholas:
     ERROR: TemplateNotFound: 11-manvisitfunc.html
 3. text inputs in forms should not submit the form when enter is pressed
 
-screen16-
-    -filter by dates
-
-screen17-
-    -visitor account is correctly checked when screen is loaded
-    -update visitor when update button is pressed
-
 screen18-
     -replace 'Employee' in the results table with the specific employee type that user is, and ensure filter works accordingly
     -approve button
     -decline button
 
-screen19-
-    -edit button
+screen22, 23, 24-
     -delete button
 
-screen21-
-    -create button
+screen23-
+    -we need a cascade or something so that when the route name is changed, it also gets changed in the taketransit and
+        connect tables
 
-screen22-
+screen25-
+    -not all events show up like they should, my guess is that this is caused when the events don't have attendees?
+        results will not show events that have total visits = 0 (because they won't be counted from taketransit and therefore
+        wont get joined)
     -edit button
     -delete button
-
-screen24-
-    -create button
