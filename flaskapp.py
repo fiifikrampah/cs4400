@@ -5,9 +5,11 @@ from flask import Flask, render_template, json, request, Response
 from decimal import Decimal
 
 app = Flask(__name__)
+
+#_logged_user = "david.smith"
+#_logged_userType = "Manager"
 _logged_user = "manager2"
 _logged_userType = "Manager, Visitor"
-
 
 @app.route('/')
 def main():
@@ -18,12 +20,13 @@ def main():
 
     #return user_take_transit();
     #return user_transit_history();
-    return manage_profile();
+    #return manage_profile();
     #return manage_user();
-    #return manage_site();
+    return manage_site();
     #return create_site();
     #return manage_transit();
     #return create_transit();
+    #return manage_event();
     return render_template('1-login.html', error = "")
 
 @app.route("/to_register_navigation")
@@ -252,18 +255,18 @@ def sign_in():
         _password = request.form["password"]
         # hash_password() --deprecated function
     	login_response = login(_name, _password)
-        emp_type = emptype_checker(_name)
+        print(login_response)
     	if login_response == 0:
             return render_template("1-login.html", error = "Cannot login, try again.")
         else:
-            _logged_user = name;
+            _logged_user = _name;
             if login_response in ['User', 'Employee', 'Employee, Visitor', 'Admin', 'Admin, Visitor', 'Manager', 'Manager, Visitor', 'Staff', 'Staff, Visitor', 'Visitor']:
                 _logged_userType = login_response;
                 return go_to_functionality_screen();
             else:
                 _logged_user = "";
                 _logged_userType = "";
-                return render_template("login_test-bootstrapped.html", error = "Cannot login, try again.")
+                return render_template("1-login.html", error = "Cannot login, try again.")
 
 @app.route("/back-button", methods = ['GET'])
 def go_to_functionality_screen():
@@ -428,8 +431,16 @@ def manage_profile():
         phone = request.form["phonenum"];
         visitor = request.form["isvisitor"];
 
+        global _logged_userType
+        _logged_userType = _logged_userType.replace(", Visitor", "");
+        usertype = "Employee"
+        print(visitor)
+        if(visitor == "1"):
+            _logged_userType = _logged_userType + ", Visitor";
+            usertype = usertype + ", Visitor";
+
         global _logged_user
-        update_employee(_logged_user, fname, lname, phone, visitor)
+        update_employee(_logged_user, fname, lname, phone, usertype)
 
     return manageProfileTemplate();
 
@@ -525,34 +536,76 @@ def manage_transit():
 
 @app.route("/to_manage_site", methods=['POST', 'GET'])
 def manage_site():
+    response = getSiteNames();
+    siteNameList = []
+    for item in response:
+        site={}
+        site['SiteName'] = item[0]
+        siteNameList.append(site)
+
+    response = getManagerNames();
+    managerList = []
+    for item in response:
+        manager={}
+        manager['Username']=item[0]
+        managerList.append(manager)
+
+    response = None
+
     if request.method == 'GET':
-        response = getSiteNames();
-        siteNameList = []
-        for item in response:
-            site={}
-            site['SiteName'] = item[0]
-            siteNameList.append(site)
-
-        response = getManagerNames();
-        managerList = []
-        for item in response:
-            manager={}
-            manager['Username']=item[0]
-            managerList.append(manager)
-
         response = getAllSites();
-        siteList = []
-        for item in response:
-            site={}
-            site['Name']=item[0]
-            site['Manager']=item[1]
-            site['OpenEveryday']=item[2]
-            siteList.append(site)
-
-        return render_template('19-adminmansite.html', siteNames=siteNameList, managers=managerList, sites=siteList)
 
     if request.method == 'POST':
-        print("someday")
+        site = request.form["site"]
+        manager = request.form["manager"]
+        everyday = request.form["everyday"]
+
+        response = getFilteredSites(site, manager, everyday)
+
+    siteList = []
+    for item in response:
+        site={}
+        site['Name']=item[0]
+        site['Manager']=item[1]
+        site['OpenEveryday']=item[2]
+        siteList.append(site)
+
+    return render_template('19-adminmansite.html', siteNames=siteNameList, managers=managerList, sites=siteList)
+
+@app.route("/to_manage_site/edit", methods=['POST'])
+def to_edit_site():
+    sitename = request.form["chosen_site"]
+    response = get_site_info(sitename);
+    item = response[0]
+
+    site = {}
+    site['SiteName'] = item[0]
+    site['SiteAddress'] = item[1]
+    site['SiteZipcode'] = item[2]
+    openeveryday = item[3]
+    currentManager = item[4]
+
+    response = getManagerNames();
+    managerList = []
+    for item in response:
+        manager={}
+        manager['Username']=item[0]
+        managerList.append(manager)
+
+    return render_template("20-admineditsite.html", site=site, managers=managerList, openeveryday=openeveryday, currentManager=currentManager)
+
+@app.route("/edit_site", methods=['POST'])
+def edit_site():
+    oldname = request.form["oldname"]
+    name = request.form["name"]
+    zip = request.form["zipcode"]
+    address = request.form["address"]
+    manager = request.form["manager"]
+    everyday = request.form["everyday"]
+
+    update_site(oldname, name, zip, address, manager, everyday)
+
+    return render_manage_sites();
 
 @app.route("/add_email", methods =['POST'])
 def add_email():
@@ -604,35 +657,33 @@ def log_transit():
 def create_site():
     if request.method == 'GET':
 
-        return render_template('21-admincreatesite.html')
-    if request.method == 'POST':
-        # TODO actually create the site
+        response = getUnassignedManagers();
 
-        # sends back to the manage sites page
-        response = getSiteNames();
-        siteNameList = []
-        for item in response:
-            site={}
-            site['SiteName'] = item[0]
-            siteNameList.append(site)
-
-        response = getManagerNames();
-        managerList = []
+        unassignedManagers = []
         for item in response:
             manager={}
             manager['Username']=item[0]
-            managerList.append(manager)
+            unassignedManagers.append(manager);
 
-        response = getAllSites();
-        siteList = []
-        for item in response:
-            site={}
-            site['Name']=item[0]
-            site['Manager']=item[1]
-            site['OpenEveryday']=item[2]
-            siteList.append(site)
+        return render_template('21-admincreatesite.html', managers=unassignedManagers)
+    if request.method == 'POST':
+        name = request.form["name"]
+        zip = request.form["zipcode"]
+        address = request.form["address"]
+        manager = request.form["manager"]
+        everyday = request.form["everyday"]
 
-        return render_template('19-adminmansite.html', siteNames=siteNameList, managers=managerList, sites=siteList)
+        add_site(name, address, zip, everyday, manager);
+
+        return render_manage_sites();
+
+@app.route("/delete_site", methods=['POST'])
+def delete_site():
+    name = request.form["chosen_site"]
+
+    removesite(name);
+
+    return render_manage_sites();
 
 @app.route("/to_create_transit", methods=['POST', 'GET'])
 def create_transit():
@@ -688,6 +739,33 @@ def create_transit():
 
         return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList)
 
+def render_manage_sites():
+    # sends back to the manage sites page
+    response = getSiteNames();
+    siteNameList = []
+    for item in response:
+        site={}
+        site['SiteName'] = item[0]
+        siteNameList.append(site)
+
+    response = getManagerNames();
+    managerList = []
+    for item in response:
+        manager={}
+        manager['Username']=item[0]
+        managerList.append(manager)
+
+    response = getAllSites();
+    siteList = []
+    for item in response:
+        site={}
+        site['Name']=item[0]
+        site['Manager']=item[1]
+        site['OpenEveryday']=item[2]
+        siteList.append(site)
+
+    return render_template('19-adminmansite.html', siteNames=siteNameList, managers=managerList, sites=siteList)
+
 @app.route("/remove_email", methods=['POST'])
 def delete_email():
     email = request.form["email"];
@@ -717,6 +795,11 @@ def manageProfileTemplate():
     phone=info[5]
     address=info[6] + ", " + info[7] + ", " + info[8] + " " + str(info[9])
 
+    isvisitor = "no"
+    global _logged_userType
+    if("Visitor" in _logged_userType):
+        isvisitor = "yes";
+
     response = get_employee_emails(_logged_user);
 
     emailList = []
@@ -725,7 +808,54 @@ def manageProfileTemplate():
         email['Email']=item[0];
         emailList.append(email);
 
-    return render_template('17-empmanageprofile.html', fname=fname, lname=lname, uname=uname, sname=sname, eid=eid, phone=phone, address=address, emails=emailList)
+    return render_template('17-empmanageprofile.html', fname=fname, lname=lname, uname=uname, sname=sname, eid=eid, phone=phone, address=address, emails=emailList, curvisitor=isvisitor)
+
+@app.route("/to_manage_event", methods=['POST', 'GET'])
+def manage_event():
+    global _logged_user
+    managed_site = getManagersSite(_logged_user)
+    response = None
+
+    if request.method == 'GET':
+        response = getAllEvents(managed_site)
+
+    if request.method == 'POST':
+        name = request.form["name"]
+        description = request.form["description"]
+        startdate = request.form["startdate"]
+        enddate = request.form["enddate"]
+        minduration = request.form["minduration"]
+        maxduration = request.form["maxduration"]
+        minvisits = request.form["minvisits"]
+        maxvisits = request.form["maxvisits"]
+        minrevenue = request.form["minrevenue"]
+        maxrevenue = request.form["maxrevenue"]
+
+        response = getFilteredEvents(managed_site, name, description, startdate, enddate, minduration, maxduration, minvisits, maxvisits, minrevenue, maxrevenue)
+
+    eventList=[];
+    for item in response:
+        event={}
+        event['EventName'] = item[0]
+        event['StaffCount'] = item[1]
+        event['StartDate'] = item[2]
+        event['Duration'] = item[3]
+        event['TotalVisits'] = item[4]
+        event['TotalRevenue'] = item[5]
+        eventList.append(event);
+
+    return render_template('25-managermanevent.html', events=eventList)
+
+@app.route("/to_create_event", methods=['POST', 'GET'])
+def create_event():
+    if request.method == 'GET':
+        response = getAvailableStaff();
+
+    if request.method == 'POST':
+        type = request.form["type"]
+        price = request.form["price"]
+
+
 
 
 

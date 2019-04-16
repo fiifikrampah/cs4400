@@ -19,7 +19,94 @@
 
 <title>Administrator Functionality</title>
 </head>
+<body>
+    <div align=center class="container-fluid" style="width:60%; min-width:600px">
+        <h1>Manage Event</h1>
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_manage_event" method="post" enctype="multipart/form-data">
+            <!-- contain site and transport type -->
+            <div class="row">
+                <div class="col-xs-5" align=left>
+                    <label for="name">Name</label>
+                    <input type="text" name="name">
+                </div>
+                <div class="col-xs-7" align=right>
+                    <label for="descrip">Description Keyword</label>
+                    <input type="text" name="description">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label for="stdate">Start Date</label>
+                    <input type="date" name="startdate">
+                </div>
+                <div class="col-xs-6" align=right>
+                    <label for="endate">End Date</label>
+                    <input type="date" name="enddate">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label for="dur">Duration</label>
+                    <input type="number" name="minduration" placeholder="min" min=0 step=1 style="width:40px;">
+                    <label for="--"> -- </label>
+                    <input type="number" name="maxduration" placeholder="max" min=0 step=1 style="width:40px;">
+                </div>
+                <div class="col-xs-6" align=right>
+                    <label for="dur">Total Visits Range</label>
+                    <input type="number" name="minvisits" placeholder="min" min=0 step=1 style="width:40px;">
+                    <label for="--"> -- </label>
+                    <input type="number" name="maxvisits" placeholder="max" min=0 step=1 style="width:40px;">
+                </div>
+            </div>
+            <div class="row" align=center>
+                <label for="dur">Total Revenue Range</label>
+                <input type="number" name="minrevenue" placeholder="min" min=0 step=1 style="width:40px;">
+                <label for="--"> -- </label>
+                <input type="number" name="maxrevenue" placeholder="max" min=0 step=1 style="width:40px;">
+            </div>
 
+            <button id="btnFilter" type="submit" style="width: 100px">Filter</a></button>
+        </form>
 
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_manage_event/edit" method="post" enctype="multipart/form-data">
+            <!-- table of site results -->
+            <div align=center style="margin:20px">
+                <table class="table table-striped">
+                <tr>
+                    <th>Name</th>
+                    <th>Staff Count</th>
+                    <th>Start Date</th>
+                    <th>Duration (days)</th>
+                    <th>Total Visits</th>
+                    <th>Total Revenue ($)</th>
+                </tr>
 
+                {% for event in events %}
+                <tr>
+                    <td><input type="radio" name="chosen_event" value="{{event}}" required> {{event.EventName}}</td>
+                    <td>{{event.StaffCount}}</td>
+                    <td>{{event.StartDate}}</td>
+                    <td>{{event.Duration}}</td>
+                    <td>{{event.TotalVisits}}</td>
+                    <td>{{event.TotalRevenue}}</td>
+                </tr>
+                {% endfor %}
+
+                </table>
+            </div>
+
+            <!-- create, edit, and delete buttons -->
+            <div class="row" align=center>
+                <button type="submit" style="width:100px">Edit</a></button>
+                <button type="submit" style="width:100px" href="/to_manage_site/delete">Delete</a></button>
+            </div>
+        </form>
+
+        <form action="/to_create_event">
+            <button type="submit">Create New Event</button>
+        </form>
+        <br>
+        <a class=" btn btn-default" href="/back-button" role="button">Back</a>
+
+    </div>
 </html>

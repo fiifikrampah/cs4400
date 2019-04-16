@@ -77,8 +77,13 @@
                     <label for="addressCurrent">{{address}}</label>
                 </div>
             </div>
-            <input type="hidden" name="isvisitor" value = "0">
+            {% if curvisitor == 'yes' -%}
+            <input type="checkbox" name="isvisitor" value="1" checked> Visitor Account</input>
+            <input type="hidden" name="isvisitor" value="0">
+            {% else -%}
             <input type="checkbox" name="isvisitor" value="1"> Visitor Account</input>
+            <input type="hidden" name="isvisitor" value="0">
+            {%- endif %}
             <br><br>
             <button id="btnSubmit" class="btn btn-lg btn-primary btn-block" style="width:100px" type="submit">Update</button>
         </form>

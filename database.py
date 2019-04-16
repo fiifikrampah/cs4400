@@ -50,7 +50,7 @@ def close_connection():
         _database.close()
         _connected = False
     print("********************************************\n" +
-          "*            Connection Closed            *\n" +
+          "*            Connection Closed             *\n" +
           "********************************************\n")
 
 # Function that checks if user is an admin
@@ -215,7 +215,7 @@ def getAllTransit():
 
 def getAllTransit2(user):
     queryTransit = """
-        SELECT TransitDate, TransitRoute, TransitType, TransitPrice
+        SELECT CAST(TransitDate AS DATE), TransitRoute, TransitType, TransitPrice
         FROM (
             SELECT TT.Username, TT.TransitDate, TT.TransitRoute, TT.TransitType, T.TransitPrice
             FROM taketransit AS TT
@@ -271,8 +271,12 @@ def getFilteredTransit(site, type, minPrice, maxPrice):
 def getFilteredTransit2(user, site, type, route, startDate, endDate):
     if(route == ""):
         route = "-ALL-"
+    if(startDate == ""):
+        startDate = "-ALL-"
+    if(endDate == ""):
+        endDate = "-ALL-"
     query = """
-        SELECT DISTINCT B.TransitDate, B.TransitRoute, B.TransitType, B.TransitPrice
+        SELECT DISTINCT CAST(B.TransitDate AS DATE), B.TransitRoute, B.TransitType, B.TransitPrice
         FROM (
             SELECT A.TransitDate, A.TransitRoute, A.TransitType, A.TransitPrice
             FROM (
@@ -295,10 +299,12 @@ def getFilteredTransit2(user, site, type, route, startDate, endDate):
             AND (C.SiteName = '%s' OR '%s' = '-ALL-')
             AND (A.TransitType = '%s' OR '%s' = '-ALL-')
             AND (A.TransitRoute = '%s' OR '%s' = '-ALL-')
+            AND (DATEDIFF(A.TransitDate, '%s') >= 0 OR '%s' = '-ALL-')
+            AND (DATEDIFF('%s', A.TransitDate) >= 0 OR '%s' = '-ALL-')
         ) AS B;
         """
         # add support for checking the dates
-    response = _cursor.execute(query % (user, site, site, type, type, route, route))
+    response = _cursor.execute(query % (user, site, site, type, type, route, route, startDate, startDate, endDate, endDate))
     return _cursor.fetchall();
 
 def logTransit(user, transit, date):
@@ -448,6 +454,16 @@ def getAllSites():
     response = _cursor.execute(query)
     return _cursor.fetchall();
 
+def getFilteredSites(site, manager, openeveryday):
+    query = """
+        SELECT SiteName, ManagerUsername, OpenEveryday
+        FROM site
+        WHERE (SiteName = '%s' OR '%s' = '-ALL-')
+        AND (ManagerUsername = '%s' OR '%s' = '-ALL-')
+        AND (OpenEveryday = '%s' OR '%s' = '-ALL-')
+        """
+    response = _cursor.execute(query % (site, site, manager, manager, openeveryday, openeveryday))
+    return _cursor.fetchall()
 
 def getAllTransitsM():
     query = """
@@ -520,11 +536,12 @@ def getFilteredTransitsM(site, type, route, minPrice, maxPrice):
         AND (D.TransitRoute = '%s' OR '%s' = '-ALL-')
         AND (D.TransitPrice >= %.1f OR %.1f = -1.0)
         AND (D.TransitPrice <= %.1f OR %.1f = -1.0);
+
         """
     response = _cursor.execute(query % (site, site, type, type, route, route, minPrice, minPrice, maxPrice, maxPrice))
     return _cursor.fetchall();
 
-def update_employee(user, fname, lname, phone, visitor):
+def update_employee(user, fname, lname, phone, usertype):
     query0 = """
         UPDATE allusers
         SET Firstname = '%s', Lastname = '%s'
@@ -541,9 +558,13 @@ def update_employee(user, fname, lname, phone, visitor):
     response = _cursor.execute(query1 % (phone, user))
     _database.commit();
 
-    # TODO UPDATE VISITOR
-    # visitor = 0 ... isVisitor = false
-    # visitor = 1 ... isVisitor = true
+    query2 = """
+        UPDATE allusers
+        SET UserType = '%s'
+        WHERE Username = '%s'
+        """
+    response = _cursor.execute(query2 % (usertype, user))
+    _database.commit();
 
 def deleteEmail(email):
     query = """
@@ -553,9 +574,159 @@ def deleteEmail(email):
     response = _cursor.execute(query % (email))
     _database.commit();
 
+def getManagersSite(manager):
+    query = """
+        SELECT SiteName
+        FROM site
+        WHERE ManagerUsername = '%s'
+        """
+    response = _cursor.execute(query % (manager))
+    return (_cursor.fetchone())[0]
 
+def getAllEvents(site):
+    query = """
+        SELECT E.EventName, E.StaffCount, E.StartDate, E.Duration, E.TotalVisits, (E.EventPrice*E.TotalVisits) AS TotalRevenue
+        FROM (
+            SELECT A.EventName, A.StartDate, A.SiteName, A.Duration, A.EventPrice, A.StaffCount, D.TotalVisits
+            FROM (
+                SELECT C.EventName, C.StartDate, C.SiteName, DATEDIFF(C.EndDate, C.StartDate) AS Duration, C.EventPrice, B.StaffCount
+                FROM event AS C
+                INNER JOIN (
+                    SELECT EventName, StartDate, SiteName, COUNT(*) As StaffCount
+                    FROM assignto
+                    GROUP BY EventName, StartDate, SiteName
+                ) AS B
+                ON C.EventName = B.EventName
+                WHERE C.StartDate = B.StartDate
+                AND C.SiteName = B.SiteName
+                AND C.SiteName = '%s'
+            ) AS A
+            INNER JOIN (
+                SELECT EventName, StartDate, SiteName, COUNT(*) AS TotalVisits
+                FROM visitevent
+                GROUP BY EventName, StartDate, SiteName
+            ) AS D
+            ON A.EventName = D.EventName
+            WHERE A.StartDate = D.StartDate
+            AND A.SiteName = D.SiteName
+        ) AS E
+        """
+    response = _cursor.execute(query % (site));
+    return _cursor.fetchall();
 
+def getFilteredEvents(site, ename, descr, sdate, edate, mindur, maxdur, minvis, maxvis, minrev, maxrev):
+    if(ename == ""):
+        ename = "-ALL-"
+    if(descr == ""):
+        descr = "-ALL-"
+    if(sdate == ""):
+        sdate = "-ALL-"
+    if(edate == ""):
+        edate = "-ALL-"
+    if(mindur == ""):
+        mindur = -1;
+    if(maxdur == ""):
+        maxdur = -1;
+    if(minvis == ""):
+        minvis = -1;
+    if(maxvis == ""):
+        maxvis = -1;
+    if(minrev == ""):
+        minrev = -1;
+    if(maxrev == ""):
+        maxrev = -1;
+    mindur = int(mindur)
+    maxdur = int(maxdur)
+    minvis = int(minvis)
+    maxvis = int(maxvis)
+    minrev = int(minrev)
+    maxrev = int(maxrev)
+    query = """
+        SELECT E.EventName, E.StaffCount, E.StartDate, E.Duration, E.TotalVisits, (E.EventPrice*E.TotalVisits) AS TotalRevenue
+        FROM (
+            SELECT A.EventName, A.StartDate, A.SiteName, A.Duration, A.EventPrice, A.StaffCount, D.TotalVisits, A.Description, A.EndDate
+            FROM (
+                SELECT C.EventName, C.StartDate, C.EndDate, C.SiteName, DATEDIFF(C.EndDate, C.StartDate) AS Duration, C.EventPrice, B.StaffCount, C.Description
+                FROM event AS C
+                INNER JOIN (
+                    SELECT EventName, StartDate, SiteName, COUNT(*) As StaffCount
+                    FROM assignto
+                    GROUP BY EventName, StartDate, SiteName
+                ) AS B
+                ON C.EventName = B.EventName
+                WHERE C.StartDate = B.StartDate
+                AND C.SiteName = B.SiteName
+                AND C.SiteName = '%s'
+            ) AS A
+            INNER JOIN (
+                SELECT EventName, StartDate, SiteName, COUNT(*) AS TotalVisits
+                FROM visitevent
+                GROUP BY EventName, StartDate, SiteName
+            ) AS D
+            ON A.EventName = D.EventName
+            WHERE A.StartDate = D.StartDate
+            AND A.SiteName = D.SiteName
+        ) AS E
+        WHERE (LOCATE('%s',E.Eventname) > 0 OR '%s' = '-ALL-')
+        AND (LOCATE('%s', E.Description) > 0 OR '%s' = '-ALL-')
+        AND ('%s' = '-ALL-' OR DATEDIFF(E.EndDate, '%s') >= 0)
+        AND ('%s' = '-ALL-' OR DATEDIFF('%s', E.StartDate) >= 0)
+        AND (E.Duration >= %d OR %d = -1)
+        AND (E.Duration <= %d OR %d = -1)
+        AND (E.TotalVisits >= %d OR %d = -1)
+        AND (E.TotalVisits <= %d OR %d = -1)
+        AND ((E.EventPrice*E.TotalVisits) >= %d OR %d = -1)
+        AND ((E.EventPrice*E.TotalVisits) <= %d OR %d = -1)
+        """
+    response = _cursor.execute(query % (site, ename, ename, descr, descr, sdate, sdate, edate, edate, mindur, mindur, maxdur, maxdur, minvis, minvis, maxvis, maxvis, minrev, minrev, maxrev, maxrev));
+    return _cursor.fetchall();
 
+def get_site_info(sitename):
+    query = """
+        SELECT *
+        FROM site
+        WHERE SiteName = '%s'
+        """
+    response = _cursor.execute(query % (sitename))
+    return _cursor.fetchall();
+
+def update_site(oldname, name, zip, address, manager, everyday):
+    query = """
+        UPDATE site
+        SET SiteName = '%s', SiteAddress = '%s', SiteZipcode = '%s', OpenEveryday = '%s', ManagerUsername = '%s'
+        WHERE Sitename = '%s';
+        """
+    response = _cursor.execute(query % (name, address, zip, everyday, manager, oldname));
+    _database.commit();
+
+def getUnassignedManagers():
+    query = """
+        SELECT Username
+        FROM employee
+        WHERE EmployeeType = 'Manager'
+        AND Username NOT IN (
+            SELECT ManagerUsername
+            FROM site
+        )
+        """
+    response = _cursor.execute(query)
+    return _cursor.fetchall();
+
+def add_site(name, address, zip, everyday, manager):
+    query = """
+        INSERT INTO site
+        VALUES ('%s', '%s', '%s', '%s', '%s')
+        """
+    response = _cursor.execute(query % (name, address, zip, everyday, manager))
+    _database.commit();
+
+def removesite(name):
+    query = """
+        DELETE FROM site
+        WHERE SiteName = '%s'
+        """
+    response = _cursor.execute(query % (name))
+    _database.commit();
 
 
 
