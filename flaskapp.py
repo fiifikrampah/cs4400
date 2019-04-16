@@ -6,10 +6,9 @@ from decimal import Decimal
 
 app = Flask(__name__)
 
-#_logged_user = "david.smith"
-#_logged_userType = "Manager"
-_logged_user = "manager2"
-_logged_userType = "Manager, Visitor"
+_logged_user = ""
+_logged_userType = ""
+
 
 @app.route('/')
 def main():
@@ -20,13 +19,24 @@ def main():
 
     #return user_take_transit();
     #return user_transit_history();
+
     #return manage_profile();
+
+    # return manage_profile();
+
     #return manage_user();
-    return manage_site();
+    #return manage_site();
     #return create_site();
     #return manage_transit();
     #return create_transit();
+
     #return manage_event();
+
+
+    #return transit_history();
+    # return take_transit();
+
+
     return render_template('1-login.html', error = "")
 
 @app.route("/to_register_navigation")
@@ -238,11 +248,11 @@ def to_login():
     """
     Takes user to login page after they click on sign out
     """
-    global logged_user
-    logged_user = ""
+    global _logged_user
+    _logged_user = ""
     return render_template("1-login.html", error = "")
 
-# This function signs the user in with given credentials
+# This function signs the user in with given credentials 
 # to the correct page based on their account type.
 # Makes call to python wrapper, and logs user in
 # or displays appropriate error message
@@ -255,44 +265,110 @@ def sign_in():
         _password = request.form["password"]
         # hash_password() --deprecated function
     	login_response = login(_name, _password)
-        print(login_response)
+# <<<<<<< HEAD
+#         print(login_response)
+# =======
+        
+
     	if login_response == 0:
+            global _logged_user
+            _logged_user = ""
             return render_template("1-login.html", error = "Cannot login, try again.")
         else:
-            _logged_user = _name;
-            if login_response in ['User', 'Employee', 'Employee, Visitor', 'Admin', 'Admin, Visitor', 'Manager', 'Manager, Visitor', 'Staff', 'Staff, Visitor', 'Visitor']:
-                _logged_userType = login_response;
-                return go_to_functionality_screen();
+# <<<<<<< HEAD
+#             _logged_user = _name;
+#             if login_response in ['User', 'Employee', 'Employee, Visitor', 'Admin', 'Admin, Visitor', 'Manager', 'Manager, Visitor', 'Staff', 'Staff, Visitor', 'Visitor']:
+#                 _logged_userType = login_response;
+#                 return go_to_functionality_screen();
+#             else:
+#                 _logged_user = "";
+#                 _logged_userType = "";
+#                 return render_template("1-login.html", error = "Cannot login, try again.")
+# =======
+            if login_response in ['User']:
+                _logged_user = _name
+                _logged_userType = login_response
+                print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType) 
+                return render_template("7-userfunc.html", error = "")
+            elif login_response in ['Visitor']:
+                _logged_user = _name
+                _logged_userType = login_response
+                print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                return render_template("14-visitorfunc.html", error = "")
+            elif login_response in ['Employee', 'Employee, Visitor', 'Admin', 'Admin, Visitor', 'Manager', 'Manager, Visitor', 'Staff', 'Staff, Visitor']:
+                emp_type = emptype_checker(_name)
+                _logged_userType = emp_type
+                if _logged_userType in ['Employee', 'Employee, Visitor']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("7-userfunc.html", error = "")
+                elif _logged_userType in ['Admin']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("8-adminfunc.html", error = "")
+                elif _logged_userType in ['Admin, Visitor']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("9-adminvisitfunc.html", error = "")
+                elif _logged_userType in ['Manager']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("10-manfunc.html", error = "")
+                elif _logged_userType in ['Manager, Visitor']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("11-manvisitfunc.html", error = "")
+                elif _logged_userType in ['Staff']:
+                    _logged_user = _name
+                    print "logged person is: %s" % _logged_user
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("12-stafffunc.html", error = "")
+                elif _logged_userType in ['Staff, Visitor']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("13-staffvisitfunc.html", error = "")
+                else:
+                    _logged_user = ""
+                    return render_template("1-login.html", error = "Username or password is incorrect, please try again.")
+
             else:
-                _logged_user = "";
-                _logged_userType = "";
+                _logged_user = ""
+                _logged_userType = ""
                 return render_template("1-login.html", error = "Cannot login, try again.")
+
+
 
 @app.route("/back-button", methods = ['GET'])
 def go_to_functionality_screen():
     if request.method == 'GET':
-        global _logged_userType
-        if _logged_userType in ['User']: #,'Employee', 'Employee, Visitor'
+        person = _logged_user
+        p_type = usertype_checker(_logged_user)
+
+        if p_type in ['Employee']:
+            emp_type = emptype_checker(_logged_user)
+            if emp_type in ['Admin']:
+                return render_template("8-adminfunc.html", error = "")
+            elif emp_type in ['Admin, Visitor']:
+                return render_template("9-adminvisitfunc.html", error = "")
+            elif emp_type in ['Manager']:
+                return render_template("10-manfunc.html", error = "")
+            elif emp_type in ['Manager, Visitor']:
+                return render_template("11-manvisitfunc.html", error = "")
+            elif emp_type in ['Staff']:
+                return render_template("12-stafffunc.html", error = "")
+            elif emp_type in ['Staff, Visitor']:
+                return render_template("13-staffvisitfunc.html", error = "")
+
+        elif p_type in ['User']:
+
             return render_template("7-userfunc.html", error = "")
-        elif _logged_userType in ['Admin']:
-            return render_template("8-adminfunc.html", error = "")
-        elif _logged_userType in ['Admin, Visitor']:
-            return render_template("9-adminvisitfunc.html", error = "")
-        elif _logged_userType in ['Manager']:
-            return render_template("10-manfunc.html", error = "")
-        elif _logged_userType in ['Manager, Visitor']:
-            return render_template("11-manvisitfunc.html", error = "")
-        elif _logged_userType in ['Staff']:
-            return render_template("12-stafffunc.html", error = "")
-        elif _logged_userType in ['Staff, Visitor']:
-            return render_template("13-staffvisitfunc.html", error = "")
-        elif _logged_userType in ['Visitor']:
+        elif p_type in ['Visitor']:
             return render_template("14-visitorfunc.html", error = "")
-        else:
-            return render_template("1-login.html", error = "Username or password is incorrect,please try again.")
+
 
 @app.route("/to_user_take_transit", methods=['POST', 'GET'])
 def user_take_transit():
+
     # getting the sites for the dropdown
     response = getSiteNames()
     siteList = []
@@ -301,6 +377,7 @@ def user_take_transit():
         site['SiteName'] = item[0]
         siteList.append(site)
 
+        
     # getting the transit types for the dropdown
     response = getTransitTypes()
     transitTypeList = []
@@ -343,6 +420,12 @@ def user_take_transit():
             transitList.append(transit);
 
         return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+
+        
+   
+
+
+
 
 @app.route("/to_user_transit_history", methods=['POST', 'GET'])
 def user_transit_history():
@@ -388,7 +471,7 @@ def user_transit_history():
         startDate = request.form["startdate"]
         endDate = request.form["enddate"]
 
-        global _logged_user
+        # global _logged_user
         response = getFilteredTransit2(_logged_user, site, transitType, route, startDate, endDate)
 
         transitList = []
@@ -396,7 +479,7 @@ def user_transit_history():
             transit={}
             transit['Date'] = item[0]
             transit['TransitRoute'] = item[1]
-            transit['TransitType'] = item[2];
+            transit['TransitType'] = item[2]
             transit['TransitPrice'] = item[3]
             transitList.append(transit);
 
@@ -425,6 +508,7 @@ def to_visitor_view_visit_history():
 
 @app.route("/to_manage_profile", methods=['POST', 'GET'])
 def manage_profile():
+
     if request.method == 'POST':
         fname = request.form["firstname"];
         lname = request.form["lastname"];
@@ -442,7 +526,45 @@ def manage_profile():
         global _logged_user
         update_employee(_logged_user, fname, lname, phone, usertype)
 
-    return manageProfileTemplate();
+    """
+    Takes user to manage profile page
+    """
+    return render_template('17-empmanageprofile.html', error="")
+
+
+# @app.route("/to_manage_user")
+# def manage_user():
+#     """
+#     Takes user to manage user page
+#     """
+#     return render_template('18-adminmanuser.html', error="")
+
+
+# @app.route("/to_manage_transit")
+# def manage_transit():
+#     """
+#     Takes user to manage transit page
+#     """
+#     return render_template('22-adminmantransit.html', error="")
+
+
+# @app.route("/to_manage_site")
+# def manage_site():
+#     """
+#     Takes user to manage site page
+#     """
+#     return render_template('19-adminmansite.html', error="")
+
+# FIIFI FIX THIS:
+# @app.route("/add_email", methods =['POST'])
+# def add_email():
+#     emails = request.get_json()
+#     # emails = request.get_json()
+#     print emails  
+
+
+#     return manageProfileTemplate();
+
 
 @app.route("/to_manage_user", methods=['POST', 'GET'])
 def manage_user():
@@ -466,6 +588,11 @@ def manage_user():
         status = request.form["status"]
 
         response = getFilteredUsersList(username, type, status)
+
+# IS THIS STILL NEEDED? 
+@app.route("/back", methods=['GET'])
+def backButton():
+
 
         userList=[]
         for item in response:
@@ -506,7 +633,9 @@ def manage_transit():
             transit = {}
             transit['TransitRoute'] = item[0]
             transit['TransitType'] = item[1]
+
             transit['TransitPrice'] = item[2]
+
             transit['ConnectedSites'] = item[3]
             transit['TransitLogged'] = item[4]
             transitList.append(transit)
@@ -527,7 +656,9 @@ def manage_transit():
             transit = {}
             transit['TransitRoute'] = item[0]
             transit['TransitType'] = item[1]
+
             transit['TransitPrice'] = item[2]
+
             transit['ConnectedSites'] = item[3]
             transit['TransitLogged'] = item[4]
             transitList.append(transit)
@@ -615,43 +746,50 @@ def add_email():
 
 @app.route("/to_user_take_transit/log_transit", methods=['POST'])
 def log_transit():
-    if request.method == 'POST':
-        transit = request.form["chosen_transit"]
-        date = request.form["dateLogged"]
+    try:
+        if request.method == 'POST':
+            transit = request.form["chosen_transit"]
+            date = request.form["dateLogged"]
 
-        global _logged_user
-        logTransit(_logged_user, transit, date)
-        # getting the sites for the dropdown
-        response = getSiteNames()
+            global _logged_user
+            logTransit(_logged_user, transit, date)
+            # getting the sites for the dropdown
+            response = getSiteNames()
 
-        siteList = []
-        for item in response:
-            site={}
-            site['SiteName'] = item[0]
-            siteList.append(site)
+            siteList = []
+            for item in response:
+                site={}
+                site['SiteName'] = item[0]
+                siteList.append(site)
 
-        # getting the transit types for the dropdown
-        response = getTransitTypes()
+            # getting the transit types for the dropdown
+            response = getTransitTypes()
 
-        transitTypeList = []
-        for item in response:
-            tType={}
-            tType['TransitType'] = item[0]
-            transitTypeList.append(tType)
+            transitTypeList = []
+            for item in response:
+                tType={}
+                tType['TransitType'] = item[0]
+                transitTypeList.append(tType)
 
-        # getting unfiltered transit when the page is first loaded
-        response = getAllTransit()
+            # getting unfiltered transit when the page is first loaded
+            response = getAllTransit()
 
-        transitList = []
-        for item in response:
-            transit={}
-            transit['TransitRoute'] = item[0]
-            transit['TransitType'] = item[1]
-            transit['Price'] = item[2];
-            transit['ConnectedSites'] = item[3]
-            transitList.append(transit);
+            transitList = []
+            for item in response:
+                transit={}
+                transit['TransitRoute'] = item[0]
+                transit['TransitType'] = item[1]
+                transit['Price'] = item[2];
+                transit['ConnectedSites'] = item[3]
+                transitList.append(transit);
 
-        return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+            return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+    except Exception as e:
+        print("---> " + str(e) + '\n')  # print exception message
+        if str(e)[1:5] == "1062":
+            # violates primary key constraint
+            return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList, transits=transitList, error= "Sorry that transit has already been logged for chosen date!")
+            
 
 @app.route("/to_create_site", methods=['POST', 'GET'])
 def create_site():
