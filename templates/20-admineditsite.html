@@ -22,19 +22,20 @@
 
 <body>
     <div align=center class="container-fluid" style="width:60%; min-width:600px">
-        <h1>Create Site</h1>
+        <h1>Edit Site</h1>
 
-        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_create_site" method="post" enctype="multipart/form-data">
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/edit_site" method="post" enctype="multipart/form-data">
 
             <!-- Name and Zipcode -->
             <div class="row">
                 <div class="col-xs-7" align=left>
                     <label for="name">Name</label>
-                    <input type="text" name="name" required autofocus>
+                    <input type="text" name="name" value="{{site.SiteName}}" required autofocus>
+                    <input type="hidden" name="oldname" value="{{site.SiteName}}">
                 </div>
                 <div class="col-xs-5" align=right>
                     <label for="zipcode">Zipcode</label>
-                    <input type="text" name="zipcode" required autofocus>
+                    <input type="number" name="zipcode" min=0 step=1 value="{{site.SiteZipcode}}" required autofocus>
                 </div>
             </div>
             <br>
@@ -45,7 +46,7 @@
                     <label for ="address">Address</label>
                 </div>
                 <div class="col-xs-10">
-                    <input type="test" name="address" style="width:100%" autofocus>
+                    <input type="test" name="address" value="{{site.SiteAddress}}" style="width:100%" autofocus>
                 </div>
             </div>
             <br>
@@ -55,18 +56,26 @@
                 <div class="col-xs-6" align=left>
                     <label for="manager">Manager</label>
                     <select name="manager">
+                        <option value="{{currentManager}}">{{currentManager}}</option>
                         {% for manager in managers %}
+                        {% if manager.Username|string() != currentManager %}
                         <option value="{{manager.Username}}">{{manager.Username}}</option>
+                        {% endif %}
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-xs-6" align=right>
+                    {% if openeveryday == 'YES' -%}
+                    <input type="checkbox" name="everyday" value="YES" checked autofocus> Open Everyday</input>
+                    <input type="hidden" name="everyday" value="NO">
+                    {% else -%}
                     <input type="checkbox" name="everyday" value="YES" autofocus> Open Everyday</input>
                     <input type="hidden" name="everyday" value="NO">
+                    {% endif %}
                 </div>
             </div>
             <br>
-            <button type="submit" style="width:100px">Create</a></button>
+            <button type="submit" style="width:100px">Update</a></button>
         </form>
 
         <a class=" btn btn-default" href="/to_manage_site" role="button">Back</a>

@@ -48,8 +48,8 @@
                 <label for="consites">Connected Sites</label>
             </div>
 
-            <div class="row" align=center>
-                <div style="width:250px">
+            <div class="row">
+                <div style="width:250px" align=left>
                     {% for site in sites %}
                     <input type="checkbox" name="{{site.SiteName}}"> {{site.SiteName}}</input>
                     <br>
