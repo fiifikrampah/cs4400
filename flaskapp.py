@@ -18,9 +18,9 @@ def main():
 
     #return user_take_transit();
     #return user_transit_history();
-    #return manage_profile();
+    return manage_profile();
     #return manage_user();
-    return manage_site();
+    #return manage_site();
     #return create_site();
     #return manage_transit();
     #return create_transit();
@@ -480,6 +480,7 @@ def to_visitor_view_visit_history():
 @app.route("/to_manage_profile", methods=['POST', 'GET'])
 def manage_profile():
 
+
     if request.method == 'POST':
         fname = request.form["firstname"];
         lname = request.form["lastname"];
@@ -739,9 +740,8 @@ def log_transit():
 @app.route("/to_create_site", methods=['POST', 'GET'])
 def create_site():
     if request.method == 'GET':
-
+        #gets managers who do not manage a site to populate managers list
         response = getUnassignedManagers();
-
         unassignedManagers = []
         for item in response:
             manager={}
@@ -749,7 +749,9 @@ def create_site():
             unassignedManagers.append(manager);
 
         return render_template('21-admincreatesite.html', managers=unassignedManagers)
+
     if request.method == 'POST':
+        #pulls the necessary information form the html form and adds to the database
         name = request.form["name"]
         zip = request.form["zipcode"]
         address = request.form["address"]
