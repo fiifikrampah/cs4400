@@ -29,12 +29,19 @@
                 <div class="col-xs-6" align=left>
                     <label for="site">Contain Site</label>
                     <select name="site">
+                        {% if filSite == '-ALL-' -%}
+                        <option value="-ALL-" selected="selected">-ALL-</option>
+                        {% else -%}
                         <option value="-ALL-">-ALL-</option>
+                        {%- endif %}
 
                         {% for site in sites %}
+                        {% if filSite == site.SiteName -%}
+                        <option value="{{site.SiteName}}" selected="selected">{{site.SiteName}}</option>
+                        {% else -%}
                         <option value="{{site.SiteName}}">{{site.SiteName}}</option>
+                        {%- endif %}
                         {% endfor %}
-
                     </select>
                 </div>
 
@@ -42,11 +49,19 @@
                     <label for="transtype">Transport Type</label>
                     <select name="transittype">
                         <option value="-ALL-">-ALL-</option>
+                        {% if filSite == '-ALL-' -%}
+                        <option value="-ALL-" selected="selected">-ALL-</option>
+                        {% else -%}
+                        <option value="-ALL-">-ALL-</option>
+                        {%- endif %}
 
                         {% for type in types %}
+                        {% if filType == type.TransitType -%}
+                        <option value="{{type.TransitType}}" selected="selected">{{type.TransitType}}</option>
+                        {% else -%}
                         <option value="{{type.TransitType}}">{{type.TransitType}}</option>
+                        {%- endif %}
                         {% endfor %}
-
                     </select>
                 </div>
             </div>
@@ -55,15 +70,15 @@
             <div class="row">
                 <div class="col-xs-4" align=left>
                     <label for="route">Route</label>
-                    <input type = "text" name="route"/>
+                    <input type = "text" name="route" value="{{filRoute}}"/>
                 </div>
                 <div class="col-xs-4" align=center>
                     <label for="sd">Start Date</label>
-                    <input type = "date" name="startdate"/>
+                    <input type = "date" name="startdate" value="{{filStDate}}"/>
                 </div>
                 <div class="col-xs-4" align=right>
                     <label for="ed">End Date</label>
-                    <input type = "date" name="enddate"/>
+                    <input type = "date" name="enddate" value="{{filEndDate}}"/>
                 </div>
 
             </div>
@@ -71,17 +86,43 @@
             <div class="row" align=center>
                 <button type="submit" name="filter">Filter</button>
             </div>
-        </form>
 
-        <p>
             <!-- results table -->
             <div align=center style="margin:20px">
                 <table class="table table-striped">
                 <tr>
-                    <th>Date</th>
-                    <th>Route</th>
-                    <th>TransportType</th>
-                    <th>Price</th>
+                    <th>Date
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitDate ASC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                        </button>
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitDate DESC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        </button>
+                    </th>
+                    <th>Route
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitRoute ASC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                        </button>
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitRoute DESC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        </button>
+                    </th>
+                    <th>TransportType
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitType ASC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                        </button>
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitType DESC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        </button>
+                    </th>
+                    <th>Price
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitPrice ASC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                        </button>
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitPrice DESC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        </button>
+                    </th>
                 </tr>
 
                 {% for transit in transits %}
@@ -95,12 +136,9 @@
 
                 </table>
             </div>
-        </table>
-        </p>
+        </form>
 
-
-    <p> <button type="back"><a href="/back-button">Back</a></button>
-    </p>
+    <button type="back"><a href="/back-button">Back</a></button>
 </div>
 
 </body>

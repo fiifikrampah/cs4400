@@ -30,10 +30,18 @@
                 <div class="col-xs-6" align=right>
                     <label for="Sname">Site</label>
                     <select name="site">
+                        {% if filSite == '-ALL-' -%}
+                        <option value="-ALL-" selected="selected">-ALL-</option>
+                        {% else -%}
                         <option value="-ALL-">-ALL-</option>
+                        {%- endif %}
 
                         {% for site in siteNames %}
+                        {% if filSite == site.SiteName -%}
+                        <option value="{{site.SiteName}}" selected="selected">{{site.SiteName}}</option>
+                        {% else -%}
                         <option value="{{site.SiteName}}">{{site.SiteName}}</option>
+                        {%- endif %}
                         {% endfor %}
                     </select>
                 </div>
@@ -41,10 +49,18 @@
                 <div class="col-xs-6" align=left>
                     <label for="man">Manager</label>
                     <select name="manager">
+                        {% if filMan == '-ALL-' -%}
+                        <option value="-ALL-" selected="selected">-ALL-</option>
+                        {% else -%}
                         <option value="-ALL-">-ALL-</option>
+                        {%- endif %}
 
                         {% for manager in managers %}
+                        {% if filMan == manager.Username -%}
+                        <option value="{{manager.Username}}" selected="selected">{{manager.Username}}</option>
+                        {% else -%}
                         <option value="{{manager.Username}}">{{manager.Username}}</option>
+                        {%- endif %}
                         {% endfor %}
                     </select>
                 </div>
@@ -54,25 +70,57 @@
                 <div class="col-xs-12" align=center>
                     <label for="eryday">Open Everyday</label>
                     <select name="everyday">
+                        {% if filEvery == '-ALL-' -%}
+                        <option value="-ALL-" selected="selected">-ALL-</option>
+                        {% else -%}
                         <option value="-ALL-">-ALL-</option>
-                        <option value="No">No</option>
+                        {%- endif %}
+
+                        {% if filEvery == 'Yes' -%}
+                        <option value="Yes" selected="selected">Yes</option>
+                        {% else -%}
                         <option value="Yes">Yes</option>
+                        {%- endif %}
+
+                        {% if filEvery == 'No' -%}
+                        <option value="No" selected="selected">No</option>
+                        {% else -%}
+                        <option value="No">No</option>
+                        {%- endif %}
                     </select>
                 </div>
             </div>
             <br>
 
-            <button id="btnFilter" type="submit" style="width: 100px">Filter</a></button>
-        </form>
-
-        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_manage_site/edit" method="post" enctype="multipart/form-data">
+            <button id="btnFilter" type="submit" style="width: 100px" formnovalidate>Filter</a></button>
             <!-- table of site results -->
             <div align=center style="margin:20px">
                 <table class="table table-striped">
                 <tr>
-                    <th>Name</th>
-                    <th>Manager</th>
-                    <th>Open Everyday</th>
+                    <th>Name
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="SiteName ASC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                        </button>
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="SiteName DESC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        </button>
+                    </th>
+                    <th>Manager
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="ManagerUsername ASC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                        </button>
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="ManagerUsername DESC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        </button>
+                    </th>
+                    <th>Open Everyday
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="OpenEveryday ASC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                        </button>
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="OpenEveryday DESC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        </button>
+                    </th>
                 </tr>
 
                 {% for site in sites %}
@@ -85,17 +133,13 @@
 
                 </table>
             </div>
-
+            <br>
             <!-- create, edit, and delete buttons -->
             <div class="row" align=center>
-                <button type="submit" value="Edit" style="width:100px">Edit</button>
-                <button type="submit" value="Delete" formaction="/delete_site" style="width:100px">Delete</button>
+                <button type="submit" value="Create" style="width:150px"formaction="/to_create_site" formnovalidate formmethod="get">Create New Site</button>
+                <button type="submit" value="Edit" style="width:150px" formaction="/to_edit_site">Edit</button>
+                <button type="submit" value="Delete" style="width:150px"formaction="/delete_site">Delete</button>
             </div>
-        </form>
-
-        <form action="/to_create_site">
-            <button type="submit" >Create New Site</button>
-        </form>
 
         <br>
         <a class=" btn btn-default" href="/back-button" role="button">Back</a>

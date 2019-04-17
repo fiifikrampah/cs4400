@@ -30,11 +30,11 @@
             <div class="row">
                 <div class="col-xs-7" align=left>
                     <label for="name">Name</label>
-                    <input type="text" name="name" required autofocus>
+                    <input type="text" name="name" value="{{filName}}" required autofocus>
                 </div>
                 <div class="col-xs-5" align=right>
                     <label for="zipcode">Zipcode</label>
-                    <input type="number" name="zipcode" min=0 step=1 required autofocus>
+                    <input type="number" name="zipcode" min=0 step=1 value="{{filZip}}" required autofocus>
                 </div>
             </div>
             <br>
@@ -45,7 +45,7 @@
                     <label for ="address">Address</label>
                 </div>
                 <div class="col-xs-10">
-                    <input type="test" name="address" style="width:100%" autofocus>
+                    <input type="test" name="address" value="{{filAdd}}" style="width:100%" autofocus>
                 </div>
             </div>
             <br>
@@ -56,13 +56,22 @@
                     <label for="manager">Manager</label>
                     <select name="manager">
                         {% for manager in managers %}
+                        {% if filMan == manager.Username -%}
+                        <option value="{{manager.Username}}" selected="selected">{{manager.Username}}</option>
+                        {% else -%}
                         <option value="{{manager.Username}}">{{manager.Username}}</option>
+                        {%- endif %}
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-xs-6" align=right>
+                    {% if openeveryday == 'Yes' -%}
+                    <input type="checkbox" name="everyday" value="YES" checked autofocus> Open Everyday</input>
+                    <input type="hidden" name="everyday" value="NO">
+                    {% else -%}
                     <input type="checkbox" name="everyday" value="YES" autofocus> Open Everyday</input>
                     <input type="hidden" name="everyday" value="NO">
+                    {% endif %}
                 </div>
             </div>
             <br>

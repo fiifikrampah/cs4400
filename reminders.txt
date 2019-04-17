@@ -8,12 +8,9 @@ Reminders of tasks - Fiifi:
 
 
 Reminders of tasks - Nicholas:
-1. buttons in the table headers to sort by that column criteria (for example on screen 15)
-    - the sorting needs to be done with sql, not using javascript
 2. none of the back buttons work, for some reason the render_template doesn't recognized the html files?
     (for example:)
     ERROR: TemplateNotFound: 11-manvisitfunc.html
-3. text inputs in forms should not submit the form when enter is pressed
 
 screen18-
     -replace 'Employee' in the results table with the specific employee type that user is, and ensure filter works accordingly
