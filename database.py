@@ -466,92 +466,111 @@ def getSites19(site, manager, openeveryday, sort):
     response = _cursor.execute(query % (site, site, manager, manager, openeveryday, openeveryday, sort))
     return _cursor.fetchall()
 
-def getFilteredTransitsM(site, type, route, minPrice, maxPrice):
-    if(minPrice == ""):
+def getTransit22(site, type, route, minPrice, maxPrice, sort):
+    if(site is None):
+        site="-ALL-"
+    if(type is None):
+        type="-ALL-"
+    if(minPrice == "" or minPrice is None):
         minPrice = -1
-    if(maxPrice == ""):
+    if(maxPrice == "" or maxPrice is None):
         maxPrice = -1
-    if(route == ""):
+    if(route == "" or route is None):
         route = "-ALL-"
+    if(sort is None):
+        sort = "TransitRoute ASC"
     minPrice = float(minPrice)
     maxPrice = float(maxPrice)
     query = """
-        SELECT DISTINCT D.TransitRoute, D.TransitType, D.TransitPrice, D.ConnectedCount, D.LoggedCount
+        SELECT DISTINCT Z.Transitroute, Z.TransitType, Z.TransitPrice, Z.ConnectedSites, Z.TransitsLogged
         FROM (
-            SELECT C.TransitRoute, C.TransitType, C.TransitPrice, C.ConnectedCount, F.LoggedCount, C.SiteName
+            SELECT D.TransitRoute, D.TransitType, D.TransitPrice, D.ConnectedCount AS ConnectedSites, D.LoggedCount AS TransitsLogged, D.SiteName
             FROM (
-                SELECT B.TransitRoute, B.TransitType, B.TransitPrice, B.ConnectedCount, A.SiteName
+                SELECT C.TransitRoute, C.TransitType, C.TransitPrice, C.ConnectedCount, F.LoggedCount, C.SiteName
                 FROM (
-                    SELECT T.TransitRoute, T.TransitType, T.TransitPrice, E.ConnectedCount
-                    FROM transit AS T
+                    SELECT B.TransitRoute, B.TransitType, B.TransitPrice, B.ConnectedCount, A.SiteName
+                    FROM (
+                        SELECT T.TransitRoute, T.TransitType, T.TransitPrice, E.ConnectedCount
+                        FROM transit AS T
+                        INNER JOIN (
+                            SELECT TransitRoute, TransitType, COUNT(*) AS ConnectedCount
+                            FROM connect
+                            GROUP BY TransitRoute, TransitType
+                        ) AS E
+                        ON E.TransitRoute = T.TransitRoute
+                        WHERE E.TransitType = T.TransitType
+                    ) AS B
                     INNER JOIN (
-                        SELECT TransitRoute, TransitType, COUNT(*) AS ConnectedCount
+                        SELECT TransitRoute, TransitType, SiteName
+                        FROM connect
+                    ) AS A
+                    ON B.TransitRoute = A.TransitRoute
+                    WHERE B.TransitType = A.TransitType
+                ) AS C
+                INNER JOIN (
+                    SELECT TransitRoute, TransitType, COUNT(*) AS LoggedCount
+                    FROM taketransit
+                    GROUP BY TransitRoute, TransitType
+                ) AS F
+                ON F.TransitRoute = C.TransitRoute
+                WHERE F.TransitType = C.TransitType
+            ) AS D
+
+            UNION
+
+            SELECT K.TransitRoute, K.TransitType, K.TransitPrice, K.ConnectedSites, K.TransitsLogged, J.SiteName
+            FROM (
+                SELECT I.TransitRoute, I.TransitType, I.TransitPrice, I.ConnectedCount AS ConnectedSites, 0 AS TransitsLogged
+                FROM (
+                    SELECT G.TransitRoute, G.TransitType, G.TransitPrice, H.ConnectedCount
+                    FROM transit AS G
+                    INNER JOIN (
+                        SELECT TransitRoute, TransitType, Count(*) AS ConnectedCount
                         FROM connect
                         GROUP BY TransitRoute, TransitType
-                    ) AS E
-                    ON E.TransitRoute = T.TransitRoute
-                    WHERE E.TransitType = T.TransitType
-                ) AS B
-                INNER JOIN (
-                    SELECT TransitRoute, TransitType, SiteName
-                    FROM connect
-                ) AS A
-                ON B.TransitRoute = A.TransitRoute
-                WHERE B.TransitType = A.TransitType
-            ) AS C
+                    ) AS H
+                    ON G.TransitRoute = H.TransitRoute
+                    WHERE G.TransitType = H.TransitType
+                    AND NOT EXISTS (
+                        SELECT TransitRoute, TransitType
+                        FROM taketransit AS J
+                        WHERE J.TransitRoute = G.TransitRoute
+                        AND J.TransitType = G.TransitType
+                    )
+                ) AS I
+            ) AS K
             INNER JOIN (
-                SELECT TransitRoute, TransitType, COUNT(*) AS LoggedCount
-                FROM taketransit
-                GROUP BY TransitRoute, TransitType
-            ) AS F
-            ON F.TransitRoute = C.TransitRoute
-            WHERE F.TransitType = C.TransitType
-        ) AS D
-        WHERE (D.SiteName = '%s' OR '%s' = '-ALL-')
-        AND (D.TransitType = '%s' OR '%s' = '-ALL-')
-        AND (D.TransitRoute = '%s' OR '%s' = '-ALL-')
-        AND (D.TransitPrice >= %.1f OR %.1f = -1.0)
-        AND (D.TransitPrice <= %.1f OR %.1f = -1.0)
-
-        UNION
-
-        SELECT DISTINCT I.TransitRoute, I.TransitType, I.TransitPrice, I.ConnectedCount, 0 AS LoggedCount
-        FROM (
-            SELECT G.TransitRoute, G.TransitType, G.TransitPrice, H.ConnectedCount
-            FROM transit AS G
-            INNER JOIN (
-                SELECT TransitRoute, TransitType, Count(*) AS ConnectedCount
+                SELECT TransitRoute, TransitType, SiteName
                 FROM connect
-                GROUP BY TransitRoute, TransitType
-            ) AS H
-            ON G.TransitRoute = H.TransitRoute
-            WHERE G.TransitType = H.TransitType
-            AND NOT EXISTS (
-                SELECT TransitRoute, TransitType
-                FROM taketransit AS J
-                WHERE J.TransitRoute = G.TransitRoute
-                AND J.TransitType = G.TransitType
-            )
-        ) AS I
+            ) AS J
+            ON K.TransitRoute = J.TransitRoute
+            WHERE K.TransitType = J.TransitType
+        )AS Z
+        WHERE (Z.SiteName = '%s' OR '%s' = '-ALL-')
+        AND (Z.TransitType = '%s' OR '%s' = '-ALL-')
+        AND (Z.TransitRoute = '%s' OR '%s' = '-ALL-')
+        AND (Z.TransitPrice >= %.1f OR %.1f = -1.0)
+        AND (Z.TransitPrice <= %.1f OR %.1f = -1.0)
+        ORDER BY %s
         """
-    response = _cursor.execute(query % (site, site, type, type, route, route, minPrice, minPrice, maxPrice, maxPrice))
+    response = _cursor.execute(query % (site, site, type, type, route, route, minPrice, minPrice, maxPrice, maxPrice, sort))
     return _cursor.fetchall();
 
 def update_employee(user, fname, lname, phone, visitor):
     query0 = """
         UPDATE allusers
-        SET Firstname = '%s', Lastname = '%s'
-        WHERE Username = '%s';
+        SET Firstname = %s, Lastname = %s
+        WHERE Username = %s;
         """
-    response = _cursor.execute(query0 % (fname, lname, user))
+    response = _cursor.execute(query0, (fname, lname, user))
     _database.commit();
 
     query1 = """
         UPDATE employee
-        SET Phone = '%s'
-        WHERE Username = '%s';
+        SET Phone = %s
+        WHERE Username = %s;
         """
-    response = _cursor.execute(query1 % (phone, user))
+    response = _cursor.execute(query1, (phone, user))
     _database.commit();
 
     # TODO UPDATE VISITOR
@@ -578,10 +597,10 @@ def get_site_info(sitename):
 def update_site(oldname, name, zip, address, manager, everyday):
     query = """
         UPDATE site
-        SET SiteName = '%s', SiteAddress = '%s', SiteZipcode = '%s', OpenEveryday = '%s', ManagerUsername = '%s'
-        WHERE Sitename = '%s';
+        SET SiteName = %s, SiteAddress = %s, SiteZipcode = %s, OpenEveryday = %s, ManagerUsername = %s
+        WHERE Sitename = %s;
         """
-    response = _cursor.execute(query % (name, address, zip, everyday, manager, oldname));
+    response = _cursor.execute(query, (name, address, zip, everyday, manager, oldname));
     _database.commit();
 
 def getUnassignedManagers():
@@ -600,9 +619,9 @@ def getUnassignedManagers():
 def add_site(name, address, zip, everyday, manager):
     query = """
         INSERT INTO site
-        VALUES ('%s', '%s', '%s', '%s', '%s')
+        VALUES (%s, %s, %s, %s, %s)
         """
-    response = _cursor.execute(query % (name, address, zip, everyday, manager))
+    response = _cursor.execute(query, (name, address, zip, everyday, manager))
     _database.commit();
 
 def removesite(name):
@@ -613,6 +632,100 @@ def removesite(name):
     response = _cursor.execute(query % (name))
     _database.commit();
 
+def set_transit(type, oldroute, route, price):
+    query = """
+        UPDATE transit
+        SET TransitRoute = %s, TransitPrice = %s
+        WHERE (TransitType = %s AND TransitRoute = %s)
+        """
+    response = _cursor.execute(query, (route, price, type, oldroute));
+    _database.commit();
+
+def change_transit_connections(type, oldroute, route, sites):
+    query = """
+        DELETE FROM connect
+        WHERE TransitType = '%s'
+        AND TransitRoute = '%s'
+        """
+    response = _cursor.execute(query % (type, oldroute));
+    _database.commit();
+
+    queryAdd = """
+        INSERT INTO connect
+        VALUES (%s, %s, %s)
+        """
+    for site in sites:
+        responseAdd = _cursor.execute(queryAdd, (site, type, route))
+        _database.commit()
+
+def createtransit(type, route, price, sites):
+    query0 = """
+        INSERT INTO transit
+        VALUES (%s, %s, %s)
+        """
+    response0 = _cursor.execute(query0, (type, route, price))
+    _database.commit();
+
+    query2 = """
+        DELETE FROM connect
+        WHERE TransitType = '%s'
+        AND TransitRoute = '%s'
+        """
+    response2 = _cursor.execute(query2 % (type, route))
+    _database.commit()
+
+    query1 = """
+        INSERT INTO connect
+        VALUES (%s, %s, %s)
+        """
+    for site in sites:
+        response1 = _cursor.execute(query1, (site['SiteName'], type, route))
+        _database.commit();
+
+def deletetransit(type, route):
+    query = """
+        DELETE FROM transit
+        WHERE TransitType = '%s'
+        AND TransitRoute = '%s'
+        """
+    response = _cursor.execute(query % (type, route))
+    _database.commit()
+
+    query = """
+        DELETE FROM connect
+        WHERE TransitType = '%s'
+        AND TransitRoute = '%s'
+        """
+    response = _cursor.execute(query % (type, route))
+    _database.commit()
+
+    query = """
+        DELETE FROM taketransit
+        WHERE TransitType = '%s'
+        AND TransitRoute = '%s'
+        """
+    response = _cursor.execute(query % (type, route))
+    _database.commit()
+
+def get_connected_sites(route, type):
+    query = """
+        SELECT SiteName
+        FROM connect
+        WHERE TransitType = '%s'
+        AND TransitRoute = '%s'
+        """
+    response = _cursor.execute(query % (type, route));
+    return _cursor.fetchall();
+
+def change_transit_history(type, oldroute, route):
+    query = """
+        UPDATE taketransit
+        SET TransitRoute = %s
+        WHERE TransitType = %s
+        AND TransitRoute = %s
+        """
+    response = _cursor.execute(query, (route, type, oldroute))
+    _database.commit();
 
 # DEPRECATED FUNCTIONS
 # def getAllTransit():

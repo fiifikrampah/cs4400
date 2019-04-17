@@ -30,17 +30,25 @@
                     <label for="type">Transport Type</label>
                     <select name="type">
                         {% for type in types %}
+                        {% if filType == type.TransitType -%}
+                        <option value="{{type.TransitType}}" selected="selected">{{type.TransitType}}</option>
+                        {% else -%}
                         <option value="{{type.TransitType}}">{{type.TransitType}}</option>
+                        {%- endif %}
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-xs-4" align=center>
                     <label for="route">Route</label>
-                    <input type="text" name="route" style="width:100px" required autofocus>
+                    <input type="text" name="route" style="width:100px" value="{{filRoute}}" required autofocus>
                 </div>
                 <div class="col-xs-3" align=right>
                     <label for="price">Price</label>
+                    {% if filPrice == -1 -%}
                     <input type="number" name="price" min=0 step=0.1 style="width:40px;" required autofocus>
+                    {% else -%}
+                    <input type="number" name="price" min=0 step=0.1 style="width:40px;" value="{{filPrice}}" required autofocus>
+                    {%- endif %}
                 </div>
             </div>
 
@@ -51,8 +59,15 @@
             <div class="row" align=center>
                 <div style="width:250px">
                     {% for site in sites %}
-                    <input type="checkbox" name="{{site.SiteName}}"> {{site.SiteName}}</input>
+                    {% if site in filSite -%}
+                    <input type="checkbox" name="{{site.SiteName}}" value="Yes" checked> {{site.SiteName}}</input>
+                    <input type="hidden" name="{{site.SiteName}}" value="No"/>
                     <br>
+                    {% else -%}
+                    <input type="checkbox" name="{{site.SiteName}}" value="Yes"> {{site.SiteName}}</input>
+                    <input type="hidden" name="{{site.SiteName}}" value="No"/>
+                    <br>
+                    {%- endif %}
                     {% endfor %}
                 </div>
             </div>
