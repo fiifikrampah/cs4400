@@ -20,9 +20,9 @@ def main():
     #return to_user_transit_history();
     #return to_manage_profile();
     #return manage_user();
-    return manage_site();
+    #return manage_site();
     #return create_site();
-    #return manage_transit();
+    return manage_transit();
     #return create_transit();
     #return manage_event();
     return render_template('1-login.html', error = "")
@@ -315,10 +315,13 @@ def sign_in():
 def go_to_functionality_screen():
     if request.method == 'GET':
 
+        global _logged_user
         person = _logged_user
+        print(person)
         p_type = usertype_checker(_logged_user)
+        print(p_type)
 
-        if p_type in ['Employee']:
+        if p_type in ['Employee', 'Employee, Visitor']:
             emp_type = emptype_checker(_logged_user)
             if emp_type in ['Admin']:
                 return render_template("8-adminfunc.html", error = "")
@@ -862,12 +865,11 @@ def delete_site():
 
 
 
-#SCREEN
+#SCREENS 22-24
 @app.route("/to_manage_transit", methods=['POST', 'GET'])
 def manage_transit():
     # getting the sites for the dropdown
     response = getSiteNames()
-
     siteList = []
     for item in response:
         site={}
@@ -876,7 +878,6 @@ def manage_transit():
 
     # getting the transit types for the dropdown
     response = getTransitTypes()
-
     transitTypeList = []
     for item in response:
         tType={}
@@ -884,21 +885,19 @@ def manage_transit():
         transitTypeList.append(tType)
 
     if request.method == 'GET':
-        response = getAllTransitsM();
-
+        response = getTransit22(None, None, None, None, None, None);
         transitList=[]
         for item in response:
             transit = {}
             transit['TransitRoute'] = item[0]
             transit['TransitType'] = item[1]
-
             transit['TransitPrice'] = item[2]
-
             transit['ConnectedSites'] = item[3]
             transit['TransitLogged'] = item[4]
             transitList.append(transit)
 
-        return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+        return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList,
+                filType="-ALL-", filSite="-ALL-", filRoute="", filMinPr=-1, filMaxPr=-1)
 
     if request.method == 'POST':
         site = request.form["site"]
@@ -906,9 +905,20 @@ def manage_transit():
         route = request.form["route"]
         minPrice = request.form["minPrice"]
         maxPrice = request.form["maxPrice"]
+        sort = ""
+        try:
+            sort = request.form["sort"]
+        except:
+            sort = None
 
-        response = getFilteredTransitsM(site, type, route, minPrice, maxPrice);
+        if(minPrice == ""):
+            minPrice = -1
+        if(maxPrice == ""):
+            maxPrice = -1
+        minPrice = float(minPrice)
+        maxPrice = float(maxPrice)
 
+        response = getTransit22(site, type, route, minPrice, maxPrice, sort);
         transitList=[]
         for item in response:
             transit = {}
@@ -921,8 +931,8 @@ def manage_transit():
             transit['TransitLogged'] = item[4]
             transitList.append(transit)
 
-        return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList)
-
+        return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList,
+                filType=type, filSite=site, filRoute=route, filMinPr=minPrice, filMaxPr=maxPrice)
 
 @app.route("/to_create_transit", methods=['POST', 'GET'])
 def create_transit():
@@ -941,31 +951,48 @@ def create_transit():
         transitTypeList.append(tType)
 
     if request.method == 'GET':
-        return render_template("24-admincreatetransit.html", sites=siteNameList, types=transitTypeList)
+        return render_template("24-admincreatetransit.html", sites=siteNameList, types=transitTypeList,
+                filType="", filRoute="", filPrice=-1, filSite=[])
 
     if request.method == 'POST':
         # TODO actually create the site
+        type = request.form["type"]
+        route = request.form["route"]
+        price = request.form["price"]
+
+        if(price == ""):
+            price = -1
+        price = float(price)
 
         # getting the sites for the dropdown
         response = getSiteNames()
-
+        selectedSites = []
         siteList = []
         for item in response:
             site={}
             site['SiteName'] = item[0]
             siteList.append(site)
 
+            #gets which sites were selected
+            included = request.form[item[0]]
+            if(included == "Yes"):
+                selectedSites.append(site)
+
+        createtransit(type, route, price, selectedSites)
+
+        # TODO if it errors
+        # return render_template("24-admincreatetransit.html", sites=siteNameList, types=transitTypeList,
+        #         filType=type, filRoute=route, filPrice=price, filSite=selectedSites)
+
         # getting the transit types for the dropdown
         response = getTransitTypes()
-
         transitTypeList = []
         for item in response:
             tType={}
             tType['TransitType'] = item[0]
             transitTypeList.append(tType)
 
-        response = getAllTransitsM();
-
+        response = getTransit22(None, None, None, None, None, None);
         transitList=[]
         for item in response:
             transit = {}
@@ -976,9 +1003,125 @@ def create_transit():
             transit['TransitLogged'] = item[4]
             transitList.append(transit)
 
-        return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList)
+        return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList,
+                filType="-ALL-", filSite="-ALL-", filRoute="", filMinPr=-1, filMaxPr=-1)
 
+@app.route("/to_edit_transit", methods=['POST'])
+def to_edit_transit():
+    transit = request.form["chosen_transit"]
+    transit = transit.replace("{", "").replace("}", "")
+    fields = transit.split(", ")
 
+    route = ""
+    ttype = ""
+    price = -1.0
+
+    for field in fields:
+        if(len(field) >= 14 and field[0:14]=="'TransitRoute'"):
+            strings = field.split(": ")
+            route = strings[1][1:len(strings[1])-1]
+        if(len(field) >= 13 and field[0:13]=="'TransitType'"):
+            strings = field.split(": ")
+            ttype = strings[1][1:len(strings[1])-1]
+        if(len(field) >= 14 and field[0:14]=="'TransitPrice'"):
+            strings = field.split(": ")
+            price = float(strings[1][0:len(strings[1])])
+
+    response = get_connected_sites(route, ttype)
+    connectedSites = []
+    for item in response:
+        site = {}
+        site['SiteName'] = item[0]
+        connectedSites.append(site)
+
+    response = getSiteNames()
+    siteNameList = []
+    for item in response:
+        site={}
+        site['SiteName'] = item[0]
+        siteNameList.append(site)
+
+    return render_template("23-adminedittransit.html", route=route, ttype=ttype, tprice=price,
+            connectedSites=connectedSites, sites=siteNameList)
+
+@app.route("/edit_transit", methods=['POST'])
+def edit_transit():
+    type = request.form["type"]
+    oldroute = request.form["oldroute"]
+    route = request.form["route"]
+    price = request.form["price"]
+    price = float(price)
+
+    response = getSiteNames()
+    siteList = []
+    for item in response:
+        site={}
+        site['SiteName'] = item[0]
+        siteList.append(site)
+
+    connectedSites = []
+    for site in siteList:
+        selected = request.form[site['SiteName']]
+        if(selected == "1"):
+            connectedSites.append(site['SiteName'])
+
+    change_transit_connections(type, oldroute, route, connectedSites)
+    set_transit(type, oldroute, route, price)
+    change_transit_history(type, oldroute, route)
+
+    return render_manage_transit();
+
+@app.route("/delete_transit", methods=['POST'])
+def delete_transit():
+    transit = request.form["chosen_transit"]
+    transit = transit.replace("{", "").replace("}", "")
+    fields = transit.split(", ")
+
+    route = ""
+    ttype = ""
+
+    for field in fields:
+        if(len(field) >= 14 and field[0:14]=="'TransitRoute'"):
+            strings = field.split(": ")
+            route = strings[1][1:len(strings[1])-1]
+        if(len(field) >= 13 and field[0:13]=="'TransitType'"):
+            strings = field.split(": ")
+            ttype = strings[1][1:len(strings[1])-1]
+
+    deletetransit(ttype, route)
+
+    return render_manage_transit()
+
+def render_manage_transit():
+    # getting the sites for the dropdown
+    response = getSiteNames()
+    siteList = []
+    for item in response:
+        site={}
+        site['SiteName'] = item[0]
+        siteList.append(site)
+
+    # getting the transit types for the dropdown
+    response = getTransitTypes()
+    transitTypeList = []
+    for item in response:
+        tType={}
+        tType['TransitType'] = item[0]
+        transitTypeList.append(tType)
+
+    response = getTransit22(None, None, None, None, None, None);
+    transitList=[]
+    for item in response:
+        transit = {}
+        transit['TransitRoute'] = item[0]
+        transit['TransitType'] = item[1]
+        transit['TransitPrice'] = item[2]
+        transit['ConnectedSites'] = item[3]
+        transit['TransitLogged'] = item[4]
+        transitList.append(transit)
+
+    return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList,
+            filType="-ALL-", filSite="-ALL-", filRoute="", filMinPr=-1, filMaxPr=-1)
 
 
 
