@@ -395,8 +395,8 @@ def get_usertype(Username):
     query = "SELECT UserType FROM allusers WHERE Username= %s"
     response = _cursor.execute(query, (Username))
     return(_cursor.fetchone())[0]
-    
-    
+
+
 
 
 def get_employee_info(user):
@@ -478,6 +478,16 @@ def getAllSites():
     response = _cursor.execute(query)
     return _cursor.fetchall();
 
+def getFilteredSites(site, manager, openeveryday):
+    query = """
+        SELECT SiteName, ManagerUsername, OpenEveryday
+        FROM site
+        WHERE (SiteName = '%s' OR '%s' = '-ALL-')
+        AND (ManagerUsername = '%s' OR '%s' = '-ALL-')
+        AND (OpenEveryday = '%s' OR '%s' = '-ALL-')
+        """
+    response = _cursor.execute(query % (site, site, manager, manager, openeveryday, openeveryday))
+    return _cursor.fetchall()
 
 def getAllTransitsM():
     query = """
@@ -583,7 +593,52 @@ def deleteEmail(email):
     response = _cursor.execute(query % (email))
     _database.commit();
 
+def get_site_info(sitename):
+    query = """
+        SELECT *
+        FROM site
+        WHERE SiteName = '%s'
+        """
+    response = _cursor.execute(query % (sitename))
+    return _cursor.fetchall();
 
+def update_site(oldname, name, zip, address, manager, everyday):
+    query = """
+        UPDATE site
+        SET SiteName = '%s', SiteAddress = '%s', SiteZipcode = '%s', OpenEveryday = '%s', ManagerUsername = '%s'
+        WHERE Sitename = '%s';
+        """
+    response = _cursor.execute(query % (name, address, zip, everyday, manager, oldname));
+    _database.commit();
+
+def getUnassignedManagers():
+    query = """
+        SELECT Username
+        FROM employee
+        WHERE EmployeeType = 'Manager'
+        AND Username NOT IN (
+            SELECT ManagerUsername
+            FROM site
+        )
+        """
+    response = _cursor.execute(query)
+    return _cursor.fetchall();
+
+def add_site(name, address, zip, everyday, manager):
+    query = """
+        INSERT INTO site
+        VALUES ('%s', '%s', '%s', '%s', '%s')
+        """
+    response = _cursor.execute(query % (name, address, zip, everyday, manager))
+    _database.commit();
+
+def removesite(name):
+    query = """
+        DELETE FROM site
+        WHERE SiteName = '%s'
+        """
+    response = _cursor.execute(query % (name))
+    _database.commit();
 
 
 
