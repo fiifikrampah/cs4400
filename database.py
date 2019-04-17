@@ -232,8 +232,6 @@ def getAllTransit():
 
 
 
-def getAllTransitASC():
-    
 
 def getAllTransit2(user):
     queryTransit = """
