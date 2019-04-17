@@ -47,7 +47,7 @@
 
     <label for="pword">Password</label>
     <input type="password" name="password" id="pword" class="form-control" placeholder="Password" required autofocus>
-    <br> 
+    <br>
 
     <label for="cpword">Confirm Password</label>
     <input type="password" name="confirm_password" id="cpword" class="form-control" placeholder="Confirm Password" required autofocus>
@@ -56,7 +56,7 @@
 
 
     <label for="phone">Phone</label>
-    <input type="text" name="phone" id="phone" class="form-control" placeholder="###-###-####" required autofocus>
+    <input type="number" name="phone" id="phone" class="form-control" placeholder="###-###-####" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required autofocus>
     <br>
 
      <label for="address">Address</label>
@@ -124,7 +124,7 @@
   <br>
 
    <label for="zipcode">Zipcode</label>
-    <input type="text" pattern="[0-9]{5}" name="zipcode" id="zipcode" class="form-control" placeholder="Zipcode" required autofocus>
+    <input type="number" pattern="[0-9]{5}" name="zipcode" id="zipcode" class="form-control" placeholder="Zipcode" required autofocus>
     <br>
 
 <!-- fix: allow multiple emails -->
