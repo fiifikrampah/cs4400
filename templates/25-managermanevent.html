@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta http-equiv="Content-Language" content="en">
     <meta charset="UTF-8">
 
     <!-- Latest compiled and minified CSS -->
@@ -17,9 +18,148 @@
 
     <!--<script src="../Scripts/login.js"></script>-->
 
-<title>Administrator Functionality</title>
+<title>Manage Event</title>
 </head>
 
+<body>
+    <div align=center class="container-fluid">
+        <h1>Manage Event</h1>
 
+        <form class="form-group" align=center style="width:80%; min-width:900px" action="/to_manage_event" method="post" enctype="multipart/form-data">
+            <!-- contain site and transport type -->
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label for="name">Name</label>
+                    <input type="text" name="name" value="{{filName}}"/>
+                </div>
+                <div class="col-xs-6" align=right>
+                    <label for="key">Descr. Keyword</label>
+                    <input type="text" name="keyword" value="{{filKey}}"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label for="sd">Start Date</label>
+                    <input type="date" name="startDate" value="{{filStDate}}"/>
+                </div>
+                <div class="col-xs-6" align=right>
+                    <label for="ed">End Date</label>
+                    <input type="date" name="endDate" value="{{filEndDate}}"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label for="duran">Duration Range</label>
+                    {% if filDurMin == -1 -%}
+                    <input type="number" name="durMin" min="0" step="1" style="width:50px"/>
+                    {% else -%}
+                    <input type="number" name="durMin" min="0" step="1" value="{{filDurMin}}" style="width:50px"/>
+                    {%- endif %}
+                    <label for="gap">--</label>
 
+                    {% if filDurMax == -1 -%}
+                    <input type="number" name="durMax" min="0" step="1" style="width:50px"/>
+                    {% else -%}
+                    <input type="number" name="durMax" min="0" step="1" value="{{filDurMax}}" style="width:50px"/>
+                    {%- endif %}
+                </div>
+                <div class="col-xs-6" align=right>
+                    <label for="vis">Total Visits Range</label>
+                    {% if filVisMin == -1 -%}
+                    <input type="number" name="visMin" min="0" step="1" style="width:50px"/>
+                    {% else -%}
+                    <input type="number" name="visMin" min="0" step="1" value="{{filVisMin}}" style="width:50px"/>
+                    {%- endif %}
+
+                    <label for="gap">--</label>
+                    {% if filVisMax == -1 -%}
+                    <input type="number" name="visMax" min="0" step="1" style="width:50px"/>
+                    {% else -%}
+                    <input type="number" name="visMax" min="0" step="1" value="{{filVisMax}}" style="width:50px"/>
+                    {%- endif %}
+                </div>
+            </div>
+            <div class="row" align=left>
+                <label for="vis">Total Revenue Range</label>
+                {% if filRevMin == -1 -%}
+                <input type="number" name="revMin" min="0" step="1" style="width:50px"/>
+                {% else -%}
+                <input type="number" name="revMin" min="0" step="1" value="{{filRevMin}}" style="width:50px"/>
+                {%- endif %}
+
+                <label for="gap">--</label>
+                {% if filRevMax == -1 -%}
+                <input type="number" name="revMax" min="0" step="1" style="width:50px"/>
+                {% else -%}
+                <input type="number" name="revMax" min="0" step="1" value="{{filRevMax}}" style="width:50px"/>
+                {%- endif %}
+            </div>
+            <button type="submit" style="width: 100px" formnovalidate>Filter</a></button>
+
+            <!-- results table -->
+            <div align=center style="margin:20px">
+                <table class="table table-striped">
+                    <tr>
+                        <th>Name
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="EventName ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="EventName DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                        <th>Staff Count
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="StaffCount ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="StaffCount DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                        <th>Duration (days)
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="Duration ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="Duration DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                        <th>Total Visits
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TotalVisits ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TotalVisits DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                        <th>Total Revenue ($)
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TotalRevenue ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TotalRevenue DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                    </tr>
+
+                    {% for event in events %}
+                    <tr>
+                        <td><input type="radio" name="chosen_transit" value="{{event}}" required> {{event.EventName}}</td>
+                        <td>{{event.StaffCount}}</td>
+                        <td>{{event.Duration}}</td>
+                        <td>{{event.TotalVisits}}</td>
+                        <td>{{event.TotalRevenue}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <div class="row" align=center>
+                <button type="submit" value="Create" style="width:150px"formaction="/to_create_event" formnovalidate formmethod="get">Create New Event</button>
+                <button type="submit" value="Edit" style="width:150px" formaction="/to_edit_event">Edit</button>
+                <button type="submit" value="Delete" style="width:150px"formaction="/delete_event">Delete</button>
+            </div>
+        </form>
+    </div>
+</body>
 </html>

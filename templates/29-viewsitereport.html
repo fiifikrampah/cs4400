@@ -19,7 +19,111 @@
 
 <title>Administrator Functionality</title>
 </head>
+<body>
+    <div align=center class="container-fluid">
+        <h1>Site Report</h1>
 
+        <form class="form-group" align=center style="width:80%; min-width:900px" action="/to_manage_transit" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label for="sd">Start Date</label>
+                    <input type="date" name="stDate" value="{{stDate}}" required>
+                </div>
+                <div class="col-xs-6" align=right>
+                    <label for="ed">End Date</label>
+                    <input type="date" name="endDate" value="{{endDate}}" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label for="ecr">Event Count Range</label>
+                    <input type="number" name="eCountMin" min="0" step="1" value="{{eCountMin}}" required>
+                    <label for="do">--</label>
+                    <input type="number" name="ecCountMax" min="0" value="{{eCountMax}}" required>
+                </div>
+                <div class="col-xs-6" align=right>
+                    <label for="scr">Staff Count Range</label>
+                    <input type="number" name="sCountMin" min="0" value="{{stCountMin}}" required>
+                    <label for="tvo">--</label>
+                    <input type="number" name="sCountMax" min="0" value="{{stCountMax}}" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label for="tvr">Total Visits Range</label>
+                    <input type="number" name="toVisMin" min="0" value="{{toVisMin}}" required>
+                    <label for="dot">--</label>
+                    <input type="number" name="toVisMax" min="0" value="{{toVisMax}}" required>
+                </div>
+                <div class="col-xs-6" align=right>
+                    <label for="trr">Total Revenue Range</label>
+                    <input type="number" name="toRevMin" min="0" value="{{toRevMin}}" required>
+                    <label for="tro">--</label>
+                    <input type="number" name="toRevMax" min="0" value="{{toRevMax}}" required>
+                </div>
+            </div>
+            <div class="row">
+                <button type="submit" style="width: 150px">Filter</a></button>
+                <button type="submit" style="width: 150px">Daily Detail</a></button>
+            </div>
 
+            <div align=center style="margin:20px">
+                <table class="table table-striped">
+                    <tr>
+                        <th>Date
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitRoute ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitRoute DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                        <th>Event Count
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitType ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitType DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                        <th>Staff Count
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitPrice ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitPrice DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                        <th>Total Visits
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="ConnectedSites ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="ConnectedSites DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                        <th>Total Revenue
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="ConnectedSites ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="ConnectedSites DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                    </tr>
+
+                    {% for site in sites %}
+                    <tr>
+                        <td><input type="radio" name="chosen_transit" value="{{site.SiteName}}" required> {{transit.TransitRoute}}</td>
+                        <td>{{transit.TransitType}}</td>
+                        <td>{{transit.Price}}</td>
+                        <td>{{transit.ConnectedSites}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </form>
+    </div>
+</body>
 
 </html>

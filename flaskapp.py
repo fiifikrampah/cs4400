@@ -22,9 +22,10 @@ def main():
     #return manage_user();
     #return manage_site();
     #return create_site();
-    return manage_transit();
+    #return manage_transit();
     #return create_transit();
     #return manage_event();
+    return to_manage_event();
     return render_template('1-login.html', error = "")
 
 @app.route("/to_register_navigation")
@@ -1069,6 +1070,24 @@ def edit_transit():
     set_transit(type, oldroute, route, price)
     change_transit_history(type, oldroute, route)
 
+    # TODO error handling
+    # response = get_connected_sites(route, ttype)
+    # connectedSites = []
+    # for item in response:
+    #     site = {}
+    #     site['SiteName'] = item[0]
+    #     connectedSites.append(site)
+    #
+    # response = getSiteNames()
+    # siteNameList = []
+    # for item in response:
+    #     site={}
+    #     site['SiteName'] = item[0]
+    #     siteNameList.append(site)
+    #
+    # return render_template("23-adminedittransit.html", route=route, ttype=type, tprice=price,
+    #         connectedSites=connectedSites, sites=siteNameList)
+
     return render_manage_transit();
 
 @app.route("/delete_transit", methods=['POST'])
@@ -1122,6 +1141,139 @@ def render_manage_transit():
 
     return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList,
             filType="-ALL-", filSite="-ALL-", filRoute="", filMinPr=-1, filMaxPr=-1)
+
+@app.route("/to_viewsitereport.html", methods=['POST', 'GET'])
+def to_view_site_report():
+    if request.method == 'GET':
+        sites=[]
+        render_template("29-viewsitereport.html", sites=sites, stDate="", endDate="", eCountMin=-1, eCountMax=-1,
+                stCountMin=-1, stCountMax=-1, toVisMin=-1, toVisMax=-1, toRevMin=-1, toRevMax=-1)
+    if request.method == 'POST':
+        stDate = request.form["stDate"]
+        endDate = request.form["endDate"]
+        eCountMin = request.form["eCountMin"]
+        eCountMax = request.form["eCountMax"]
+        stCountMin = request.form["stCountMin"]
+        stCountMax = request.form["stCountMax"]
+        toVisMin = request.form["toVisMin"]
+        toVisMax = request.form["toVisMax"]
+        toRevMin = request.form["toRevMin"]
+        toRevMax = request.form["toRevMax"]
+
+        if(eCountMin == ""):
+            eCountMin = -1
+        if(eCountMax == ""):
+            eCountMax = -1
+        if(stCountMin == ""):
+            stCountMin = -1
+        if(stCountMax == ""):
+            stCountMax = -1
+        if(toVisMin == ""):
+            toVisMin = -1
+        if(toVisMax == ""):
+            toVisMax = -1
+        if(toRevMin == ""):
+            toRevMin = -1;
+        if(toRevMax == ""):
+            toRevMax = -1;
+        eCountMin = float(eCountMin)
+        eCountMax = float(eCountMax)
+        stCountMin = float(stCountMin)
+        stCountMax = float(stCountMax)
+        toVisMin = float(toVisMin)
+        toVisMax = float(tovisMax)
+        toRevMin = float(toRevMin)
+        toRevMax = float(toRevMax)
+
+
+
+#SCREENS 25-27
+@app.route("/to_manage_event", methods=['POST', 'GET'])
+def to_manage_event():
+    if request.method == 'GET':
+        global _logged_user
+        site = getManagersSite(_logged_user)
+        response = getEvents25(site, None, None, None, None, None, None, None, None, None, None, None)
+        eventList = []
+        for item in response:
+            event={}
+            event['EventName'] = item[0]
+            event['StaffCount'] = item[1]
+            event['Duration'] = item[2]
+            event['TotalVisits'] = item[3]
+            event['TotalRevenue'] = item[4]
+            eventList.append(event)
+
+        return render_template("25-managermanevent.html", events=eventList, filName="", filKey="", filStDate="",
+                filEndDate="", filDurMin=-1, filDurMax=-1, filVisMin=-1, filVisMax=-1,
+                filRevMin=-1, filRevMax=-1)
+
+    if request.method == 'POST':
+        name = request.form["name"]
+        descr = request.form["keyword"]
+        startDate = request.form["startDate"]
+        endDate = request.form["endDate"]
+        mindur = request.form["durMin"]
+        maxdur = request.form["durMax"]
+        minvis = request.form["visMin"]
+        maxvis = request.form["visMax"]
+        minrev = request.form["revMin"]
+        maxrev = request.form["revMax"]
+        sort = ""
+        try:
+            sort = request.form["sort"]
+        except:
+            sort = None
+
+        if(mindur == "" or mindur is None):
+            mindur = -1;
+        if(maxdur == "" or maxdur is None):
+            maxdur = -1;
+        if(minvis == "" or minvis is None):
+            minvis = -1;
+        if(maxvis == "" or maxvis is None):
+            maxvis = -1;
+        if(minrev == "" or minrev is None):
+            minrev = -1;
+        if(maxrev == "" or maxrev is None):
+            maxrev = -1;
+        mindur = int(mindur)
+        maxdur = int(maxdur)
+        minvis = int(minvis)
+        maxvis = int(maxvis)
+        minrev = int(minrev)
+        maxrev = int(maxrev)
+
+        global _logged_user
+        site = getManagersSite(_logged_user)
+        response = getEvents25(site, name, descr, startDate, endDate, mindur, maxdur,
+                minvis, maxvis, minrev, maxrev, sort)
+        eventList = []
+        for item in response:
+            event={}
+            event['EventName'] = item[0]
+            event['StaffCount'] = item[1]
+            event['Duration'] = item[2]
+            event['TotalVisits'] = item[3]
+            event['TotalRevenue'] = item[4]
+            eventList.append(event)
+
+        return render_template("25-managermanevent.html", events=eventList, filName=name,
+                filKey=descr, filStDate=startDate, filEndDate=endDate, filDurMin=mindur,
+                filDurMax=maxdur, filVisMin=minvis, filVisMax=maxvis,
+                filRevMin=minrev, filRevMax=maxrev)
+
+@app.route("/to_create_event", methods=['POST', 'GET'])
+def create_event():
+    if request.method == 'GET':
+        print("hey")
+    if request.method == 'POST':
+        print("hey")
+
+
+
+
+
 
 
 
