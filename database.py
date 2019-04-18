@@ -727,6 +727,153 @@ def change_transit_history(type, oldroute, route):
     response = _cursor.execute(query, (route, type, oldroute))
     _database.commit();
 
+def get_site_report(stDate, endDate, eCountMin, eCountMax, stCountMin, stCountMax, toVisMin, toVisMax, toRevMin, toRevMax, sort):
+    if(eCountMin == "" or eCountMin is None):
+        eCountMin = -1
+    if(eCountMax == "" or eCountMax is None):
+        eCountMax = -1
+    if(stCountMin == "" or stCountMin is None):
+        stCountMin = -1
+    if(stCountMax == "" or stCountMax is None):
+        stCountMax = -1
+    if(toVisMin == "" or toVisMin is None):
+        toVisMin = -1
+    if(toVisMax == "" or toVisMax is None):
+        toVisMax = -1
+    if(toRevMin == "" or toRevMin is None):
+        toRevMin = -1;
+    if(toRevMax == "" or toRevMax is None):
+        toRevMax = -1;
+    eCountMin = float(eCountMin)
+    eCountMax = float(eCountMax)
+    stCountMin = float(stCountMin)
+    stCountMax = float(stCountMax)
+    toVisMin = float(toVisMin)
+    toVisMax = float(tovisMax)
+    toRevMin = float(toRevMin)
+    toRevMax = float(toRevMax)
+
+    query = """
+        SELECT B.ReportDate, B.TotalVisits
+        FROM (
+            SELECT ReportDate, SUM(Visits) AS TotalVisits
+            FROM (
+                SELECT VisitSiteDate AS ReportDate, COUNT(*) AS Visits
+                FROM visitsite
+                WHERE SiteName = '%s'
+                GROUP BY VisitSiteDate
+
+                UNION
+
+                SELECT VisitEventDate AS ReportDate, COUNT(*) AS Visits
+                FROM visitevent
+                WHERE SiteName = '%s'
+                GROUP BY VisitEventDate
+            ) AS A
+            GROUP BY ReportDate
+        ) AS B
+        ON B.VisitEventDate = A.VisitSiteDate
+        INNER JOIN (
+            SELECT EventName, StartDate, EndDate, COUNT()
+            FROM event
+            WHERE SiteName = '%s'
+        )
+        """
+
+def getManagersSite(manager):
+    query = """
+        SELECT SiteName
+        FROM site
+        WHERE ManagerUsername = '%s'
+        """
+    response = _cursor.execute(query % (manager))
+    return (_cursor.fetchone())[0]
+
+def getEvents25(site, ename, descr, sdate, edate, mindur, maxdur, minvis, maxvis, minrev, maxrev, sort):
+    if(ename == "" or ename is None):
+        ename = "-ALL-"
+    if(descr == "" or descr is None):
+        descr = "-ALL-"
+    if(sdate == "" or sdate is None):
+        sdate = "-ALL-"
+    if(edate == "" or edate is None):
+        edate = "-ALL-"
+    if(mindur == "" or mindur is None):
+        mindur = -1;
+    if(maxdur == "" or maxdur is None):
+        maxdur = -1;
+    if(minvis == "" or minvis is None):
+        minvis = -1;
+    if(maxvis == "" or maxvis is None):
+        maxvis = -1;
+    if(minrev == "" or minrev is None):
+        minrev = -1;
+    if(maxrev == "" or maxrev is None):
+        maxrev = -1;
+    if(sort == "" or sort is None):
+        sort = "EventName ASC"
+    mindur = int(mindur)
+    maxdur = int(maxdur)
+    minvis = int(minvis)
+    maxvis = int(maxvis)
+    minrev = int(minrev)
+    maxrev = int(maxrev)
+    query = """
+        SELECT EventName, StaffCount, Duration, TotalVisits, TotalRevenue
+        FROM (
+            SELECT E.EventName, E.StaffCount, E.StartDate, E.Duration, E.TotalVisits, (E.EventPrice*E.TotalVisits) AS TotalRevenue
+            FROM (
+                SELECT A.EventName, A.StartDate, A.SiteName, A.Duration, A.EventPrice, A.StaffCount, D.TotalVisits, A.Description, A.EndDate
+                FROM (
+                    SELECT C.EventName, C.StartDate, C.EndDate, C.SiteName, DATEDIFF(C.EndDate, C.StartDate) AS Duration, C.EventPrice, B.StaffCount, C.Description
+                    FROM event AS C
+                    INNER JOIN (
+                        SELECT EventName, StartDate, SiteName, COUNT(*) As StaffCount
+                        FROM assignto
+                        GROUP BY EventName, StartDate, SiteName
+                    ) AS B
+                    ON C.EventName = B.EventName
+                    WHERE C.StartDate = B.StartDate
+                    AND C.SiteName = B.SiteName
+                    AND C.SiteName = '%s'
+                ) AS A
+                INNER JOIN (
+                    SELECT EventName, StartDate, SiteName, COUNT(*) AS TotalVisits
+                    FROM visitevent
+                    GROUP BY EventName, StartDate, SiteName
+                ) AS D
+                ON A.EventName = D.EventName
+                WHERE A.StartDate = D.StartDate
+                AND A.SiteName = D.SiteName
+            ) AS E
+            WHERE (LOCATE('%s',E.Eventname) > 0 OR '%s' = '-ALL-')
+            AND (LOCATE('%s', E.Description) > 0 OR '%s' = '-ALL-')
+            AND ('%s' = '-ALL-' OR DATEDIFF(E.EndDate, '%s') >= 0)
+            AND ('%s' = '-ALL-' OR DATEDIFF('%s', E.StartDate) >= 0)
+            AND (E.Duration >= %d OR %d = -1)
+            AND (E.Duration <= %d OR %d = -1)
+            AND (E.TotalVisits >= %d OR %d = -1)
+            AND (E.TotalVisits <= %d OR %d = -1)
+            AND ((E.EventPrice*E.TotalVisits) >= %d OR %d = -1)
+            AND ((E.EventPrice*E.TotalVisits) <= %d OR %d = -1)
+        ) AS Z
+        ORDER BY %s
+        """
+    response = _cursor.execute(query % (site, ename, ename, descr, descr, sdate,
+        sdate, edate, edate, mindur, mindur, maxdur, maxdur, minvis, minvis, maxvis,
+        maxvis, minrev, minrev, maxrev, maxrev, sort));
+    return _cursor.fetchall();
+
+
+
+
+
+
+
+
+
+
+
 # DEPRECATED FUNCTIONS
 # def getAllTransit():
 #     queryTransit = """
