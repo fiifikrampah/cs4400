@@ -1227,6 +1227,63 @@ def logsiteVisit(user, siteName, date):
         return 0
 
 
+def manageStaffers(siteName, firstname, lastname, startDate, enddate,sort):
+    
+
+# #Default when screen is initially loaded:
+# if firstname == "" and lastname == "" and startdate == " " and enddate == "" :
+#      if(sort is None):
+#         sort = "Shifts ASC"
+
+#     query1 = """
+#         SELECT Distinct Concat(Firstname,' ', Lastname) AS 'StaffName', Count(EventName) As "Shifts"
+#         FROM assignto 
+#         INNER JOIN allusers
+#         ON StaffUsername = Username
+#         WHERE SiteName = %s AND 
+#         GROUP BY StaffUsername
+#         ORDER BY %s;
+
+#     """
+#     response1 = _cursor.execute(query1, (siteName, sort))
+#     result1 = _cursor.fetchall()
+#     return (result1)
+
+#else if stuff have been tempered with
+# else:
+
+    if(sort == "" or sort is None):
+        sort = "Shifts ASC"
+    if(firstname == "" or firstname is None):
+        firstname = "-ALL-"
+    if(lastname == "" or lastname is None):
+        lastname = "-ALL-"
+    if(startDate == "" or startDate is None):
+        startDate = "-ALL-"
+    if(enddate == "" or enddate is None):
+        enddate = "-ALL-"
+    if(siteName is None):
+        siteName = "-ALL-"
+        
+    # print siteName
+    query = """
+
+        SELECT Distinct Concat(Firstname,' ', Lastname) AS 'StaffName', Count(EventName) As "Shifts"
+        FROM assignto 
+        INNER JOIN allusers
+        ON StaffUsername = Username
+        WHERE SiteName = '%s' 
+        AND (LOCATE('%s',Firstname) > 0 OR '%s' = '-ALL-')
+        AND (LOCATE('%s',Lastname) > 0 OR '%s' = '-ALL-')
+        AND ('%s' = '-ALL-' OR DATEDIFF(StartDate, '%s') >= 0)
+        AND ('%s' = '-ALL-' OR DATEDIFF('%s', StartDate) >= 0)
+        GROUP BY StaffUsername
+        ORDER BY %s;
+    """
+    response2 = _cursor.execute(query % (siteName, firstname, firstname, lastname, lastname, enddate, enddate,startDate,startDate, sort))
+    result2 = _cursor.fetchall()
+    return (result2)
+
 # DEPRECATED FUNCTIONS
 # def getAllTransit():
 #     queryTransit = """
@@ -1290,4 +1347,7 @@ def logsiteVisit(user, siteName, date):
     #bottom
 
 # set_connection()
-# get_employee_info("wsteff90")
+# sites = getSiteNames()
+# print sites 
+
+

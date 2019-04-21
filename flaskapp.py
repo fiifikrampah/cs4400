@@ -33,8 +33,8 @@ def main():
     # return to_manage_event();
     # return eventDetails()
     # return visitor_eventDetails()
-    return visitor_siteDetails()
-
+    # return visitor_siteDetails()
+    return manageStaff()
     # return render_template('1-login.html', error = "")
 
 
@@ -1544,6 +1544,65 @@ def to_manage_event():
 
 
 
+# Screen 28
+@app.route("/to_manage_staff", methods=['POST', 'GET'])
+def manageStaff():
+    
+     # getting the sites for the dropdown
+    response = getSiteNames()
+    siteList = []
+    for item in response:
+        site={}
+        site['SiteName'] = item[0]
+        siteList.append(site)
+
+        site_name = []
+    for val in siteList:
+        site_name.append(val['SiteName'])
+
+    firstSite = site_name[0]
+
+    if request.method == 'GET':
+        # getting unfiltered table when the page is first loaded
+        # global _logged_user
+        response =manageStaffers(firstSite, None, None, None, None, None)
+        stafflist = []
+        for item in response:
+            staff={}
+            staff['staffName'] = item[0]
+            staff['EventShift'] = item[1]
+            stafflist.append(staff);       
+        return render_template("28-managermanstaff.html", sites=siteList, Firstname="",Lastname="",
+            Startdate="", Enddate="", staffs=stafflist, filSite= "")
+    if request.method =='POST':
+
+
+        #getting filtered transit when some of the options have been played with
+        site = request.form["site"]
+        # print site
+        Startdate = request.form["sdate"]
+        Enddate = request.form["endate"]
+        Firstname = request.form["fname"]
+        Lastname = request.form["lname"]
+        sort = ""
+        try:
+            sort = request.form["sort"]
+        except:
+            sort = None
+
+        # global _logged_user
+        response =manageStaffers(site,Firstname,Lastname, Startdate, Enddate, sort) 
+        stafflist = []
+        for item in response:
+            staff={}
+            staff['staffName'] = item[0]
+            staff['EventShift'] = item[1]
+            stafflist.append(staff)
+        return render_template("28-managermanstaff.html", sites=siteList, Firstname=Firstname,Lastname=Lastname,
+            Startdate=Startdate, Enddate=Enddate, filSite=site,staffs=stafflist)
+
+
+
 #Screen32
 @app.route("/to_staff_event_detail", methods=['GET'])
 def eventDetails():
@@ -1573,7 +1632,7 @@ def eventDetails():
         StaffUsername = ",\n".join(stafflist)
         Duration = info3
 
-    return render_template("32-eventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
+    return render_template("32-eventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,filSite=site, EndDate=EndDate,
         EventPrice=EventPrice, Capacity=Capacity,Description=Description,StaffUsername=StaffUsername,Duration=Duration)
 
 
