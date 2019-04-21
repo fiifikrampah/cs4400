@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script src="../static/js/login.js"></script>
+
+    <!--<script src="../Scripts/login.js"></script>-->
+
+    <title>Manager Edit Event</title>
+</head>
+
+<body>
+    <div align=center class="container-fluid">
+        <form class="form-group" align=center style="width:80%; min-width:800px" action="/to_edit_event_filtered" method="post" enctype="multipart/form-data">
+            <h1>Edit Event</h1>
+
+            <!-- contain site and transport type -->
+            <div class="row">
+                <div class="col-xs-2" align=left>
+                    <label for="name">Name</label>
+                </div>
+                <div class="col-xs-10" align=left>
+                    <label for="name">{{filName}}</label>
+                    <input type="hidden" name="eventname" value="{{filName}}"/>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="pr">Price</label>
+                    <label for="prv">{{filPrice}}</label>
+                </div>
+                <div class="col-xs-3" align=center>
+                    <label for="cap">Capacity</label>
+                    <label>{{filCap}}</label>
+                </div>
+                <div class="col-xs-6" align=right>
+                    <label for="minreq">Minimum Staff Required</label>
+                    <label>{{filMinStaff}}</label>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label for="sdate">Start Date</label>
+                    <label>{{filStDate}}</label>
+                    <input type="hidden" name="startdate" value="{{filStDate}}"/>
+                </div>
+                <div class="col-xs-6" align=right>
+                    <label for="edate">End Date</label>
+                    <label>{{filEndDate}}</label>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="descr">Description</label>
+                </div>
+                <div class="col-xs-9" align=right>
+                    {% if filDescr == "" -%}
+                    <textarea name="description" style="width:100%; height:100px" required autofocus></textarea>
+                    {% else -%}
+                    <textarea name="description" style="width:100%; height:100px" required autofocus></textarea>
+                    {%- endif %}
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-xs-2" align=left>
+                    <label for="assign">Assign Staff</label>
+                </div>
+                <div class="col-xs-10" align=left>
+                    {% for staff in staffs %}
+                    {% if staff in filStaff -%}
+                    <input type="checkbox" name="{{staff.Username}}" value="Yes" checked> {{staff.Username}}</input>
+                    <input type="hidden" name="{{staff.Username}}" value="No"/>
+                    <br>
+                    {% else -%}
+                    <input type="checkbox" name="{{staff.Username}}" value="Yes"> {{staff.Username}}</input>
+                    <input type="hidden" name="{{staff.Username}}" value="No"/>
+                    <br>
+                    {%- endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label>Daily Visits Range</label>
+                    {% if filVisMin == -1 -%}
+                    <input type="number" name="minVisits" min=0 step=1 style="width:50px" autofocus/>
+                    {% else -%}
+                    <input type="number" name="minVisits" min=0 step=1 style="width:50px" value="{{filVisMin}}" autofocus/>
+                    {%- endif %}
+
+                    <label> -- </label>
+                    {% if filVisMax == -1 -%}
+                    <input type="number" name="maxVisits" min=0 step=1 style="width:50px" autofocus/>
+                    {% else -%}
+                    <input type="number" name="maxVisits" min=0 step=1 style="width:50px" value="{{filVisMax}}" autofocus/>
+                    {%- endif %}
+                </div>
+                <div class="col-xs-6" align=right>
+                    <label>Daily Revenue Range</label>
+                    {% if filRevMin == -1 -%}
+                    <input type="number" name="minRevenue" min=0 step=1 style="width:50px" autofocus/>
+                    {% else -%}
+                    <input type="number" name="minRevenue" min=0 step=1 style="width:50px" value="{{filRevMin}}" autofocus/>
+                    {%- endif %}
+
+                    <label> -- </label>
+                    {% if filRevMax == -1 -%}
+                    <input type="number" name="maxRevenue" min=0 step=1 style="width:50px" autofocus/>
+                    {% else -%}
+                    <input type="number" name="maxRevenue" min=0 step=1 style="width:50px" value="{{filRevMax}}" autofocus/>
+                    {%- endif %}
+                </div>
+            </div>
+            <div class="row">
+                <button type="submit" value="Filter" formnovalidate>Filter</button>
+                <button type="submit" value="Update" formaction="/edit_event">Update</button>
+            </div>
+
+            <div align=center style="margin:20px">
+                <table class="table table-striped">
+                    <tr>
+                        <th>Date
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="Date ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="Date DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                        <th>Daily Visits
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="DailyVisits ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="DailyVisits DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                        <th>Daily Revenue ($)
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="DailyRevenue ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="DailyRevenue DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                    </tr>
+
+                    {% for day in days %}
+                    <tr>
+                        <td>{{day.Date}}</td>
+                        <td>{{day.DailyVisits}}</td>
+                        <td>{{day.DailyRevenue}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+            <button type="submit" value="Back" style="width:150px" formaction="/to_manage_event" formnovalidate formmethod="get">Back</button>
+        </form>
+        <br>
+        <p id = "feedback"  style="color: red">{{error}}</p>
+    </div>
+</body>
+</html>
