@@ -144,7 +144,7 @@
 
                     {% for event in events %}
                     <tr>
-                        <td><input type="radio" name="chosen_transit" value="{{event}}" required> {{event.EventName}}</td>
+                        <td><input type="radio" name="chosen_event" value="{{event}}" required> {{event.EventName}}</td>
                         <td>{{event.StaffCount}}</td>
                         <td>{{event.Duration}}</td>
                         <td>{{event.TotalVisits}}</td>
@@ -155,11 +155,12 @@
             </div>
 
             <div class="row" align=center>
-                <button type="submit" value="Create" style="width:150px"formaction="/to_create_event" formnovalidate formmethod="get">Create New Event</button>
+                <button type="submit" value="Create" style="width:150px" formaction="/to_create_event" formnovalidate formmethod="get">Create New Event</button>
                 <button type="submit" value="Edit" style="width:150px" formaction="/to_edit_event">Edit</button>
-                <button type="submit" value="Delete" style="width:150px"formaction="/delete_event">Delete</button>
+                <button type="submit" value="Delete" style="width:150px" formaction="/delete_event">Delete</button>
             </div>
         </form>
+        <a class=" btn btn-default" href="/back-button" role="button">Back</a>
     </div>
 </body>
 </html>

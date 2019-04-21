@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script src="../static/js/login.js"></script>
+
+    <!--<script src="../Scripts/login.js"></script>-->
+
+    <title>Manager Create Event</title>
+</head>
+
+<body>
+    <div align=center class="container-fluid">
+        <form class="form-group" align=center style="width:80%; min-width:800px" action="/to_create_event" method="post" enctype="multipart/form-data">
+            <h1>Create Event</h1>
+
+            <!-- contain site and transport type -->
+            <div class="row">
+                <div class="col-xs-2" align=left>
+                    <label for="name">Name</label>
+                </div>
+                <div class="col-xs-10" align=right>
+                    <input type="text" name="name" style="width:100%" value="{{filName}}" required autofocus/>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="pr">Price</label>
+                    {% if filPrice == -1 -%}
+                    <input type="number" name="price" style="width:50px" min=0 step=0.01 required autofocus/>
+                    {% else -%}
+                    <input type="number" name="price" style="width:50px" min=0 step=0.01 value="{{filPrice}}" required autofocus/>
+                    {%- endif %}
+                </div>
+                <div class="col-xs-3" align=center>
+                    <label for="cap">Capacity</label>
+                    {% if filCap == -1 -%}
+                    <input type="number" name="capacity" style="width:50px" min=0 step=1 required autofocus/>
+                    {% else -%}
+                    <input type="number" name="capacity" style="width:50px" min=0 step=1 value="{{filCap}}" required autofocus/>
+                    {%- endif %}
+                </div>
+                <div class="col-xs-6" align=right>
+                    <label for="minreq">Minimum Staff Required</label>
+                    {% if filMinStaff == -1 -%}
+                    <input type="number" name="minstaff" min=0 step=1 required autofocus/>
+                    {% else -%}
+                    <input type="number" name="minstaff" min=0 step=1 value="{{filMinStaff}}" required autofocus/>
+                    {%- endif %}
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-xs-6" align=left>
+                    <label for="sdate">Start Date</label>
+                    <input type="date" name="startdate" value="{{filStDate}}" required autofocus/>
+                </div>
+                <div class="col-xs-6" align=right>
+                    <label for="edate">End Date</label>
+                    <input type="date" name="enddate" value="{{filEndDate}}" required autofocus/>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-xs-2" align=left>
+                    <label for="descr">Description</label>
+                </div>
+                <div class="col-xs-10" align=right>
+                    {% if filDescr == "" -%}
+                    <textarea name="description" style="width:100%; height:100px" required autofocus></textarea>
+                    {% else -%}
+                    <textarea name="description" style="width:100%; height:100px" required autofocus>{{filDescr}}</textarea>
+                    {%- endif %}
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-xs-2" align=left>
+                    <label for="assign">Assign Staff</label>
+                </div>
+                <div class="col-xs-10" align=left>
+                    {% for staff in staffs %}
+                    {% if staff in filStaff -%}
+                    <input type="checkbox" name="{{staff.Username}}" value="Yes" checked> {{staff.Username}}</input>
+                    <input type="hidden" name="{{staff.Username}}" value="No"/>
+                    <br>
+                    {% else -%}
+                    <input type="checkbox" name="{{staff.Username}}" value="Yes"> {{staff.Username}}</input>
+                    <input type="hidden" name="{{staff.Username}}" value="No"/>
+                    <br>
+                    {%- endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <br>
+            <button type="submit" value="GetStaff" style="width:150px" formaction="/get_available_staff_to_create" formnovalidate>Get Available Staff</button>
+            <button type="submit" value="Create" style="width:150px">Create New Event</button>
+            <button type="submit" value="Back" style="width:150px" formaction="/to_manage_event" formnovalidate formmethod="get">Back</button>
+        </form>
+        <br>
+        <p id = "feedback"  style="color: red">{{error}}</p>
+    </div>
+</body>
+</html>
