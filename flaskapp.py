@@ -1286,6 +1286,8 @@ def create_event():
             error="You must fill in all fields to create the event"
         elif(len(selectedStaff) < minstaff):
             error="You must assign >= the minimum required staff"
+        elif(minstaff < 1):
+            error="The minimum number of staff must be at least 1"
         else:
             global _logged_users
             site = getManagersSite(_logged_user);
@@ -1589,7 +1591,7 @@ def edit_event():
 
 
 
-#SCREEN 29
+#SCREENS 29-30
 @app.route("/to_view_site_report", methods=['POST', 'GET'])
 def to_view_site_report():
     if request.method == 'GET':
@@ -1675,9 +1677,47 @@ def to_view_site_report():
                 stCountMax=stCountMax, toVisMin=toVisMin, toVisMax=toVisMax, toRevMin=toRevMin,
                 toRevMax=toRevMax, days=days, error=error)
 
+@app.route("/to_daily_detail", methods=['POST'])
+def daily_detail():
+    date = request.form["chosen_day"]
+    global _logged_user
+    site = getManagersSite(_logged_user)
 
+    response = getDailyDetail(site, date, None)
+    events = []
+    for item in response:
+        event = {}
+        event['EventName'] = item[0]
+        event['StaffNames'] = item[1]
+        event['Visits'] = item[2]
+        event['Revenue'] = item[3]
+        events.append(event)
 
+    return render_template("30-dailydetail.html", events=events, date=date)
 
+@app.route("/sort_daily_detail", methods=['POST'])
+def sort_daily_detail():
+    date = request.form["date"]
+    sort = ""
+    try:
+        sort = request.form["sort"]
+    except:
+        sort = None
+
+    global _logged_user
+    site = getManagersSite(_logged_user)
+
+    response = getDailyDetail(site, date, sort)
+    events = []
+    for item in response:
+        event = {}
+        event['EventName'] = item[0]
+        event['StaffNames'] = item[1]
+        event['Visits'] = item[2]
+        event['Revenue'] = item[3]
+        events.append(event)
+
+    return render_template("30-dailydetail.html", events=events, date=date)
 
 
 

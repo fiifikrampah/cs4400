@@ -1189,6 +1189,57 @@ def getSiteReport(stDate, endDate, eCountMin, eCountMax, stCountMin, stCountMax,
             toVisMin, toVisMax, toVisMax, toRevMin, toRevMin, toRevMax, toRevMax, sort));
     return _cursor.fetchall();
 
+def getDailyDetail(site, date, sort):
+    if(sort == "" or sort is None):
+        sort = "EventName ASC"
+    query = """
+        SELECT G.EventName, G.StaffNames, G.Visits, (G.EventPrice*G.Visits) AS Revenue
+        FROM (
+            SELECT F.EventName, F.StartDate, F.SiteName, F.StaffNames, SUM(F.VisitorValue) AS Visits, F.EventPrice
+            FROM (
+            	SELECT D.EventName, D.StartDate, D.SiteName, D.StaffNames, E.VisitorValue, D.EventPrice
+            	FROM (
+            		SELECT C.EventName, C.StartDate, C.SiteName, C.EventPrice, GROUP_CONCAT(C.StaffUsername SEPARATOR '\n') AS StaffNames
+            		FROM (
+            			SELECT A.EventName, A.StartDate, A.SiteName, B.StaffUsername, A.EventPrice
+            			FROM (
+            				SELECT EventName, StartDate, SiteName, EventPrice
+            				FROM event
+            				WHERE DATEDIFF(StartDate, '%s') <= 0
+            				AND DATEDIFF(EndDate, '%s') >= 0
+            				AND SiteName = '%s'
+            			) AS A
+            			INNER JOIN (
+            				SELECT *
+            				FROM assignto
+            			) AS B
+            			ON A.EventName = B.EventName
+            			WHERE A.StartDate = B.StartDate
+            			AND A.SiteName = B.SiteName
+            		) AS C
+            		GROUP BY C.EventName, C.StartDate, C.SiteName
+            	) AS D
+            	INNER JOIN (
+            		SELECT EventName, StartDate, SiteName, 1 AS VisitorValue
+            		FROM visitevent
+            		WHERE VisitEventDate = '%s'
+
+                    UNION
+
+                    SELECT EventName, StartDate, SiteName, 0 AS VisitorValue
+                    FROM event
+            	) AS E
+            	ON D.EventName = E.EventName
+            	WHERE D.StartDate = E.StartDate
+            	AND D.SiteName = E.SiteName
+            ) AS F
+            GROUP BY F.EventName, F.StartDate, F.SiteName
+        ) AS G
+        ORDER BY %s
+        """
+    #print(query % (date, date, site, date, sort))
+    response = _cursor.execute(query % (date, date, site, date, sort))
+    return _cursor.fetchall();
 
 
 
