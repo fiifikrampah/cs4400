@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script src="../static/js/login.js"></script>
+
+    <!--<script src="../Scripts/login.js"></script>-->
+
+<title>Manager Daily Detail</title>
+</head>
+<body>
+    <div align=center class="container-fluid">
+        <h1>Daily Detail</h1>
+        <form class="form-group" action="/sort_daily_detail" method="post" enctype="multipart/form-data">
+            <div align=center style="margin:20px">
+                <input type="hidden" name="date" value="{{date}}"/>
+                <table class="table table-striped">
+                    <tr>
+                        <th>Event Name
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="EventName ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="EventName DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                        <th>Staff Names
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="StaffNames ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="StaffNames DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                        <th>Visits
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="Visits ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="Visits DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                        <th>Revenue ($)
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="Revenue ASC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                            </button>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="Revenue DESC" formnovalidate>
+                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                            </button>
+                        </th>
+                    </tr>
+
+                    {% for event in events %}
+                    <tr>
+                        <td>{{event.EventName}}</td>
+                        <td>{{event.StaffNames}}</td>
+                        <td>{{event.Visits}}</td>
+                        <td>{{event.Revenue}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <button type="submit" value="Back" style="width:150px" formaction="/to_view_site_report" formnovalidate formmethod="get">Back</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -30,12 +30,19 @@ def main():
     #return create_transit();
     #return manage_event();
 
+
     # return to_manage_event();
     # return eventDetails()
     # return visitor_eventDetails()
-    return visitor_siteDetails()
+    # return visitor_siteDetails()
 
     # return render_template('1-login.html', error = "")
+
+
+    #return to_manage_event();
+    #return create_event()
+    # return to_view_site_report()
+    return render_template('1-login.html', error = "")
 
 
 @app.route("/to_register_navigation")
@@ -1418,49 +1425,6 @@ def render_manage_transit():
     return render_template('22-adminmantransit.html', sites=siteList, types=transitTypeList, transits=transitList,
             filType="-ALL-", filSite="-ALL-", filRoute="", filMinPr=-1, filMaxPr=-1)
 
-@app.route("/to_viewsitereport.html", methods=['POST', 'GET'])
-def to_view_site_report():
-    if request.method == 'GET':
-        sites=[]
-        render_template("29-viewsitereport.html", sites=sites, stDate="", endDate="", eCountMin=-1, eCountMax=-1,
-                stCountMin=-1, stCountMax=-1, toVisMin=-1, toVisMax=-1, toRevMin=-1, toRevMax=-1)
-    if request.method == 'POST':
-        stDate = request.form["stDate"]
-        endDate = request.form["endDate"]
-        eCountMin = request.form["eCountMin"]
-        eCountMax = request.form["eCountMax"]
-        stCountMin = request.form["stCountMin"]
-        stCountMax = request.form["stCountMax"]
-        toVisMin = request.form["toVisMin"]
-        toVisMax = request.form["toVisMax"]
-        toRevMin = request.form["toRevMin"]
-        toRevMax = request.form["toRevMax"]
-
-        if(eCountMin == ""):
-            eCountMin = -1
-        if(eCountMax == ""):
-            eCountMax = -1
-        if(stCountMin == ""):
-            stCountMin = -1
-        if(stCountMax == ""):
-            stCountMax = -1
-        if(toVisMin == ""):
-            toVisMin = -1
-        if(toVisMax == ""):
-            toVisMax = -1
-        if(toRevMin == ""):
-            toRevMin = -1;
-        if(toRevMax == ""):
-            toRevMax = -1;
-        eCountMin = float(eCountMin)
-        eCountMax = float(eCountMax)
-        stCountMin = float(stCountMin)
-        stCountMax = float(stCountMax)
-        toVisMin = float(toVisMin)
-        toVisMax = float(tovisMax)
-        toRevMin = float(toRevMin)
-        toRevMax = float(toRevMax)
-
 
 
 #SCREENS 25-27
@@ -1784,6 +1748,8 @@ def create_event():
             error="You must fill in all fields to create the event"
         elif(len(selectedStaff) < minstaff):
             error="You must assign >= the minimum required staff"
+        elif(minstaff < 1):
+            error="The minimum number of staff must be at least 1"
         else:
             global _logged_users
             site = getManagersSite(_logged_user);
@@ -2087,11 +2053,133 @@ def edit_event():
 
 
 
+#SCREENS 29-30
+@app.route("/to_view_site_report", methods=['POST', 'GET'])
+def to_view_site_report():
+    if request.method == 'GET':
+        days=[]
+        return render_template("29-viewsitereport.html", stDate="", endDate="", eCountMin=-1,
+                eCountMax=-1, stCountMin=-1, stCountMax=-1, toVisMin=-1, toVisMax=-1,
+                toRevMin=-1, toRevMax=-1, days=days, error="")
 
+    if request.method == 'POST':
+        stDate = request.form["stDate"]
+        endDate = request.form["endDate"]
+        eCountMin = request.form["eCountMin"]
+        eCountMax = request.form["eCountMax"]
+        stCountMin = request.form["stCountMin"]
+        stCountMax = request.form["stCountMax"]
+        toVisMin = request.form["toVisMin"]
+        toVisMax = request.form["toVisMax"]
+        toRevMin = request.form["toRevMin"]
+        toRevMax = request.form["toRevMax"]
+        sort = ""
+        try:
+            sort = request.form["sort"]
+        except:
+            sort = None
 
+        if(eCountMin == ""):
+            eCountMin = -1
+        if(eCountMax == ""):
+            eCountMax = -1
+        if(stCountMin == ""):
+            stCountMin = -1
+        if(stCountMax == ""):
+            stCountMax = -1
+        if(toVisMin == ""):
+            toVisMin = -1
+        if(toVisMax == ""):
+            toVisMax = -1
+        if(toRevMin == ""):
+            toRevMin = -1;
+        if(toRevMax == ""):
+            toRevMax = -1;
+        eCountMin = float(eCountMin)
+        eCountMax = float(eCountMax)
+        stCountMin = float(stCountMin)
+        stCountMax = float(stCountMax)
+        toVisMin = float(toVisMin)
+        toVisMax = float(toVisMax)
+        toRevMin = float(toRevMin)
+        toRevMax = float(toRevMax)
 
+        error=""
+        days=[]
+        if(stDate == "" or endDate == ""):
+            error = "You must enter a date range in order for results to be shown"
+        elif(eCountMin > eCountMax and eCountMax != -1):
+            error = "Your maximum event count cannot be less than the minimum"
+            eCountMax = float(-1)
+        elif(stCountMin > stCountMax and stCountMax != -1):
+            error = "Your maximum staff count cannot be less than the minimum"
+            stCountMax = float(-1)
+        elif(toVisMin > toVisMax and toVisMax != -1):
+            error = "Your maximum total visits cannot be less than the minimum"
+            toVisMax = float(-1)
+        elif(toRevMin > toRevMax and toRevMax != 1):
+            error = "Your maximum total revenue cannot be less than the minimum"
+            toRevMax = float(-1)
+        else:
+            global _logged_user
+            site = getManagersSite(_logged_user)
+            response = getSiteReport(stDate, endDate, eCountMin, eCountMax, stCountMin, stCountMax,
+                    toVisMin, toVisMax, toRevMin, toRevMax, site, sort)
+            for item in response:
+                day={}
+                day['Date'] = item[0]
+                day['EventCount'] = item[1]
+                day['StaffCount'] = item[2]
+                day['TotalVisits'] = item[3]
+                day['TotalRevenue'] = item[4]
+                days.append(day)
 
+        return render_template("29-viewsitereport.html", stDate=stDate, endDate=endDate,
+                eCountMin=eCountMin, eCountMax=eCountMax, stCountMin=stCountMin,
+                stCountMax=stCountMax, toVisMin=toVisMin, toVisMax=toVisMax, toRevMin=toRevMin,
+                toRevMax=toRevMax, days=days, error=error)
 
+@app.route("/to_daily_detail", methods=['POST'])
+def daily_detail():
+    date = request.form["chosen_day"]
+    global _logged_user
+    site = getManagersSite(_logged_user)
+
+    response = getDailyDetail(site, date, None)
+    events = []
+    for item in response:
+        event = {}
+        event['EventName'] = item[0]
+        event['StaffNames'] = item[1]
+        event['Visits'] = item[2]
+        event['Revenue'] = item[3]
+        events.append(event)
+
+    return render_template("30-dailydetail.html", events=events, date=date)
+
+@app.route("/sort_daily_detail", methods=['POST'])
+def sort_daily_detail():
+    date = request.form["date"]
+    sort = ""
+    try:
+        sort = request.form["sort"]
+    except:
+        sort = None
+
+    global _logged_user
+    site = getManagersSite(_logged_user)
+
+    response = getDailyDetail(site, date, sort)
+    events = []
+    for item in response:
+        event = {}
+        event['EventName'] = item[0]
+        event['StaffNames'] = item[1]
+        event['Visits'] = item[2]
+        event['Revenue'] = item[3]
+        events.append(event)
+
+    return render_template("30-dailydetail.html", events=events, date=date)
 
 
 
