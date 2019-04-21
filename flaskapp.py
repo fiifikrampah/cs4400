@@ -500,38 +500,47 @@ def sign_in():
                 _logged_userType = login_response
                 print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                 return render_template("14-visitorfunc.html", error = "")
-            elif login_response in ['Employee', 'Employee, Visitor', 'Admin', 'Admin, Visitor', 'Manager', 'Manager, Visitor', 'Staff', 'Staff, Visitor']:
+
+            elif login_response in ['Employee, Visitor']:
                 emp_type = emptype_checker(_name)
                 _logged_userType = emp_type
-                if _logged_userType in ['Employee', 'Employee, Visitor']:
-                    _logged_user = _name
-                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
-                    return render_template("7-userfunc.html", error = "")
-                elif _logged_userType in ['Admin']:
-                    _logged_user = _name
-                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
-                    return render_template("8-adminfunc.html", error = "")
-                elif _logged_userType in ['Admin, Visitor']:
+
+                if _logged_userType in ['Admin']:
                     _logged_user = _name
                     print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                     return render_template("9-adminvisitfunc.html", error = "")
+
+                elif _logged_userType in ['Manager']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("11-manvisitfunc.html", error = "")
+
+                elif _logged_userType in ['Staff']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("13-staffvisitfunc.html", error = "")
+
+
+            elif login_response in ['Employee']:
+                emp_type = emptype_checker(_name)
+                _logged_userType = emp_type
+
+                if _logged_userType in ['Admin']:
+                    _logged_user = _name
+                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
+                    return render_template("8-adminfunc.html", error = "")
+               
                 elif _logged_userType in ['Manager']:
                     _logged_user = _name
                     print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                     return render_template("10-manfunc.html", error = "")
-                elif _logged_userType in ['Manager, Visitor']:
-                    _logged_user = _name
-                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
-                    return render_template("11-manvisitfunc.html", error = "")
+               
                 elif _logged_userType in ['Staff']:
                     _logged_user = _name
                     print "logged person is: %s" % _logged_user
                     print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                     return render_template("12-stafffunc.html", error = "")
-                elif _logged_userType in ['Staff, Visitor']:
-                    _logged_user = _name
-                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
-                    return render_template("13-staffvisitfunc.html", error = "")
+                
                 else:
                     _logged_user = ""
                     return render_template("1-login.html", error = "Username or password is incorrect, please try again.")
@@ -789,7 +798,7 @@ def to_user_transit_history():
 def to_manage_profile():
     if request.method == 'GET':
         #getting info to populate the screen with
-        _logged_user
+        global _logged_user
         _logged_userType = get_usertype(_logged_user)
         print "FIIFI THE GUY IS: %s AND HIS USER IS: %s" % (_logged_userType, _logged_user)
         info = get_employee_info(_logged_user)
@@ -1514,7 +1523,7 @@ def to_manage_event():
 
 
 # Screen 28
-@app.route("/to_manage_staff", methods=['POST', 'GET'])
+@app.route("/to_view_staff", methods=['POST', 'GET'])
 def manageStaff():
     
      # getting the sites for the dropdown
