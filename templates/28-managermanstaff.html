@@ -22,17 +22,21 @@
 
 <body>
     <div align=center class="container-fluid" style="width:60%; min-width:600px">
-        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_manage_site" method="post" enctype="multipart/form-data">
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_manage_staff" method="post" enctype="multipart/form-data">
             <h1>Manage Staff</h1>
 
             <!-- sitename, manager -->
             <div class="row">
                 <div class="col-xs-12" align=middle>
-                    <label for="Sname">Site</label>
+                    <label for="site">Site</label>
                     <select name="site">
 
-                        {% for site in siteNames %}
+                        {% for site in sites %}
+                        {% if filSite == site.SiteName -%}
+                        <option value="{{site.SiteName}}" selected="selected">{{site.SiteName}}</option>
+                        {% else -%}
                         <option value="{{site.SiteName}}">{{site.SiteName}}</option>
+                        {%- endif %}
                         {% endfor %}
                     </select>
                 </div>
@@ -41,16 +45,16 @@
             <div class="row">
                 <div class="col-xl-5" align=middle>
                     <label for="fname">First Name</label>
-                    <input type = "text" name="fname"/>
-                    <label for="ed">Last Name</label>
-                    <input type = "text" name="lname"/><br>
+                    <input type = "text" name="fname" value="{{Firstname}}"/>
+                    <label for="lname">Last Name</label>
+                    <input type = "text" name="lname" value="{{Lastname}}"/><br>
                 </div> 
 
                 <div  class="col-xl-5" align=middle>
                     <label for="sdate">Start Date</label>
-                    <input type = "date" name="sdate"/><br>
+                    <input type = "date" name="sdate" value="{{Startdate}}"/><br>
                     &nbsp<label for="endate">End Date</label>
-                    <input type = "date" name="endate"/>
+                    <input type = "date" name="endate" value="{{Enddate}}"/>
                 </div>
             </div> 
 
@@ -66,8 +70,22 @@
             <div>
                 <table class="table table-striped">
                     <thead>
-                        <th class="text-center">Staff Name</th>
-                        <th class="text-center"> # Event Shift</th>
+                        <th class="text-center">Staff Name
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="StaffName ASC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                        </button>
+                         <button type="submit" class="btn btn-default btn-xs" name="sort" value="StaffName DESC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        </button>
+                        </th>
+                        <th class="text-center"> # Event Shift
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="Shifts ASC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                        </button>
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="Shifts DESC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        </button>
+                        </th>
                     </thead>
                  <tbody>                     
                 {% for staff in staffs %}
