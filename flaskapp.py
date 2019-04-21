@@ -29,7 +29,7 @@ def main():
     #return to_manage_event();
     #return create_event()
     #return to_view_site_report()
-    return to_view_schedule()
+    # return to_view_schedule()
     return render_template('1-login.html', error = "")
 
 @app.route("/to_register_navigation")
