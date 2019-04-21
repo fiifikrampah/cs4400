@@ -1297,7 +1297,44 @@ def getSchedule(user, ename, keyword, sdate, edate, sort):
     return _cursor.fetchall();
 
 
+#Query for screen 36
 
+def getTransitDetail36(site, type,sort):
+    if(type is None):
+        type = "-ALL-"
+    if(sort is None):
+
+        queryTransit = """
+        SELECT *
+        FROM (
+            SELECT DISTINCT TransitRoute, TransitType, TransitPrice, D.Count AS ConnectedSites
+            FROM (
+                SELECT E.TransitRoute, E.TransitType, E.TransitPrice, E.Count, F.SiteName
+                FROM (
+                    SELECT T.TransitRoute, T.TransitType, T.TransitPrice, C.Count
+                    FROM transit AS T
+                    INNER JOIN (
+                        SELECT TransitRoute, TransitType, Count(*) AS Count
+                        FROM connect
+                        GROUP BY TransitRoute, TransitType
+                    ) AS C
+                    ON T.TransitType = C.TransitType
+                    WHERE T.TransitRoute = C.TransitRoute
+                ) AS E
+                INNER JOIN (
+                    SELECT TransitRoute, TransitType, SiteName
+                    FROM connect
+                ) AS F
+                ON F.TransitType = E.TransitType
+                WHERE F.TransitRoute = E.TransitRoute
+            ) AS D
+            WHERE (D.SiteName = %s)
+            AND (D.TransitType = %s OR %s = '-ALL-')
+        ) AS Z
+        ORDER BY %s
+        """
+    response = _cursor.execute(queryTransit, (site, site, type, type, sort));
+    return _cursor.fetchall()
 
 
 # DEPRECATED FUNCTIONS

@@ -30,7 +30,8 @@ def main():
     #return create_event()
     #return to_view_site_report()
     # return to_view_schedule()
-    return render_template('1-login.html', error = "")
+    return to_visitor_transitDetail()
+    # return render_template('1-login.html', error = "")
 
 @app.route("/to_register_navigation")
 def to_register_navigation():
@@ -335,23 +336,25 @@ def go_to_functionality_screen():
         p_type = usertype_checker(_logged_user)
         print(p_type)
 
-        if p_type in ['Employee', 'Employee, Visitor']:
+        if p_type in ['Employee']:
             emp_type = emptype_checker(_logged_user)
             if emp_type in ['Admin']:
                 return render_template("8-adminfunc.html", error = "")
-            elif emp_type in ['Admin, Visitor']:
-                return render_template("9-adminvisitfunc.html", error = "")
             elif emp_type in ['Manager']:
                 return render_template("10-manfunc.html", error = "")
-            elif emp_type in ['Manager, Visitor']:
-                return render_template("11-manvisitfunc.html", error = "")
             elif emp_type in ['Staff']:
                 return render_template("12-stafffunc.html", error = "")
-            elif emp_type in ['Staff, Visitor']:
+
+        elif p_type in ['Employee, Visitor']:
+            emp_type = emptype_checker(_logged_user)
+            if emp_type in ['Admin']:
+                return render_template("9-adminvisitfunc.html", error = "")
+            elif emp_type in ['Manager']:
+                return render_template("11-manvisitfunc.html", error = "")
+            elif emp_type in ['Staff']:
                 return render_template("13-staffvisitfunc.html", error = "")
 
         elif p_type in ['User']:
-
             return render_template("7-userfunc.html", error = "")
         elif p_type in ['Visitor']:
             return render_template("14-visitorfunc.html", error = "")
@@ -565,6 +568,7 @@ def to_manage_profile():
         print "FIIFI THE GUY IS: %s AND HIS USER IS: %s" % (_logged_userType, _logged_user)
 
         info = get_employee_info(_logged_user)
+        print "INFO IS: %s" % info
         fname = info[0]
         lname = info[1]
         uname = info[2]
@@ -2023,6 +2027,64 @@ def to_view_schedule():
 
 
 
+# SCREEN 36 VISITOR TRANSIT DETAIL
+
+@app.route("/to_visitor_transitDetail", methods=['POST', 'GET'])
+def to_visitor_transitDetail():
+    # getting the sites for the dropdown
+
+    # getting the transit types for the dropdown
+    response = getTransitTypes()
+    transitTypeList = []
+    for item in response:
+        tType={}
+        tType['TransitType'] = item[0]
+        transitTypeList.append(tType)
+
+    if request.method == 'GET':
+        info1 = get_site_info("Inman Park")
+        # info1 = get_site_info(sitename)
+        SiteName = str(info1[0][0])
+        print SiteName
+
+        # getting unfiltered transit when the page is first loaded, with default sort
+        response = getTransitDetail36(SiteName, None, None,)
+        transitList = []
+        for item in response:
+            transit={}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+            transit['Price'] = item[2];
+            transit['ConnectedSites'] = item[3]
+            transitList.append(transit);
+
+        return render_template('36-vistransdetail.html', SiteName=SiteName, types=transitTypeList,
+                transits=transitList,filType="-ALL-")
+
+    if request.method == 'POST':
+        info1 = get_site_info(sitename)
+        SiteName = info1[0][0]
+        #getting filtered transit when some of the options have been played with
+        transitType = request.form["transittype"]
+        sort = ""
+        try:
+            sort = request.form["sort"]
+        except:
+            sort = None
+
+
+        response = getTransitDetail36(SiteName, transitType,sort)
+        transitList = []
+        for item in response:
+            transit={}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+            transit['Price'] = item[2];
+            transit['ConnectedSites'] = item[3]
+            transitList.append(transit);
+
+        return render_template('36-vistransdetail.html', SiteName=SiteName, types=transitTypeList,
+                transits=transitList, filType=transitType)
 
 
 
