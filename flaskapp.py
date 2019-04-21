@@ -5,9 +5,10 @@ from flask import Flask, render_template, json, request, Response
 from decimal import Decimal
 
 app = Flask(__name__)
-_logged_user = "david.smith"
-_logged_userType = "Manager"
-
+# _logged_user = "david.smith"
+# _logged_userType = "Manager"
+_logged_user = "michael.smith"
+_logged_userType = "Staff, Visitor"
 
 @app.route('/')
 def main():
@@ -27,7 +28,8 @@ def main():
     #return manage_event();
     #return to_manage_event();
     #return create_event()
-    return to_view_site_report()
+    #return to_view_site_report()
+    return to_view_schedule()
     return render_template('1-login.html', error = "")
 
 @app.route("/to_register_navigation")
@@ -1718,6 +1720,63 @@ def sort_daily_detail():
         events.append(event)
 
     return render_template("30-dailydetail.html", events=events, date=date)
+
+
+
+#SCREENS 31-32
+@app.route("/to_view_schedule", methods=['POST', 'GET'])
+def to_view_schedule():
+    if request.method == 'GET':
+        global _logged_user
+        events = []
+        response = getSchedule(_logged_user, None, None, None, None, None)
+        for item in response:
+            event = {}
+            event['EventName'] = item[0]
+            event['SiteName'] = item[1]
+            event['StartDate'] = item[2]
+            event['EndDate'] = item[3]
+            event['StaffCount'] = item[4]
+            events.append(event)
+
+        return render_template("31-viewschedule.html", filName="", filDescr="",
+                filStDate="", filEndDate="", events=events)
+
+    if request.method == 'POST':
+        print("LOL")
+        ename = request.form["name"]
+        descr = request.form["description"]
+        startdate = request.form["startdate"]
+        enddate = request.form["enddate"]
+        sort = ""
+        try:
+            sort = request.form["sort"]
+        except:
+            sort = None
+
+        global _logged_user
+        events = []
+        response = getSchedule(_logged_user, ename, descr, startdate, enddate, sort)
+        for item in response:
+            event = {}
+            event['EventName'] = item[0]
+            event['SiteName'] = item[1]
+            event['StartDate'] = item[2]
+            event['EndDate'] = item[3]
+            event['StaffCount'] = item[4]
+            events.append(event)
+
+        return render_template("31-viewschedule.html", filName=ename, filDescr=descr,
+                filStDate=startdate, filEndDate=enddate, events=events)
+
+
+
+
+
+
+
+
+
 
 
 
