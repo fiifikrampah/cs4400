@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script src="../static/js/login.js"></script>
+
+    <!--<script src="../Scripts/login.js"></script>-->
+
+<title>Visitor Event Detail</title>
+</head>
+
+<body>
+    <div align=center class="container-fluid" style="width:60%; min-width:600px">
+        <h1>Event Detail</h1>
+
+          <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="EventName">Event</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="eventCurrent">{{EventName}}</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="SiteName">Site Name</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="snameCurrent">{{SiteName}}</label>
+                </div>
+            </div>
+
+
+              <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="StartDate">Start Date</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="sdateCurrent">{{StartDate}}</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="EndDate">EndDate</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="edateCurrent">{{EndDate}}</label>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="TicketRemaining">Ticket Remaining</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="TicketRemainingcurr">{{TicketRemaining}}</label>
+                </div>
+
+                 <div class="col-xs-3" align=left>
+                    <label for="price">Ticket Price</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="priceCurrent">{{price}}</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-3" align=left>
+                    <label for="Description">Description</label>
+                </div>
+                <div class="col-xs-3" align=left>
+                    <label for="descripCurrent">{{Description}}</label>
+                </div>
+                
+            </div>
+            <form class="form-group" align=center action="/visitor_logVisit" method="post" enctype="multipart/form-data">
+            <div class="col-xs-12" align=middle>
+                    <input type="date" name="visitdate" class="form-control" value="{{visitdate}}" required autofocus style="width:15%;min-width:200px"><br>
+
+                    <div class="col-xs-12" align=middle>
+                    <div class="col-xs-12" align=middle>
+                    <button type="submit" formaction="/visitor_logVisit">Log Visit</a></button><br></br>
+                </div>
+                </div>
+            </div>
+        </form>
+                <br>
+
+        <a class=" btn btn-default" href="/to_explore_event" role="button">Back</a>
+        <p id = "feedback"  style="color: red">{{error}}</p>
+        <p id = "feedback"  style="color: green">{{success}}</p>
+    </div>
+</body>
+</html>

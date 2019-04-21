@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script src="../static/js/login.js"></script>
+
+    <!--<script src="../Scripts/login.js"></script>-->
+
+<title>Manage Staff</title>
+</head>
+
+<body>
+    <div align=center class="container-fluid" style="width:60%; min-width:600px">
+        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_manage_site" method="post" enctype="multipart/form-data">
+            <h1>Manage Staff</h1>
+
+            <!-- sitename, manager -->
+            <div class="row">
+                <div class="col-xs-12" align=middle>
+                    <label for="Sname">Site</label>
+                    <select name="site">
+
+                        {% for site in siteNames %}
+                        <option value="{{site.SiteName}}">{{site.SiteName}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xl-5" align=middle>
+                    <label for="fname">First Name</label>
+                    <input type = "text" name="fname"/>
+                    <label for="ed">Last Name</label>
+                    <input type = "text" name="lname"/><br>
+                </div> 
+
+                <div  class="col-xl-5" align=middle>
+                    <label for="sdate">Start Date</label>
+                    <input type = "date" name="sdate"/><br>
+                    &nbsp<label for="endate">End Date</label>
+                    <input type = "date" name="endate"/>
+                </div>
+            </div> 
+
+            
+            <br>
+            <div class="col-xs-15"align="middle">
+                <button id="btnFilter" type="submit" style="width: 80px">Filter</a></button>
+            </div>
+            
+        
+            <br></br>
+         <!-- results table -->
+            <div>
+                <table class="table table-striped">
+                    <thead>
+                        <th class="text-center">Staff Name</th>
+                        <th class="text-center"> # Event Shift</th>
+                    </thead>
+                 <tbody>                     
+                {% for staff in staffs %}
+
+                <tr>
+                    <td>{{staff.staffName}}</td>
+                    <td>{{staff.EventShift}}</td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+                </table>
+            </div>
+
+        
+
+        <br>
+        <a class=" btn btn-default" href="/back-button" role="button">Back</a>
+    </div>
+</body>
+</html>
