@@ -1189,7 +1189,6 @@ def getSiteReport(stDate, endDate, eCountMin, eCountMax, stCountMin, stCountMax,
             toVisMin, toVisMax, toVisMax, toRevMin, toRevMin, toRevMax, toRevMax, sort));
     return _cursor.fetchall();
 
-
 def getDailyDetail(site, date, sort):
     if(sort == "" or sort is None):
         sort = "EventName ASC"
@@ -1198,39 +1197,41 @@ def getDailyDetail(site, date, sort):
         FROM (
             SELECT F.EventName, F.StartDate, F.SiteName, F.StaffNames, SUM(F.VisitorValue) AS Visits, F.EventPrice
             FROM (
-                SELECT D.EventName, D.StartDate, D.SiteName, D.StaffNames, E.VisitorValue, D.EventPrice
-                FROM (
-                    SELECT C.EventName, C.StartDate, C.SiteName, C.EventPrice, GROUP_CONCAT(C.StaffUsername SEPARATOR '\n') AS StaffNames
-                    FROM (
-                        SELECT A.EventName, A.StartDate, A.SiteName, B.StaffUsername, A.EventPrice
-                        FROM (
-                            SELECT EventName, StartDate, SiteName, EventPrice
-                            FROM event
-                            WHERE DATEDIFF(StartDate, '%s') <= 0
-                            AND DATEDIFF(EndDate, '%s') >= 0
-                            AND SiteName = '%s'
-                        ) AS A
-                        INNER JOIN (
-                            SELECT *
-                            FROM assignto
-                        ) AS B
-                        ON A.EventName = B.EventName
-                        WHERE A.StartDate = B.StartDate
-                        AND A.SiteName = B.SiteName
-                    ) AS C
-                    GROUP BY C.EventName, C.StartDate, C.SiteName
-                ) AS D
-                INNER JOIN (
-                    SELECT EventName, StartDate, SiteName, 1 AS VisitorValue
-                    FROM visitevent
-                    WHERE VisitEventDate = '%s'
+            	SELECT D.EventName, D.StartDate, D.SiteName, D.StaffNames, E.VisitorValue, D.EventPrice
+            	FROM (
+            		SELECT C.EventName, C.StartDate, C.SiteName, C.EventPrice, GROUP_CONCAT(C.StaffUsername SEPARATOR '\n') AS StaffNames
+            		FROM (
+            			SELECT A.EventName, A.StartDate, A.SiteName, B.StaffUsername, A.EventPrice
+            			FROM (
+            				SELECT EventName, StartDate, SiteName, EventPrice
+            				FROM event
+            				WHERE DATEDIFF(StartDate, '%s') <= 0
+            				AND DATEDIFF(EndDate, '%s') >= 0
+            				AND SiteName = '%s'
+            			) AS A
+            			INNER JOIN (
+            				SELECT *
+            				FROM assignto
+            			) AS B
+            			ON A.EventName = B.EventName
+            			WHERE A.StartDate = B.StartDate
+            			AND A.SiteName = B.SiteName
+            		) AS C
+            		GROUP BY C.EventName, C.StartDate, C.SiteName
+            	) AS D
+            	INNER JOIN (
+            		SELECT EventName, StartDate, SiteName, 1 AS VisitorValue
+            		FROM visitevent
+            		WHERE VisitEventDate = '%s'
+
                     UNION
+
                     SELECT EventName, StartDate, SiteName, 0 AS VisitorValue
                     FROM event
-                ) AS E
-                ON D.EventName = E.EventName
-                WHERE D.StartDate = E.StartDate
-                AND D.SiteName = E.SiteName
+            	) AS E
+            	ON D.EventName = E.EventName
+            	WHERE D.StartDate = E.StartDate
+            	AND D.SiteName = E.SiteName
             ) AS F
             GROUP BY F.EventName, F.StartDate, F.SiteName
         ) AS G
@@ -1239,99 +1240,6 @@ def getDailyDetail(site, date, sort):
     #print(query % (date, date, site, date, sort))
     response = _cursor.execute(query % (date, date, site, date, sort))
     return _cursor.fetchall();
-
-def getEventDetail32(eventName, startDate, siteName):
-    query = """
-        SELECT *
-        FROM event
-        WHERE EventName = %s
-        AND StartDate = %s
-        AND SiteName = %s;
-        """
-    response = _cursor.execute(query, (eventName, startDate, siteName))
-    return (_cursor.fetchall()[0])
-
-
-def getstaffDetail32(eventName, startDate, siteName):
-    query = """
-    SELECT StaffUsername
-    FROM assignto
-    WHERE EventName = %s
-    AND StartDate = %s
-    AND SiteName = %s
-    ORDER BY StaffUsername ASC;
-    """
-
-    response = _cursor.execute(query, (eventName, startDate, siteName))
-    return (_cursor.fetchall())
-
-
-def getEventDate32(eventName, startDate, siteName):
-    query = """
-
-
-    SELECT DATEDIFF(EndDate,StartDate)
-    FROM event
-    WHERE EventName = %s
-    AND StartDate = %s
-    AND SiteName = %s;
-
-    """
-
-    response = _cursor.execute(query, (eventName, startDate, siteName))
-    return (_cursor.fetchone()[0])
-
-
-def logeventVisit(user, eventName, startDate, siteName, date):
-    try:
-        query = """
-        INSERT INTO visitevent
-        VALUES (%s, %s, %s,%s, %s);
-        """
-
-        response = _cursor.execute(query, (user, eventName, startDate, siteName, date))
-        _database.commit();
-        return 1
-
-    except Exception as e:
-        print("---> run into Exception:")
-        print("---> " + str(e) + '\n')  # print exception message
-        return 0
-
-
-
-def logsiteVisit(user, siteName, date):
-    try:
-        query = """
-        INSERT into visitsite
-        VALUES(%s, %s, %s)
-        """
-        response = _cursor.execute(query, (user, siteName, date))
-        _database.commit();
-        return 1
-    except Exception as e:
-        print("---> run into Exception:")
-        print("---> " + str(e) + '\n')  # print exception message
-        return 0
-
-
-def manageStaffers(siteName, firstname, lastname, startDate, enddate,sort):
-    if(sort == "" or sort is None):
-        sort = "Shifts ASC"
-    if(firstname == "" or firstname is None):
-        firstname = "-ALL-"
-    if(lastname == "" or lastname is None):
-        lastname = "-ALL-"
-    if(startDate == "" or startDate is None):
-        startDate = "-ALL-"
-    if(enddate == "" or enddate is None):
-        enddate = "-ALL-"
-    if(siteName is None):
-        siteName = "-ALL-"
-
-    # print siteName
-    query = """
-        """
 
 def getSchedule(user, ename, keyword, sdate, edate, sort):
     if(ename == "" or ename is None):
