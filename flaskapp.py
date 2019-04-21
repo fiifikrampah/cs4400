@@ -1436,6 +1436,7 @@ def render_manage_transit():
 def to_manage_event():
     if request.method == 'GET':
         global _logged_user
+        print "MANAGE EVENT LOGGED USER IS: %s" % _logged_user
         site = getManagersSite(_logged_user)
         response = getEvents25(site, None, None, None, None, None, None, None, None, None, None, None)
         eventList = []
@@ -1576,6 +1577,11 @@ def manageStaff():
 def eventDetails():
     if request.method == 'GET':
 
+        # info1 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+        # info2 = getstaffDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+        # info3 = getEventDate32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+
+
         info1 = getEventDetail32(eventName, startDate, siteName)
         info2 = getstaffDetail32(eventName, startDate, siteName)
         info3 = getEventDate32(eventName, startDate, siteName)
@@ -1600,7 +1606,7 @@ def eventDetails():
         StaffUsername = ",\n".join(stafflist)
         Duration = info3
 
-    return render_template("32-eventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,filSite=site, EndDate=EndDate,
+    return render_template("32-eventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName, EndDate=EndDate,
         EventPrice=EventPrice, Capacity=Capacity,Description=Description,StaffUsername=StaffUsername,Duration=Duration)
 
 
@@ -1611,6 +1617,9 @@ def eventDetails():
 def visitor_eventDetails():
     if request.method == 'GET':
         # info1 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+        # info2 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+        # info3 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+
 
         info1 = getEventDetail32(eventName, startDate, siteName)
         info2 = getstaffDetail32(eventName, startDate, siteName)
@@ -1694,9 +1703,9 @@ def visitor_logVisit():
 @app.route("/to_visitor_site_detail", methods=['GET'])
 def visitor_siteDetails():
     if request.method == 'GET':
-        info1 = get_site_info('Atlanta Beltline Center')
+        # info1 = get_site_info('Atlanta Beltline Center')
 
-        # info1 = get_site_info(sitename)
+        info1 = get_site_info(sitename)
                
         SiteName = info1[0][0]
         Address = str(info1[0][1])      
@@ -1735,19 +1744,6 @@ def visitor_logsiteVisit():
 
             # violates primary key constraint username
             return render_template("37-vissitedetail.html", SiteName=SiteName, OpenEveryday=OpenEveryday,fulladdress=fulladdress, error="Cannot log visit to the same site on same date")
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @app.route("/to_create_event", methods=['POST', 'GET'])
 def create_event():
