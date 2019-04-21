@@ -3,6 +3,7 @@ from api import *
 from database import *
 from flask import Flask, render_template, json, request, Response, redirect, url_for
 from decimal import Decimal
+from datetime import datetime
 
 app = Flask(__name__)
 _logged_user = ""
@@ -27,7 +28,11 @@ def main():
     #return create_transit();
     #return manage_event();
     # return to_manage_event();
-    return render_template('1-login.html', error = "")
+    # return eventDetails()
+    # return visitor_eventDetails()
+    return visitor_siteDetails()
+
+    # return render_template('1-login.html', error = "")
 
 @app.route("/to_register_navigation")
 def to_register_navigation():
@@ -1529,6 +1534,187 @@ def to_manage_event():
                 filKey=descr, filStDate=startDate, filEndDate=endDate, filDurMin=mindur,
                 filDurMax=maxdur, filVisMin=minvis, filVisMax=maxvis,
                 filRevMin=minrev, filRevMax=maxrev)
+
+
+
+
+#Screen32
+@app.route("/to_staff_event_detail", methods=['GET'])
+def eventDetails():
+    if request.method == 'GET':
+
+        info1 = getEventDetail32(eventName, startDate, siteName)
+        info2 = getstaffDetail32(eventName, startDate, siteName)
+        info3 = getEventDate32(eventName, startDate, siteName)
+
+       
+        EventName = info1[0]
+        StartDate = str(info1[1])[0:10]
+        SiteName = info1[2]
+        EndDate = str(info1[3])[0:10]
+        EventPrice = info1[4]
+        Capacity = info1[5]
+        # MinStaffRequired = info1[6]
+        Description = info1[7]
+
+        staff = info2
+        stafflist = []
+        
+        for list in staff:
+            for item in list:
+                stafflist.append(item)
+
+        StaffUsername = ",\n".join(stafflist)
+        Duration = info3
+
+    return render_template("32-eventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
+        EventPrice=EventPrice, Capacity=Capacity,Description=Description,StaffUsername=StaffUsername,Duration=Duration)
+
+
+
+
+# Screen 34
+@app.route("/to_visitor_event_detail", methods=['GET'])
+def visitor_eventDetails():
+    if request.method == 'GET':
+        # info1 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+
+        info1 = getEventDetail32(eventName, startDate, siteName)
+        info2 = getstaffDetail32(eventName, startDate, siteName)
+        info3 = getEventDate32(eventName, startDate, siteName)
+
+       
+        EventName = info1[0]
+        StartDate = str(info1[1])[0:10]
+        SiteName = info1[2]
+        EndDate = str(info1[3])[0:10]
+        price = info1[4]
+        Description = info1[7]
+        #FIX THIS USING PREVIOUS SCREEN:
+        TicketRemaining = 0
+                
+    
+
+    return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
+        price=price,Description=Description,TicketRemaining=TicketRemaining)
+
+
+@app.route("/visitor_logVisit", methods=[ 'POST'])
+def visitor_logVisit():
+    
+    try:
+        # info1 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+        info1 = getEventDetail32(eventName, startDate, siteName)
+        EventName = info1[0]
+        StartDate = str(info1[1])[0:10]
+        SiteName = info1[2]
+        EndDate = str(info1[3])[0:10]
+        price = info1[4]
+        Description = info1[7]
+        #FIX THIS USING PREVIOUS SCREEN:
+        TicketRemaining = 0
+        VisitDate = request.form["visitdate"][0:10]
+
+        global _logged_user
+        print "THE VISITOR IS: %s" % _logged_user
+
+        newstart = datetime.strptime(StartDate, '%Y-%m-%d').date()
+        newend = datetime.strptime(EndDate, '%Y-%m-%d').date()
+        newvisitdate = datetime.strptime(VisitDate, '%Y-%m-%d').date()
+        # print newvisitdate
+
+        # Visit date must be b/n start and end and Remaining tickets > 0:
+        
+
+        if (newstart <= newvisitdate) and  (newvisitdate <= newend) and TicketRemaining > 0 :
+            result = logeventVisit(_logged_user, EventName, StartDate,SiteName, VisitDate)
+            if result == 1:
+                print "YAAAY"
+                return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
+                    price=price,Description=Description,TicketRemaining=TicketRemaining, success="Event has been logged!")
+            elif result == 0:
+                print  "NAAY"
+                return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
+                    price=price,Description=Description,TicketRemaining=TicketRemaining, error="An event with the same date has been already logged!")
+
+        elif (newvisitdate < newstart) or  (newvisitdate > newend):
+            return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
+                    price=price,Description=Description,TicketRemaining=TicketRemaining, error="Visit Date must be between Start and End Dates")
+        elif(TicketRemaining==0):
+            return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,price=price,Description=Description,TicketRemaining=TicketRemaining, error="The event is sold out!")
+        
+    except Exception as e:
+        print("---> run into Exception:")
+        print("---> " + str(e) + '\n')  # print exception message
+        if str(e)[1:5] == "1062":
+
+            # violates primary key constraint username
+            return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
+                price=price,Description=Description,TicketRemaining=TicketRemaining, error="An event with the same date has been already logged!")
+
+        return go_to_functionality_screen()
+
+
+
+
+#Screen 37
+@app.route("/to_visitor_site_detail", methods=['GET'])
+def visitor_siteDetails():
+    if request.method == 'GET':
+        info1 = get_site_info('Atlanta Beltline Center')
+
+        # info1 = get_site_info(sitename)
+               
+        SiteName = info1[0][0]
+        Address = str(info1[0][1])      
+        Zipcode = str(info1[0][2])
+        OpenEveryday = info1[0][3]
+        fulladdress = Address + " " + Zipcode
+    return render_template("37-vissitedetail.html", SiteName=SiteName, OpenEveryday=OpenEveryday,fulladdress=fulladdress)
+
+
+@app.route("/visitor_logsiteVisit", methods=[ 'POST'])
+def visitor_logsiteVisit():
+    
+    try:
+        global _logged_user
+        print "THE VISITOR IS: %s" % _logged_user
+
+        # info1 = get_site_info('Atlanta Beltline Center')
+
+        info1 = get_site_info(sitename)
+               
+        SiteName = info1[0][0]
+        Address = str(info1[0][1])      
+        Zipcode = str(info1[0][2])
+        OpenEveryday = info1[0][3]
+        fulladdress = Address + " " + Zipcode
+        sitevisitdate = request.form["sitevisitdate"][0:10]
+
+        result = logsiteVisit(_logged_user, SiteName, sitevisitdate)
+        if result == 1:
+            return render_template("37-vissitedetail.html", SiteName=SiteName, OpenEveryday=OpenEveryday,fulladdress=fulladdress, success="Site Visit logged successfully")
+
+    except Exception as e:
+        print("---> run into Exception:")
+        print("---> " + str(e) + '\n')  # print exception message
+        if str(e)[1:5] == "1062":
+
+            # violates primary key constraint username
+            return render_template("37-vissitedetail.html", SiteName=SiteName, OpenEveryday=OpenEveryday,fulladdress=fulladdress, error="Cannot log visit to the same site on same date")
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route("/to_create_event", methods=['POST', 'GET'])
 def create_event():

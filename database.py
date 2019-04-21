@@ -2,7 +2,13 @@
 
 from datetime import datetime
 import pymysql
+import sys
 import traceback
+reload(sys)
+sys.setdefaultencoding('utf8')
+
+
+
 
 
 # Establish a secure connection to the database (which will be hosted on some gatech server?)
@@ -965,11 +971,76 @@ def getEvents25(site, ename, descr, sdate, edate, mindur, maxdur, minvis, maxvis
 
 
 
+def getEventDetail32(eventName, startDate, siteName):
+    query = """
+        SELECT *
+        FROM event
+        WHERE EventName = %s
+        AND StartDate = %s
+        AND SiteName = %s;
+        """
+    response = _cursor.execute(query, (eventName, startDate, siteName))
+    return (_cursor.fetchall()[0])
+
+
+def getstaffDetail32(eventName, startDate, siteName):
+    query = """
+    SELECT StaffUsername
+    FROM assignto
+    WHERE EventName = %s
+    AND StartDate = %s
+    AND SiteName = %s
+    ORDER BY StaffUsername ASC;
+    """
+
+    response = _cursor.execute(query, (eventName, startDate, siteName))
+    return (_cursor.fetchall())
+
+
+def getEventDate32(eventName, startDate, siteName):
+    query = """
+
+    SELECT DATEDIFF(EndDate,StartDate)
+    FROM event
+    WHERE EventName = %s
+    AND StartDate = %s
+    AND SiteName = %s;
+    """
+    response = _cursor.execute(query, (eventName, startDate, siteName))
+    return (_cursor.fetchone()[0])
+
+
+def logeventVisit(user, eventName, startDate, siteName, date):
+    try:
+        query = """
+        INSERT INTO visitevent
+        VALUES (%s, %s, %s,%s, %s);
+        """
+
+        response = _cursor.execute(query, (user, eventName, startDate, siteName, date))
+        _database.commit();
+        return 1
+
+    except Exception as e:
+        print("---> run into Exception:")
+        print("---> " + str(e) + '\n')  # print exception message
+        return 0
 
 
 
-
-
+def logsiteVisit(user, siteName, date):
+    try:
+        query = """
+        INSERT into visitsite
+        VALUES(%s, %s, %s)
+        """
+        response = _cursor.execute(query, (user, siteName, date))
+        _database.commit();
+        return 1
+    except Exception as e:
+        print("---> run into Exception:")
+        print("---> " + str(e) + '\n')  # print exception message
+        return 0
 
 
 # DEPRECATED FUNCTIONS
