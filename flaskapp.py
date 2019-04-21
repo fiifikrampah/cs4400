@@ -6,10 +6,12 @@ from decimal import Decimal
 from datetime import datetime
 
 app = Flask(__name__)
+
 _logged_user = ""
 _logged_userType = ""
 # _logged_user = "manager2"
 # _logged_userType = "Manager, Visitor"
+
 
 @app.route('/')
 def main():
@@ -27,12 +29,14 @@ def main():
     #return manage_transit();
     #return create_transit();
     #return manage_event();
+
     # return to_manage_event();
     # return eventDetails()
     # return visitor_eventDetails()
     return visitor_siteDetails()
 
     # return render_template('1-login.html', error = "")
+
 
 @app.route("/to_register_navigation")
 def to_register_navigation():
@@ -1474,6 +1478,7 @@ def to_manage_event():
             event['Duration'] = item[2]
             event['TotalVisits'] = item[3]
             event['TotalRevenue'] = item[4]
+            event['StartDate'] = item[5]
             eventList.append(event)
 
         return render_template("25-managermanevent.html", events=eventList, filName="", filKey="", filStDate="",
@@ -1528,6 +1533,7 @@ def to_manage_event():
             event['Duration'] = item[2]
             event['TotalVisits'] = item[3]
             event['TotalRevenue'] = item[4]
+            event['StartDate'] = item[5]
             eventList.append(event)
 
         return render_template("25-managermanevent.html", events=eventList, filName=name,
@@ -1719,9 +1725,366 @@ def visitor_logsiteVisit():
 @app.route("/to_create_event", methods=['POST', 'GET'])
 def create_event():
     if request.method == 'GET':
-        print("hey")
+        filStaff = []
+        staffs = []
+        response = getAllStaff();
+        for item in response:
+            staff={}
+            staff['Username'] = item[0]
+            staffs.append(staff)
+
+        return render_template("27-managercreateevent.html", filName="", filPrice=-1, filCap=-1,
+                filMinStaff=-1, filStDate="", filEndDate="", filDescr="", filStaff=filStaff, staffs=staffs)
     if request.method == 'POST':
-        print("hey")
+        name=request.form["name"]
+        price=request.form["price"]
+        capacity=request.form["capacity"]
+        minstaff=request.form["minstaff"]
+        stdate=request.form["startdate"]
+        enddate=request.form["enddate"]
+        description=request.form["description"]
+
+        if(price == ""):
+            price = -1;
+        if(capacity == ""):
+            capacity = -1;
+        if(minstaff == ""):
+            minstaff = -1;
+        price = float(price)
+        capacity = float(capacity)
+        minstaff = float(minstaff)
+
+        selectedStaff = []
+        allStaff = []
+        response = getAllStaff()
+        for item in response:
+            staff={}
+            staff['Username'] = item[0];
+            allStaff.append(staff)
+
+            included = ""
+            try:
+                included = request.form[item[0]]
+            except:
+                included = "No"
+            if(included == "Yes"):
+                selectedStaff.append(staff)
+
+        if(stdate != "" and enddate != ""):
+            response = getAvailableStaff(stdate, enddate);
+            allStaff = []
+            for item in response:
+                staff={}
+                staff['Username'] = item[0]
+                print(item)
+                allStaff.append(staff)
+
+        if(name == "" or price == -1 or capacity == -1 or minstaff == -1 or stdate == ""
+                or enddate == "" or description == "" or len(selectedStaff) == 0):
+            error="You must fill in all fields to create the event"
+        elif(len(selectedStaff) < minstaff):
+            error="You must assign >= the minimum required staff"
+        else:
+            global _logged_users
+            site = getManagersSite(_logged_user);
+            addEvent(name, price, capacity, minstaff, stdate, enddate, description, selectedStaff, site);
+            return render_manage_event();
+        return render_template("27-managercreateevent.html", filName=name, filPrice=price,
+                filCap=capacity, filMinStaff=minstaff, filStDate=stdate, filEndDate=enddate,
+                filDescr=description, filStaff=selectedStaff, staffs=allStaff, error=error)
+
+@app.route("/get_available_staff_to_create", methods=['POST'])
+def get_available_staff_to_create():
+    error=""
+    print("why isn't htis working")
+    name=request.form["name"]
+    price=request.form["price"]
+    capacity=request.form["capacity"]
+    minstaff=request.form["minstaff"]
+    stdate=request.form["startdate"]
+    enddate=request.form["enddate"]
+    description=request.form["description"]
+
+    if(price == ""):
+        price = -1;
+    if(capacity == ""):
+        capacity = -1;
+    if(minstaff == ""):
+        minstaff = -1;
+    price = float(price)
+    capacity = float(capacity)
+    minstaff = float(minstaff)
+
+    response = getAllStaff()
+    selectedStaff = []
+    allStaff = []
+    for item in response:
+        staff={}
+        staff['Username'] = item[0];
+        allStaff.append(staff)
+
+        included = ""
+        try:
+            included = request.form[item[0]]
+        except:
+            included = "No"
+        if(included == "Yes"):
+            selectedStaff.append(staff)
+    print(stdate)
+    print(enddate)
+    if(stdate == "" or enddate == ""):
+        error="You must fill in a start and end date to get available staff"
+        return render_template("27-managercreateevent.html", filName=name, filPrice=price,
+                filCap=capacity, filMinStaff=minstaff, filStDate=stdate, filEndDate=enddate,
+                filDescr=description, filStaff=selectedStaff, staffs=allStaff, error=error)
+    else:
+        response = getAvailableStaff(stdate, enddate);
+        availableStaff = []
+        for item in response:
+            staff={}
+            staff['Username'] = item[0]
+            print(item)
+            availableStaff.append(staff)
+        return render_template("27-managercreateevent.html", filName=name, filPrice=price,
+                filCap=capacity, filMinStaff=minstaff, filStDate=stdate, filEndDate=enddate,
+                filDescr=description, filStaff=selectedStaff, staffs=availableStaff, error=error)
+
+def render_manage_event():
+    global _logged_user
+    site = getManagersSite(_logged_user)
+    response = getEvents25(site, None, None, None, None, None, None, None, None, None, None, None)
+    eventList = []
+    for item in response:
+        event={}
+        event['EventName'] = item[0]
+        event['StaffCount'] = item[1]
+        event['Duration'] = item[2]
+        event['TotalVisits'] = item[3]
+        event['TotalRevenue'] = item[4]
+        event['StartDate'] = item[5]
+        eventList.append(event)
+
+    return render_template("25-managermanevent.html", events=eventList, filName="", filKey="", filStDate="",
+            filEndDate="", filDurMin=-1, filDurMax=-1, filVisMin=-1, filVisMax=-1,
+            filRevMin=-1, filRevMax=-1)
+
+@app.route("/delete_event", methods=['POST'])
+def delete_event():
+    event = request.form["chosen_event"]
+    event = event.replace("{'", "").replace("}", "")
+    fields = event.split(", '")
+
+    eventname = ""
+    startdate = ""
+
+    global _logged_user
+    site = getManagersSite(_logged_user)
+
+    for field in fields:
+        if(len(field) >= 10 and field[0:10] == "EventName'"):
+            strings = field.split(": ")
+            eventname = strings[1][1:len(strings[1])-1]
+        if(len(field) >= 10 and field[0:10] == "StartDate'"):
+            strings = field.split(": ")
+            date = strings[1][17:len(strings[1])]
+            date = date.replace("(", "").replace(")", "")
+            components = date.split(", ")
+            year = components[0]
+            month = components[1]
+            day = components[2]
+
+            if(len(month) < 2):
+                month = "0" + month;
+            if(len(day) < 2):
+                day = "0" + day;
+            startdate = year + "-" + month + "-" + day
+
+    deleteEvent(eventname, startdate, site)
+
+    return render_manage_event()
+
+@app.route("/to_edit_event", methods=['POST', 'GET'])
+def to_edit_event():
+    event = request.form["chosen_event"]
+    event = event.replace("{'", "").replace("}", "")
+    fields = event.split(", '")
+
+    eventname = ""
+    startdate = ""
+
+    global _logged_user
+    site = getManagersSite(_logged_user)
+
+    for field in fields:
+        if(len(field) >= 10 and field[0:10] == "EventName'"):
+            strings = field.split(": ")
+            eventname = strings[1][1:len(strings[1])-1]
+        if(len(field) >= 10 and field[0:10] == "StartDate'"):
+            strings = field.split(": ")
+            date = strings[1][17:len(strings[1])]
+            date = date.replace("(", "").replace(")", "")
+            components = date.split(", ")
+            year = components[0]
+            month = components[1]
+            day = components[2]
+
+            if(len(month) < 2):
+                month = "0" + month;
+            if(len(day) < 2):
+                day = "0" + day;
+            startdate = year + "-" + month + "-" + day
+
+    response = getEventInfo(eventname, startdate, site)
+    name = response[0]
+    stDate = response[1]
+    endDate = response[3]
+    price = response[4]
+    capacity = response[5]
+    minstaff = response[6]
+    descr = response[7]
+
+    price = float(price)
+    capacity = float(capacity)
+    minstaff = float(minstaff)
+
+    print(stDate)
+    print(endDate)
+    response = getAvailableStaff(stDate, endDate);
+    availableStaff = []
+    for item in response:
+        staff={}
+        staff['Username'] = item[0]
+        availableStaff.append(staff)
+    print(availableStaff)
+
+
+    response = getAssignedStaff(eventname, startdate, site)
+    assignedStaff = []
+    for item in response:
+        staff={}
+        staff['Username'] = item[0]
+        #availableStaff.append(staff)
+        assignedStaff.append(staff)
+    print(assignedStaff)
+
+    response = getDayInfo(eventname, startdate, site, None, None, None, None)
+    days = []
+    for item in response:
+        day={}
+        day['Date'] = item[0]
+        day['DailyVisits'] = item[1]
+        day['DailyRevenue'] = item[2]
+        days.append(day);
+
+    return render_template("26-managereditevent.html", filName=name, filPrice=price,
+            filCap=capacity, filEndDate=endDate, filStDate=stDate, filMinStaff=minstaff,
+            filVisMin=-1, filVisMax=-1, filRevMin=-1, filRevMax=-1, filDescr=descr,
+            staffs=availableStaff, filStaff=assignedStaff, days=days, error="")
+
+@app.route("/to_edit_event_filtered", methods=['POST'])
+def to_edit_event_filtered():
+    error=""
+    eventname = request.form["eventname"]
+    startdate = request.form["startdate"]
+
+    global _logged_user
+    site = getManagersSite(_logged_user)
+
+    response = getEventInfo(eventname, startdate, site)
+    name = response[0]
+    stDate = response[1]
+    endDate = response[3]
+    price = response[4]
+    capacity = response[5]
+    minstaff = response[6]
+    descr = request.form["description"]
+
+    price = float(price)
+    capacity = float(capacity)
+    minstaff = float(minstaff)
+
+    response = getAvailableStaff(stDate, endDate);
+    availableStaff = []
+    assignedStaff = []
+    for item in response:
+        staff={}
+        staff['Username'] = item[0]
+        availableStaff.append(staff)
+
+        included = ""
+        try:
+            included = request.form[item[0]]
+        except:
+            included = "No"
+        if(included == "Yes"):
+            assignedStaff.append(staff)
+
+    vismin = request.form["minVisits"]
+    vismax = request.form["maxVisits"]
+    revmin = request.form["minRevenue"]
+    revmax = request.form["maxRevenue"]
+
+    if(vismin == ""):
+        vismin = -1
+    if(vismax == ""):
+        vismax = -1;
+    if(revmin == ""):
+        revmin = -1;
+    if(revmax == ""):
+        revmax = -1;
+    vismin = float(vismin)
+    vismax = float(vismax)
+    revmin = float(revmin)
+    revmax = float(revmax)
+
+    days=[]
+    if(vismax < vismin and vismax != -1):
+        error="Max Visits cannot be less than min"
+    elif(revmax < revmin and revmin != -1):
+        error="Max Revenue cannot be less than min"
+    else:
+        response = getDayInfo(eventname, startdate, site, vismin, vismax, revmin, revmax)
+        for item in response:
+            day={}
+            day['Date'] = item[0]
+            day['DailyVisits'] = item[1]
+            day['DailyRevenue'] = item[2]
+            days.append(day);
+
+    return render_template("26-managereditevent.html", filName=name, filPrice=price,
+            filCap=capacity, filEndDate=endDate, filStDate=stDate, filMinStaff=minstaff,
+            filVisMin=vismin, filVisMax=vismax, filRevMin=revmin, filRevMax=revmax, filDescr=descr,
+            staffs=availableStaff, filStaff=assignedStaff, days=days, error=error)
+
+@app.route("/edit_event", methods=['POST'])
+def edit_event():
+    error=""
+    eventname = request.form["eventname"]
+    startdate = request.form["startdate"]
+
+    global _logged_user
+    site = getManagersSite(_logged_user)
+
+    description = request.form["description"]
+
+    response = getAllStaff();
+    assignedStaff = []
+    for item in response:
+        staff={}
+        staff['Username'] = item[0]
+
+        included = ""
+        try:
+            included = request.form[item[0]]
+        except:
+            included = "No"
+        if(included == "Yes"):
+            assignedStaff.append(staff)
+
+    updateEvent(eventname, startdate, site, description, assignedStaff)
+
+    return render_manage_event();
+
 
 
 

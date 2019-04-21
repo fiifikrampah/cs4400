@@ -923,13 +923,13 @@ def getEvents25(site, ename, descr, sdate, edate, mindur, maxdur, minvis, maxvis
     minrev = int(minrev)
     maxrev = int(maxrev)
     query = """
-        SELECT EventName, StaffCount, Duration, TotalVisits, TotalRevenue
+        SELECT EventName, StaffCount, Duration, TotalVisits, TotalRevenue, StartDate
         FROM (
             SELECT E.EventName, E.StaffCount, E.StartDate, E.Duration, E.TotalVisits, (E.EventPrice*E.TotalVisits) AS TotalRevenue
             FROM (
                 SELECT A.EventName, A.StartDate, A.SiteName, A.Duration, A.EventPrice, A.StaffCount, D.TotalVisits, A.Description, A.EndDate
                 FROM (
-                    SELECT C.EventName, C.StartDate, C.EndDate, C.SiteName, DATEDIFF(C.EndDate, C.StartDate) AS Duration, C.EventPrice, B.StaffCount, C.Description
+                    SELECT C.EventName, C.StartDate, C.EndDate, C.SiteName, (DATEDIFF(C.EndDate, C.StartDate) + 1) AS Duration, C.EventPrice, B.StaffCount, C.Description
                     FROM event AS C
                     INNER JOIN (
                         SELECT EventName, StartDate, SiteName, COUNT(*) As StaffCount
@@ -945,6 +945,21 @@ def getEvents25(site, ename, descr, sdate, edate, mindur, maxdur, minvis, maxvis
                     SELECT EventName, StartDate, SiteName, COUNT(*) AS TotalVisits
                     FROM visitevent
                     GROUP BY EventName, StartDate, SiteName
+
+                    UNION
+
+                    SELECT Y.EventName, Y.StartDate, Y.SiteName, 0 AS TotalVisits
+                    FROM (
+                        SELECT EventName, StartDate, SiteName
+                        FROM event AS U
+                        WHERE NOT EXISTS (
+                            SELECT V.EventName, V.StartDate, V.SiteName
+                            FROM visitevent AS V
+                            WHERE U.EventName = V.EventName
+                            AND U.StartDate = V.StartDate
+                            AND U.SiteName = V.SiteName
+                        )
+                    ) AS Y
                 ) AS D
                 ON A.EventName = D.EventName
                 WHERE A.StartDate = D.StartDate
@@ -968,6 +983,175 @@ def getEvents25(site, ename, descr, sdate, edate, mindur, maxdur, minvis, maxvis
         maxvis, minrev, minrev, maxrev, maxrev, sort));
     return _cursor.fetchall();
 
+def getAllStaff():
+    query = """
+        SELECT Username
+        FROM employee
+        WHERE EmployeeType = 'Staff'
+        """
+    response = _cursor.execute(query)
+    return _cursor.fetchall();
+
+def getAvailableStaff(startDate, endDate):
+    query = """
+        SELECT DISTINCT StaffUsername
+        FROM (
+            SELECT A.StaffUsername, A.EventName, A.StartDate, A.SiteName, B.EndDate
+            FROM assignto AS A
+            INNER JOIN (
+                SELECT EventName, StartDate, SiteName, EndDate
+                FROM event
+            ) AS B
+            ON A.EventName = B.EventName
+            WHERE A.StartDate = B.StartDate
+            AND A.SiteName = B.SiteName
+            AND (DATEDIFF(B.EndDate, '%s') > 0 OR DATEDIFF('%s', A.StartDate) > 0)
+        ) AS C
+        """
+    response = _cursor.execute(query % (startDate, endDate))
+    return _cursor.fetchall();
+
+def addEvent(name, price, capacity, minstaff, stdate, enddate, description, selectedStaff, site):
+    query0 = """
+        INSERT INTO event
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+    response0 = _cursor.execute(query0, (name, stdate, site, enddate, price, capacity, minstaff, description));
+    _database.commit();
+
+    query1 = """
+        INSERT INTO assignto
+        VALUES (%s, %s, %s, %s)
+        """
+    for staff in selectedStaff:
+        response1 = _cursor.execute(query1, (staff['Username'], name, stdate, site));
+        _database.commit();
+
+def deleteEvent(name, startDate, site):
+    query0="""
+        DELETE FROM event
+        WHERE EventName = '%s'
+        AND StartDate = '%s'
+        AND SiteName = '%s'
+        """
+    response0 = _cursor.execute(query0 % (name, startDate, site))
+    _database.commit();
+
+    query1="""
+        DELETE FROM visitevent
+        WHERE EventName = '%s'
+        AND StartDate = '%s'
+        AND SiteName = '%s'
+        """
+    response1 = _cursor.execute(query1 % (name, startDate, site))
+    _database.commit();
+
+    query2="""
+        DELETE FROM assignto
+        WHERE EventName = '%s'
+        AND StartDate = '%s'
+        AND SiteName = '%s'
+        """
+    response2 = _cursor.execute(query2 % (name, startDate, site))
+    _database.commit();
+
+def getEventInfo(name, startDate, site):
+    query = """
+        SELECT EventName, DATE(StartDate), SiteName, DATE(EndDate), EventPrice, Capacity, MinStaffRequired, Description
+        FROM event
+        WHERE EventName = '%s'
+        AND StartDate = '%s'
+        AND SiteName = '%s'
+        """
+    response = _cursor.execute(query % (name, startDate, site))
+    return _cursor.fetchone()
+
+def getAssignedStaff(name, startdate, site):
+    query = """
+        SELECT StaffUsername
+        FROM assignto
+        WHERE EventName = '%s'
+        AND StartDate = '%s'
+        AND SiteName = '%s'
+        """
+    response = _cursor.execute(query % (name, startdate, site))
+    return _cursor.fetchall();
+
+def getDayInfo(name, startdate, site, minvis, maxvis, minrev, maxrev):
+    if(minvis is None):
+        minvis = -1
+    if(maxvis is None):
+        maxvis = -1
+    if(minrev is None):
+        minrev = -1
+    if(maxrev is None):
+        maxrev = -1
+    query = """
+        SELECT VisitEventDate, DailyVisits, DailyRevenue
+        FROM (
+            SELECT C.VisitEventDate, C.DailyVisits, (C.DailyVisits*D.EventPrice) AS DailyRevenue
+            FROM (
+            	SELECT A.VisitEventDate, A.EventName, A.StartDate, A.SiteName, B.DailyVisits
+            	FROM (
+            		SELECT DISTINCT VisitEventDate, EventName, StartDate, SiteName
+            		FROM visitevent
+            		WHERE EventName = '%s'
+            		AND StartDate = '%s'
+            		AND SiteName = '%s'
+            	) AS A
+            	INNER JOIN (
+            		SELECT VisitEventDate, EventName, StartDate, SiteName, COUNT(*) AS DailyVisits
+            		FROM visitevent
+            		GROUP BY VisitEventDate, EventName, StartDate, SiteName
+            	) AS B
+            	ON A.EventName = B.EventName
+            	WHERE A.StartDate = B.StartDate
+            	AND A.SiteName = B.SiteName
+                AND A.VisitEventDate = B.VisitEventDate
+            ) AS C
+            INNER JOIN (
+            	SELECT EventName, StartDate, SiteName, EventPrice
+            	FROM event
+            ) AS D
+            ON C.EventName = D.EventName
+            WHERE C.StartDate = D.StartDate
+            AND C.SiteName = D.SiteName
+        ) AS E
+        WHERE (DailyVisits >= %d OR %d = -1)
+        AND (DailyVisits <= %d OR %d = -1)
+        AND (DailyRevenue >= %d OR %d = -1)
+        AND (DailyRevenue <= %d OR %d = -1)
+        """
+    response = _cursor.execute(query % (name, startdate, site, minvis, minvis, maxvis, maxvis,
+            minrev, minrev, maxrev, maxrev))
+    return _cursor.fetchall()
+
+def updateEvent(eventname, startdate, site, description, assignedStaff):
+    query0 = """
+        UPDATE event
+        SET Description = %s
+        WHERE EventName = %s
+        AND StartDate = %s
+        AND SiteName = %s
+        """
+    response0 = _cursor.execute(query0, (description, eventname, startdate, site))
+    _database.commit()
+
+    query1 = """
+        DELETE FROM assignto
+        WHERE EventName = '%s'
+        AND StartDate = '%s'
+        AND SiteName = '%s'
+        """
+    response1 = _cursor.execute(query1 % (eventname, startdate, site))
+
+    query2 = """
+        INSERT INTO assignto
+        VALUES (%s, %s, %s, %s)
+        """
+    for staff in assignedStaff:
+        response2 = _cursor.execute(query2, (staff['Username'], eventname, startdate, site))
+        _database.commit()
 
 
 
