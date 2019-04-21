@@ -1153,7 +1153,183 @@ def updateEvent(eventname, startdate, site, description, assignedStaff):
         response2 = _cursor.execute(query2, (staff['Username'], eventname, startdate, site))
         _database.commit()
 
+def getSiteReport(stDate, endDate, eCountMin, eCountMax, stCountMin, stCountMax,
+        toVisMin, toVisMax, toRevMin, toRevMax, site, sort):
+    if(eCountMin == "" or eCountMin is None):
+        eCountMin = -1
+    if(eCountMax == "" or eCountMax is None):
+        eCountMax = -1
+    if(stCountMin == "" or stCountMin is None):
+        stCountMin = -1
+    if(stCountMax == "" or stCountMax is None):
+        stCountMax = -1
+    if(toVisMin == "" or toVisMin is None):
+        toVisMin = -1
+    if(toVisMax == "" or toVisMax is None):
+        toVisMin = -1
+    if(toRevMin == "" or toRevMin is None):
+        toRevMin = -1
+    if(toRevMax == "" or toRevMax is None):
+        toRevMax = -1
+    if(sort == "" or sort is None):
+        sort = "Day ASC"
+    query = """
+        SELECT *
+        FROM (
+            SELECT AE.Day, AE.EventCount, AE.StaffCount, AE.TotalVisits, AE.TotalRevenue
+            FROM (
+                SELECT D.Day, D.EventCount, M.TotalStaffCount AS StaffCount, AD.TotalVis AS TotalVisits, AD.TotalRev AS TotalRevenue
+                FROM (
+                	SELECT C.Day, Count(*) AS EventCount
+                	FROM (
+                		SELECT A.Day, B.EventName, B.StartDate, B.SiteName
+                		FROM (
+                			SELECT _date AS Day
+                			FROM calendar
+                			WHERE DATEDIFF(_date, '%s') >= 0
+                			AND DATEDIFF(_date, '%s') <= 0
+                		) AS A
+                		INNER JOIN (
+                			SELECT EventName, StartDate, EndDate, SiteName
+                			FROM event
+                            WHERE SiteName = '%s'
+                		) AS B
+                		ON DATEDIFF(A.Day, B.StartDate) >= 0
+                		WHERE DATEDIFF(A.Day, B.EndDate) <= 0
+                	) AS C
+                	GROUP BY C.Day
+                ) AS D
+                INNER JOIN (
+                	SELECT L.Day, SUM(StaffCount) AS TotalStaffCount
+                    FROM (
+                		SELECT J.Day, J.EventName, J.StartDate, J.SiteName, K.StaffCount
+                		FROM (
+                			SELECT E.Day, F.EventName, F.StartDate, F.SiteName
+                			FROM (
+                				SELECT _date AS Day
+                				FROM calendar
+                				WHERE DATEDIFF(_date, '%s') >= 0
+                				AND DATEDIFF(_date, '%s') <= 0
+                			) AS E
+                			INNER JOIN (
+                				SELECT EventName, StartDate, EndDate, SiteName
+                				FROM event
+                                WHERE SiteName = '%s'
+                			) AS F
+                			ON DATEDIFF(E.Day, F.StartDate) >= 0
+                			WHERE DATEDIFF(E.Day, F.EndDate) <= 0
+                		) AS J
+                		INNER JOIN (
+                			SELECT EventName, StartDate, SiteName, COUNT(*) AS StaffCount
+                			FROM assignto
+                			GROUP BY EventName, StartDate, SiteName
+                		) AS K
+                		ON J.EventName = K.EventName
+                		WHERE J.StartDate = K.StartDate
+                		AND J.SiteName = K.SiteName
+                	) AS L
+                    GROUP BY L.Day
+                ) AS M
+                ON M.Day = D.Day
+                INNER JOIN (
+                	SELECT AC.Day, SUM(TotalVisits) AS TotalVis, SUM(TotalRevenue) AS TotalRev
+                	FROM (
+                		SELECT AB.Day, AB.TotalVisits, AB.TotalRevenue
+                		FROM (
+                			SELECT P.Day, Q.TotalVisits, Q.TotalRevenue
+                			FROM (
+                				SELECT _date AS Day
+                				FROM calendar
+                				WHERE DATEDIFF(_date, '%s') >= 0
+                				AND DATEDIFF(_date, '%s') <= 0
+                			) AS P
+                			INNER JOIN (
+                				SELECT T.VisitEventDate, SUM(T.VisitValue) AS TotalVisits, Sum(T.EventPrice) AS TotalRevenue
+                				FROM (
+                					SELECT R.VisitEventDate, R.EventName, R.StartDate, R.SiteName, S.VisitValue, S.EventPrice
+                					FROM visitevent AS R
+                					INNER JOIN (
+                						SELECT EventName, StartDate, SiteName, EventPrice, 1 AS VisitValue
+                						FROM event
+                						WHERE SiteName = '%s'
+                					) AS S
+                					WHERE S.EventName = R.EventName
+                					AND S.StartDate = R.StartDate
+                					AND S.SiteName = R.SiteName
+                				) AS T
+                				GROUP BY T.VisitEventDate
+                			) AS Q
+                			ON P.Day = Q.VisitEventDate
+                		) AS AB
 
+                		UNION
+
+                		SELECT AA.Day, 0 AS TotalVisits, 0 AS TotalRevenue
+                		FROM (
+                			SELECT _date AS Day
+                			FROM calendar
+                			WHERE DATEDIFF(_date, '%s') >= 0
+                			AND DATEDIFF(_date, '%s') <= 0
+                		) AS AA
+                	) AS AC
+                	GROUP BY AC.Day
+                ) AS AD
+                ON AD.Day = D.Day
+            ) AS AE
+            WHERE (AE.EventCount >= %d OR %d = -1)
+            AND (AE.EventCount <= %d OR %d = -1)
+            AND (AE.StaffCount >= %d OR %d = -1)
+            AND (AE.StaffCount <= %d OR %d = -1)
+            AND (AE.TotalVisits >= %d OR %d = -1)
+            AND (AE.TotalVisits <= %d OR %d = -1)
+            AND (AE.TotalRevenue >= %d OR %d = -1)
+            AND (AE.TotalRevenue <= %d OR %d = -1)
+        ) AS AF
+        ORDER BY %s
+        """
+    response = _cursor.execute(query % (stDate, endDate, site, stDate, endDate, site,
+            stDate, endDate, site, stDate, endDate, eCountMin, eCountMin, eCountMax,
+            eCountMax, stCountMin, stCountMin, stCountMax, stCountMax, toVisMin,
+            toVisMin, toVisMax, toVisMax, toRevMin, toRevMin, toRevMax, toRevMax, sort));
+    return _cursor.fetchall();
+
+def getDailyDetail(site, date, sort):
+    if(sort == "" or sort is None):
+        sort = "EventName ASC"
+    query = """
+        SELECT G.EventName, G.StaffNames, G.Visits, (G.EventPrice*G.Visits) AS Revenue
+        FROM (
+            SELECT F.EventName, F.StartDate, F.SiteName, F.StaffNames, SUM(F.VisitorValue) AS Visits, F.EventPrice
+            FROM (
+            	SELECT D.EventName, D.StartDate, D.SiteName, D.StaffNames, E.VisitorValue, D.EventPrice
+            	FROM (
+            		SELECT C.EventName, C.StartDate, C.SiteName, C.EventPrice, GROUP_CONCAT(C.StaffUsername SEPARATOR '\n') AS StaffNames
+            		FROM (
+            			SELECT A.EventName, A.StartDate, A.SiteName, B.StaffUsername, A.EventPrice
+            			FROM (
+            				SELECT EventName, StartDate, SiteName, EventPrice
+            				FROM event
+            				WHERE DATEDIFF(StartDate, '%s') <= 0
+            				AND DATEDIFF(EndDate, '%s') >= 0
+            				AND SiteName = '%s'
+            			) AS A
+            			INNER JOIN (
+            				SELECT *
+            				FROM assignto
+            			) AS B
+            			ON A.EventName = B.EventName
+            			WHERE A.StartDate = B.StartDate
+            			AND A.SiteName = B.SiteName
+            		) AS C
+            		GROUP BY C.EventName, C.StartDate, C.SiteName
+            	) AS D
+            	INNER JOIN (
+            		SELECT EventName, StartDate, SiteName, 1 AS VisitorValue
+            		FROM visitevent
+            		WHERE VisitEventDate = '%s'
+
+                    UNION
+        """
 
 def getEventDetail32(eventName, startDate, siteName):
     query = """
@@ -1184,14 +1360,30 @@ def getstaffDetail32(eventName, startDate, siteName):
 def getEventDate32(eventName, startDate, siteName):
     query = """
 
-    SELECT DATEDIFF(EndDate,StartDate)
-    FROM event
-    WHERE EventName = %s
-    AND StartDate = %s
-    AND SiteName = %s;
-    """
-    response = _cursor.execute(query, (eventName, startDate, siteName))
-    return (_cursor.fetchone()[0])
+                    SELECT EventName, StartDate, SiteName, 0 AS VisitorValue
+                    FROM event
+            	) AS E
+            	ON D.EventName = E.EventName
+            	WHERE D.StartDate = E.StartDate
+            	AND D.SiteName = E.SiteName
+            ) AS F
+            GROUP BY F.EventName, F.StartDate, F.SiteName
+        ) AS G
+        ORDER BY %s
+        """
+    #print(query % (date, date, site, date, sort))
+    response = _cursor.execute(query % (date, date, site, date, sort))
+    return _cursor.fetchall();
+
+
+    # SELECT DATEDIFF(EndDate,StartDate)
+    # FROM event
+    # WHERE EventName = %s
+    # AND StartDate = %s
+    # AND SiteName = %s;
+    
+    # response = _cursor.execute(query, (eventName, startDate, siteName))
+    # return (_cursor.fetchone()[0])
 
 
 def logeventVisit(user, eventName, startDate, siteName, date):
