@@ -29,7 +29,8 @@ def main():
     #return to_manage_event();
     #return create_event()
     #return to_view_site_report()
-    return to_view_schedule()
+    #return to_view_schedule()
+    return to_vis_explore_event()
     return render_template('1-login.html', error = "")
 
 @app.route("/to_register_navigation")
@@ -1772,8 +1773,95 @@ def to_view_schedule():
 
 
 
+#SCREENS 33-34
+@app.route("/to_vis_explore_event", methods=['POST', 'GET'])
+def to_vis_explore_event():
+    if request.method == 'GET':
+        global _logged_user
 
+        response = getEvents33(_logged_user, None, None, None, None, None, None,
+                None, None, None, "Yes", "Yes", None)
+        events = []
+        for item in response:
+            event = {}
+            event['EventName'] = item[0]
+            event['SiteName'] = item[1]
+            event['TicketPrice'] = item[2]
+            event['TicketsRemaining'] = item[3]
+            event['TotalVisits'] = item[4]
+            event['MyVisits'] = item[5]
+            events.append(event)
 
+        # getting the sites for the dropdown
+        response = getSiteNames()
+        siteList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteList.append(site)
+
+        return render_template("33-visexploreevent.html", filName="", filDescr="",
+                filSite="", filStDate="", filEndDate="", toVisMin=-1, toVisMax=-1,
+                tPriceMin=-1, tPriceMax=-1, filIncVis="Yes", filIncSoldOut="Yes",
+                sites=siteList, events=events)
+
+    if request.method == 'POST':
+        name = request.form["name"]
+        descr = request.form["description"]
+        site = request.form["site"]
+        startdate = request.form["startdate"]
+        enddate = request.form["enddate"]
+        toVisMin = request.form["toVisMin"]
+        toVisMax = request.form["toVisMax"]
+        tPriceMin = request.form["tPriceMin"]
+        tPriceMax = request.form["tPriceMax"]
+        includeVisit = request.form["includeVisited"]
+        includeSoldOut = request.form["includeSoldOut"]
+        sort = ""
+        try:
+            sort = request.form["sort"]
+        except:
+            sort = None
+
+        if(toVisMin == "" or toVisMin is None):
+            toVisMin = -1
+        if(toVisMax == "" or toVisMax is None):
+            toVisMax = -1
+        if(tPriceMin == "" or tPriceMin is None):
+            tPriceMin = -1
+        if(tPriceMax == "" or tPriceMax is None):
+            tPriceMax = -1
+        toVisMin = float(toVisMin)
+        toVisMax = float(toVisMax)
+        tPriceMin = float(tPriceMin)
+        tPriceMax = float(tPriceMax)
+
+        global _logged_user
+        response = getEvents33(_logged_user, name, descr, site, startdate, enddate,
+                toVisMin, toVisMax, tPriceMin, tPriceMax, includeVisit, includeSoldOut, sort)
+        events = []
+        for item in response:
+            event = {}
+            event['EventName'] = item[0]
+            event['SiteName'] = item[1]
+            event['TicketPrice'] = item[2]
+            event['TicketsRemaining'] = item[3]
+            event['TotalVisits'] = item[4]
+            event['MyVisits'] = item[5]
+            events.append(event)
+
+        # getting the sites for the dropdown
+        response = getSiteNames()
+        siteList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteList.append(site)
+
+        return render_template("33-visexploreevent.html", filName=name, filDescr=descr,
+                filSite=site, filStDate=startdate, filEndDate=enddate, toVisMin=toVisMin,
+                toVisMax=toVisMax, tPriceMin=tPriceMin, tPriceMax=tPriceMax, filIncVis=includeVisit,
+                filIncSoldOut=includeSoldOut, sites=siteList, events=events)
 
 
 
