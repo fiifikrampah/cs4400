@@ -1062,7 +1062,7 @@ def getSiteReport(stDate, endDate, eCountMin, eCountMax, stCountMin, stCountMax,
     if(toVisMin == "" or toVisMin is None):
         toVisMin = -1
     if(toVisMax == "" or toVisMax is None):
-        toVisMin = -1
+        toVisMax = -1
     if(toRevMin == "" or toRevMin is None):
         toRevMin = -1
     if(toRevMax == "" or toRevMax is None):
@@ -1297,7 +1297,115 @@ def getSchedule(user, ename, keyword, sdate, edate, sort):
     return _cursor.fetchall();
 
 
+def getEvents33(user, name, keyword, site, sdate, edate, toVisMin, toVisMax,
+        tPriceMin, tPriceMax, includeVisit, includeSoldOut, sort):
+    if(name == "" or name is None):
+        name = "-ALL-"
+    if(keyword == "" or keyword is None):
+        keyword = "-ALL-"
+    if(site == "" or site is None):
+        site = "-ALL-"
+    if(sdate == "" or sdate is None):
+        sdate = "1900-01-01"
+    if(edate == "" or edate is None):
+        edate = "2100-12-31"
+    if(toVisMin == "" or toVisMin is None):
+        toVisMin = -1
+    if(toVisMax == "" or toVisMax is None):
+        toVisMax = -1
+    if(tPriceMin == "" or tPriceMin is None):
+        tPriceMin = -1
+    if(tPriceMax == "" or tPriceMax is None):
+        tPriceMax = -1
+    if(sort == "" or sort is None):
+        sort = "EventName ASC"
+    if(includeVisit == "Yes"):
+        includeVisit = 500
+    else:
+        includeVisit = 0
+    if(includeSoldOut == "Yes"):
+        includeSoldOut = 0
+    else:
+        includeSoldOut = 1
 
+    query = """
+        SELECT *
+        FROM (
+            SELECT I.EventName, I.SiteName, I.TicketPrice, I.TicketsRemaining, I.TotalVisits, I.MyVisits
+            FROM (
+                SELECT G.EventName, G.StartDate, G.SiteName, G.TicketPrice, G.TicketsRemaining, G.TotalVisits, G.MyVisits, H.Description, H.EndDate
+                FROM (
+                	SELECT D.EventName, D.StartDate, D.SiteName, D.EventPrice AS TicketPrice, (D.Capacity-D.TotalVisits) AS TicketsRemaining, D.TotalVisits, E.MyVisits
+                	FROM (
+                		SELECT A.EventName, A.StartDate, A.SiteName, A.EventPrice, A.Capacity, B.TotalVisits
+                		FROM event AS A
+                		INNER JOIN (
+                			SELECT C.EventName, C.StartDate, C.SiteName, SUM(C.TotalVisits) AS TotalVisits
+                			FROM (
+                				SELECT EventName, StartDate, SiteName, COUNT(VisitorUsername) AS TotalVisits
+                				FROM visitevent
+                				GROUP BY EventName, StartDate, SiteName
+
+                				UNION
+
+                				SELECT EventName, StartDate, SiteName, 0 AS TotalVisits
+                				FROM event
+                			) AS C
+                			GROUP BY C.EventName, C.StartDate, C.SiteName
+                		) AS B
+                		ON A.EventName = B.EventName
+                		WHERE A.SiteName = B.SiteName
+                		AND A.StartDate = B.StartDate
+                	) AS D
+                	INNER JOIN (
+                		SELECT F.EventName, F.StartDate, F.SiteName, SUM(F.TotalVisits) AS MyVisits
+                		FROM (
+                			SELECT EventName, StartDate, SiteName, COUNT(VisitorUsername) AS TotalVisits
+                			FROM visitevent
+                			WHERE VisitorUsername = '%s'
+                			GROUP BY EventName, StartDate, SiteName
+
+                			UNION
+
+                			SELECT EventName, StartDate, SiteName, 0 AS TotalVisits
+                			FROM event
+                		) AS F
+                		GROUP BY F.EventName, F.StartDate, F.SiteName
+                	) AS E
+                	ON D.EventName = E.EventName
+                	WHERE D.StartDate = E.StartDate
+                	AND D.SiteName = E.SiteName
+                ) AS G
+                INNER JOIN (
+                	SELECT *
+                    FROM event
+                ) AS H
+                ON G.EventName = H.EventName
+                WHERE G.SiteName = H.SiteName
+                AND G.StartDate = H.StartDate
+            ) AS I
+            WHERE (LOCATE('%s', I.EventName) > 0 OR '%s' = '-ALL-')
+            AND (LOCATE('%s', I.Description) > 0 OR '%s' = '-ALL-')
+            AND DATEDIFF(I.StartDate, '%s') <= 0
+            AND DATEDIFF(I.EndDate, '%s') >= 0
+            AND (I.SiteName = '%s' OR '%s' = '-ALL-')
+            AND (I.TotalVisits >= %d OR %d = -1)
+            AND (I.TotalVisits <= %d OR %d = -1)
+            AND (I.TicketPrice >= %d OR %d = -1)
+            AND (I.TicketPrice <= %d OR %d = -1)
+            AND (I.MyVisits <= %d)
+            AND (I.TicketsRemaining >= %d)
+        ) AS Z
+        ORDER BY %s
+        """
+
+    print((query % (user, name, name, keyword, keyword, edate, sdate,
+            site, site, toVisMin, toVisMin, toVisMax, toVisMax, tPriceMin, tPriceMin,
+            tPriceMax, tPriceMax, includeVisit, includeSoldOut, sort)))
+    response = _cursor.execute(query % (user, name, name, keyword, keyword, edate, sdate,
+            site, site, toVisMin, toVisMin, toVisMax, toVisMax, tPriceMin, tPriceMin,
+            tPriceMax, tPriceMax, includeVisit, includeSoldOut, sort))
+    return _cursor.fetchall()
 
 
 # DEPRECATED FUNCTIONS
