@@ -861,7 +861,7 @@ def getEvents25(site, ename, descr, sdate, edate, mindur, maxdur, minvis, maxvis
                 WHERE A.StartDate = D.StartDate
                 AND A.SiteName = D.SiteName
             ) AS E
-            WHERE (LOCATE('%s',E.Eventname) > 0 OR '%s' = '-ALL-')
+            WHERE (LOCATE('%s',E.EventName) > 0 OR '%s' = '-ALL-')
             AND (LOCATE('%s', E.Description) > 0 OR '%s' = '-ALL-')
             AND ('%s' = '-ALL-' OR DATEDIFF(E.EndDate, '%s') >= 0)
             AND ('%s' = '-ALL-' OR DATEDIFF('%s', E.StartDate) >= 0)
@@ -1241,7 +1241,60 @@ def getDailyDetail(site, date, sort):
     response = _cursor.execute(query % (date, date, site, date, sort))
     return _cursor.fetchall();
 
-
+def getSchedule(user, ename, keyword, sdate, edate, sort):
+    if(ename == "" or ename is None):
+        ename = "-ALL-"
+    if(keyword == "" or keyword is None):
+        keyword = "-ALL-"
+    if(sdate == "" or sdate is None):
+        sdate = "1900-01-01"
+    if(edate == "" or edate is None):
+        edate = "2100-12-31"
+    if(sort == "" or sort is None):
+        sort = "EventName ASC"
+    query = """
+        SELECT G.EventName, G.SiteName, G.StartDate, G.EndDate, G.StaffCount
+        FROM (
+            SELECT *
+            FROM (
+            	SELECT E.EventName, E.SiteName, E.StartDate, E.EndDate, COUNT(E.StaffUsername) AS StaffCount, E.Description
+            	FROM (
+            		SELECT C.EventName, C.SiteName, C.StartDate, C.EndDate, C.Description, D.StaffUsername
+            		FROM (
+            			SELECT A.EventName, A.SiteName, A.StartDate, B.Description, B.EndDate
+            			FROM (
+            				SELECT DISTINCT EventName, SiteName, StartDate
+            				FROM assignto
+            				WHERE StaffUsername = '%s'
+            			) AS A
+            			INNER JOIN (
+            				SELECT *
+            				FROM event
+            			) AS B
+            			ON A.EventName = B.EventName
+            			WHERE A.SiteName = B.SiteName
+            			AND A.StartDate = B.StartDate
+            		) AS C
+            		INNER JOIN (
+            			SELECT EventName, SiteName, StartDate, StaffUsername
+            			FROM assignto
+            		) AS D
+            		ON C.EventName = D.EventName
+            		WHERE C.StartDate = D.StartDate
+            		AND C.SiteName = D.SiteName
+            	) AS E
+            	GROUP BY E.EventName, E.SiteName, E.StartDate, E.EndDate, E.Description
+            ) AS F
+            WHERE DATEDIFF(F.StartDate, '%s') <= 0
+            AND DATEDIFF(F.EndDate, '%s') >= 0
+            AND (LOCATE('%s', F.EventName) > 0 OR '%s' = '-ALL-')
+            AND (LOCATE('%s', F.Description) > 0 OR '%s' = '-ALL-')
+        ) AS G
+        ORDER BY %s
+        """
+    print(query % (user, edate, sdate, ename, ename, keyword, keyword, sort))
+    response = _cursor.execute(query % (user, edate, sdate, ename, ename, keyword, keyword, sort));
+    return _cursor.fetchall();
 
 
 
