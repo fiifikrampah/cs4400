@@ -22,107 +22,150 @@
 <body>
     <div align=center class="container-fluid">
         <h1>Site Report</h1>
+        <form class="form-group" action="/to_view_site_report" method="post" enctype="multipart/form-data">
+            <div style="width:50%; min-width:500px" align=center>
+                <div class="row">
+                    <div class="col-xs-6" align=left>
+                        <label for="sd">Start Date</label>
+                        <input type="date" name="stDate" value="{{stDate}}"/>
+                    </div>
+                    <div class="col-xs-6" align=right>
+                        <label for="ed">End Date</label>
+                        <input type="date" name="endDate" value="{{endDate}}"/>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-xs-6" align=left>
+                        <label for="ecr">Event Count Range</label>
+                        {% if eCountMin == -1 -%}
+                        <input type="number" style="width:50px" name="eCountMin" min=0 step=1/>
+                        {% else -%}
+                        <input type="number" style="width:50px" name="eCountMin" min=0 step=1 value="{{eCountMin}}"/>
+                        {%- endif %}
 
-        <form class="form-group" align=center style="width:80%; min-width:900px" action="/to_manage_transit" method="post" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-xs-6" align=left>
-                    <label for="sd">Start Date</label>
-                    <input type="date" name="stDate" value="{{stDate}}" required>
+                        <label for="do"> -- </label>
+                        {% if eCountMax == -1 -%}
+                        <input type="number" style="width:50px" name="eCountMax" min=0 step=1/>
+                        {% else -%}
+                        <input type="number" style="width:50px" name="eCountMax" min=0 step=1 value="{{eCountMax}}"/>
+                        {%- endif %}
+                    </div>
+                    <div class="col-xs-6" align=right>
+                        <label for="scr">Staff Count Range</label>
+                        {% if stCountMin == -1 -%}
+                        <input type="number" style="width:50px" name="stCountMin" min=0 step=1/>
+                        {% else -%}
+                        <input type="number" style="width:50px" name="stCountMin" min=0 step=1 value="{{stCountMin}}"/>
+                        {%- endif %}
+
+                        <label for="tvo">--</label>
+                        {% if stCountMax == -1 -%}
+                        <input type="number" style="width:50px" name="stCountMax" min=0 step=1/>
+                        {% else -%}
+                        <input type="number" style="width:50px" name="stCountMax" min=0 step=1 value="{{stCountMax}}"/>
+                        {%- endif %}
+                    </div>
                 </div>
-                <div class="col-xs-6" align=right>
-                    <label for="ed">End Date</label>
-                    <input type="date" name="endDate" value="{{endDate}}" required>
+                <br>
+                <div class="row">
+                    <div class="col-xs-6" align=left>
+                        <label for="tvr">Total Visits Range</label>
+                        {% if toVisMin == -1 -%}
+                        <input type="number" style="width:50px" name="toVisMin" min=0 step=1/>
+                        {% else -%}
+                        <input type="number" style="width:50px" name="toVisMin" min=0 step=1 value="{{toVisMin}}"/>
+                        {%- endif %}
+
+                        <label for="dot">--</label>
+                        {% if toVisMax == -1 -%}
+                        <input type="number" style="width:50px" name="toVisMax" min=0 step=1/>
+                        {% else -%}
+                        <input type="number" style="width:50px" name="toVisMax" min=0 step=1 value="{{toVisMax}}"/>
+                        {%- endif %}
+                    </div>
+                    <div class="col-xs-6" align=right>
+                        <label for="trr">Total Revenue Range</label>
+                        {% if toRevMin == -1 -%}
+                        <input type="number" style="width:50px" name="toRevMin" min=0 step=1/>
+                        {% else -%}
+                        <input type="number" style="width:50px" name="toRevMin" min=0 step=1 value="{{toRevMin}}"/>
+                        {%- endif %}
+
+                        <label for="tro">--</label>
+                        {% if toRevMax == -1 -%}
+                        <input type="number" style="width:50px" name="toRevMax" min=0 step=1/>
+                        {% else -%}
+                        <input type="number" style="width:50px" name="toRevMax" min=0 step=1 value="{{toRevMax}}"/>
+                        {%- endif %}
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-6" align=left>
-                    <label for="ecr">Event Count Range</label>
-                    <input type="number" name="eCountMin" min="0" step="1" value="{{eCountMin}}" required>
-                    <label for="do">--</label>
-                    <input type="number" name="ecCountMax" min="0" value="{{eCountMax}}" required>
+                <br>
+                <div class="row">
+                    <button type="submit" style="width: 150px" formnovalidate>Filter</a></button>
+                    <button type="submit" style="width: 150px">Daily Detail</a></button>
                 </div>
-                <div class="col-xs-6" align=right>
-                    <label for="scr">Staff Count Range</label>
-                    <input type="number" name="sCountMin" min="0" value="{{stCountMin}}" required>
-                    <label for="tvo">--</label>
-                    <input type="number" name="sCountMax" min="0" value="{{stCountMax}}" required>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-6" align=left>
-                    <label for="tvr">Total Visits Range</label>
-                    <input type="number" name="toVisMin" min="0" value="{{toVisMin}}" required>
-                    <label for="dot">--</label>
-                    <input type="number" name="toVisMax" min="0" value="{{toVisMax}}" required>
-                </div>
-                <div class="col-xs-6" align=right>
-                    <label for="trr">Total Revenue Range</label>
-                    <input type="number" name="toRevMin" min="0" value="{{toRevMin}}" required>
-                    <label for="tro">--</label>
-                    <input type="number" name="toRevMax" min="0" value="{{toRevMax}}" required>
-                </div>
-            </div>
-            <div class="row">
-                <button type="submit" style="width: 150px">Filter</a></button>
-                <button type="submit" style="width: 150px">Daily Detail</a></button>
             </div>
 
             <div align=center style="margin:20px">
                 <table class="table table-striped">
                     <tr>
                         <th>Date
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitRoute ASC" formnovalidate>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="Day ASC" formnovalidate>
                                 <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
                             </button>
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitRoute DESC" formnovalidate>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="Day DESC" formnovalidate>
                                 <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
                             </button>
                         </th>
                         <th>Event Count
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitType ASC" formnovalidate>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="EventCount ASC" formnovalidate>
                                 <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
                             </button>
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitType DESC" formnovalidate>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="EventCount DESC" formnovalidate>
                                 <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
                             </button>
                         </th>
                         <th>Staff Count
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitPrice ASC" formnovalidate>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="StaffCount ASC" formnovalidate>
                                 <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
                             </button>
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TransitPrice DESC" formnovalidate>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="StaffCount DESC" formnovalidate>
                                 <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
                             </button>
                         </th>
                         <th>Total Visits
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="ConnectedSites ASC" formnovalidate>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TotalVisits ASC" formnovalidate>
                                 <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
                             </button>
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="ConnectedSites DESC" formnovalidate>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TotalVisits DESC" formnovalidate>
                                 <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
                             </button>
                         </th>
                         <th>Total Revenue
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="ConnectedSites ASC" formnovalidate>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TotalRevenue ASC" formnovalidate>
                                 <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
                             </button>
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="ConnectedSites DESC" formnovalidate>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TotalRevenue DESC" formnovalidate>
                                 <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
                             </button>
                         </th>
                     </tr>
 
-                    {% for site in sites %}
+                    {% for day in days %}
                     <tr>
-                        <td><input type="radio" name="chosen_transit" value="{{site.SiteName}}" required> {{transit.TransitRoute}}</td>
-                        <td>{{transit.TransitType}}</td>
-                        <td>{{transit.Price}}</td>
-                        <td>{{transit.ConnectedSites}}</td>
+                        <td><input type="radio" name="chosen_day" value="{{day.Date}}" required> {{day.Date}}</td>
+                        <td>{{day.EventCount}}</td>
+                        <td>{{day.StaffCount}}</td>
+                        <td>{{day.TotalVisits}}</td>
+                        <td>{{day.TotalRevenue}}</td>
                     </tr>
                     {% endfor %}
                 </table>
             </div>
         </form>
+
+        <p id = "feedback"  style="color: red">{{error}}</p>
     </div>
 </body>
 
