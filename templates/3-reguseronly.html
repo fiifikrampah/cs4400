@@ -28,50 +28,35 @@
 <form class="form-group" style="width:20%" action="/register_user" method="post" enctype="multipart/form-data">
 
         <label for="fname">First Name</label>
-        <input type="text" name="firstname" id="fname" class="form-control" placeholder="First Name" value="{{ request.form['firstname'] }}" required autofocus>
+        <input type="text" name="firstname" id="fname" class="form-control" placeholder="First Name" required autofocus>
         <br>
 
         <label for="lname">Last Name</label>
-        <input type="text" name="lastname" id="lname" class="form-control" placeholder="Last Name" value="{{ request.form['lastname'] }}" required autofocus>
+        <input type="text" name="lastname" id="lname" class="form-control" placeholder="Last Name" required autofocus>
         <br>
 
         <label for="uname">Username</label>
-        <input type="text" name="username" id="uname" class="form-control" placeholder="Username" value="{{ request.form['username'] }}" required autofocus>
+        <input type="text" name="username" id="uname" class="form-control" placeholder="Username" required autofocus>
         <br>
 
         <label for="pword">Password</label>
-        <input type="password" name="password" id="pword" class="form-control" placeholder="Password" value="{{ request.form['password'] }}" required autofocus>
+        <input type="password" name="password" id="pword" class="form-control" placeholder="Password" required autofocus>
         <br>
 
         <label for="cpword">Confirm Password</label>
-        <input type="password" name="confirm_password" id="cpword" class="form-control" placeholder="Confirm Password" value="{{ request.form['confirm_password'] }}" required autofocus>
+        <input type="password" name="confirm_password" id="cpword" class="form-control" placeholder="Confirm Password" required autofocus>
         <br>
 
+        <!-- fix: allow multiple emails -->
 
         <label for="email-add">Email</label>
          <div id="TextBoxesGroup">
     <div id="TextBoxDiv1">
-                      <div>
-                    {% for email in emails %}
-                    <div class="row">
-                        <div class="col" align=middle>
-                            <label for="email">{{email.Email}}</label>
-                        </div>
-                        <div class="col" align=middle>
-                            <button name="rememail" value="{{email.Email}}" type="submit" formaction="/remove_tempmail-user" formnovalidate>Remove</button>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    <div class="row">
-                        <div>
-                            <input type="email" name="addemail" class="form-control" placeholder="Email" value="{{newemail}}" autofocus formnovalidate>
-                        </div>
-                        <div class="col" align=middle>
-                            <button type="add" formaction="/add-email-reg-user" formnovalidate>Add Email</button></p>
-                        </div>
-                    </div>
-                </div>
-         
+      <input type="textbox" id="textbox" name="email" class="form-control" placeholder="Email" autofocus>
+    </div>
+  </div>
+  <input class=" btn btn-default" type="button" value="Add Email" id="addButton">
+  <input class=" btn btn-default"type="button" value="Remove Email" id="removeButton">
 
   <br></br>
 
@@ -81,10 +66,10 @@
         <a class=" btn btn-default" href="to_register_navigation" role="button">Back</a>
         <p id = "feedback"  style="color: red">{{error}}</p>
 
-  
+     
 
 
-<!-- <script type="text/javascript">
+<script type="text/javascript">
     
 $(document).ready(function boxes() {
 
@@ -150,7 +135,7 @@ $(document).ready(function boxes() {
 
 });
 
-</script> -->
+</script>
  </form>
 </div>
 
