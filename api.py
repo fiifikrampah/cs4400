@@ -96,11 +96,12 @@ def isAdmin(username):
 # ID if account status == approved
 # NULL if account status == pending
 
-def employeeid_generator():
+def employeeid_generator(Username):
 	set_connection()
-	isApproved = status_checker()
+	isApproved = getCurrentStatus(Username)
 	if isApproved == 1:
 		id = random.randint(100000000,999999999)
+		str(id)
 		return id
 	elif isApproved == 2 or isApproved == 0:
 		id = null

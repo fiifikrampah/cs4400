@@ -5,10 +5,9 @@ from flask import Flask, render_template, json, request, Response
 from decimal import Decimal
 
 app = Flask(__name__)
-# _logged_user = "david.smith"
-# _logged_userType = "Manager"
-_logged_user = "michael.smith"
-_logged_userType = "Staff, Visitor"
+_logged_user = ""
+_logged_userType = ""
+
 
 @app.route('/')
 def main():
@@ -17,24 +16,7 @@ def main():
     """
     set_connection()
 
-    #return to_user_take_transit();
-    #return to_user_transit_history();
-    #return to_manage_profile();
-    #return manage_user();
-    #return manage_site();
-    #return create_site();
-    #return manage_transit();
-    #return create_transit();
-    #return manage_event();
-    #return to_manage_event();
-    #return create_event()
-    #return to_view_site_report()
-
-    #return to_view_schedule()
-    # return to_vis_explore_event()
-
-    # return to_view_schedule()
-
+    # return to_vis_explore_site()
     return render_template('1-login.html', error = "")
 
 @app.route("/to_register_navigation")
@@ -51,6 +33,165 @@ def to_user_register():
     """
     return render_template('3-reguseronly.html', error="")
 
+@app.route("/add-email-reg-user", methods=['GET','POST'])
+def addEmail_register_1():
+    if request.method == 'POST':
+    # Username = request.form["username"]
+        email = request.form["addemail"]
+
+        if constraint_email_format(email) == 0:
+            # previous = request.referrer
+            # return (request.referrer)
+            return render_template('3-reguseronly.html', error="Please enter a valid email!")
+
+        tempmail_insert(email)
+
+        response = get_tempmails()
+        if response == []:
+            return render_template('3-reguseronly.html', error="Please enter at least one email address!")
+
+        emails = []
+        for item in response:
+            email = {}
+            email['Email'] = item[0]
+            emails.append(email)
+        return render_template('3-reguseronly.html', emails=emails)
+
+@app.route("/remove_tempmail-user", methods=['POST'])
+def delete_tempmails_1():
+    email = request.form["rememail"]
+    delete_tempmail(email)
+    response = get_tempmails()
+    if response == []:
+        return render_template('3-reguseronly.html', error="Please enter at least one email address!")
+
+    emails = []
+    for item in response:
+        email = {}
+        email['Email'] = item[0]
+        emails.append(email)
+    return render_template('3-reguseronly.html', emails=emails)
+
+
+@app.route("/add_email_reg_visitor", methods=['GET','POST'])
+def addEmail_register_2():
+    if request.method == 'POST':
+    # Username = request.form["username"]
+        email = request.form["addemail"]
+
+        if constraint_email_format(email) == 0:
+            # previous = request.referrer
+            # return (request.referrer)
+            return render_template('4-regvisit.html', error="Please enter a valid email!")
+
+        tempmail_insert(email)
+
+        response = get_tempmails()
+        if response == []:
+            return render_template('4-regvisit.html', error="Please enter at least one email address!")
+
+        emails = []
+        for item in response:
+            email = {}
+            email['Email'] = item[0]
+            emails.append(email)
+        return render_template('4-regvisit.html', emails=emails)
+
+@app.route("/remove_tempmail_visitor", methods=['POST'])
+def delete_tempmails_2():
+    email = request.form["rememail"]
+    delete_tempmail(email)
+    response = get_tempmails()
+    if response == []:
+        return render_template('4-regvisit.html', error="Please enter at least one email address!")
+
+    emails = []
+    for item in response:
+        email = {}
+        email['Email'] = item[0]
+        emails.append(email)
+    return render_template('4-regvisit.html', emails=emails)
+
+
+@app.route("/add_email_reg_emp", methods=['GET','POST'])
+def addEmail_register_3():
+    if request.method == 'POST':
+    # Username = request.form["username"]
+        email = request.form["addemail"]
+
+        if constraint_email_format(email) == 0:
+            # previous = request.referrer
+            # return (request.referrer)
+            return render_template('5-regemp.html', error="Please enter a valid email!")
+
+        tempmail_insert(email)
+
+        response = get_tempmails()
+        if response == []:
+            return render_template('5-regemp.html', error="Please enter at least one email address!")
+
+        emails = []
+        for item in response:
+            email = {}
+            email['Email'] = item[0]
+            emails.append(email)
+        return render_template('5-regemp.html', emails=emails)
+
+@app.route("/remove_tempmail_emp", methods=['POST'])
+def delete_tempmails_3():
+    email = request.form["rememail"]
+    delete_tempmail(email)
+    response = get_tempmails()
+    if response == []:
+        return render_template('5-regemp.html', error="Please enter at least one email address!")
+
+    emails = []
+    for item in response:
+        email = {}
+        email['Email'] = item[0]
+        emails.append(email)
+    return render_template('5-regemp.html', emails=emails)
+
+@app.route("/add_email_reg_empvis", methods=['GET','POST'])
+def addEmail_register_4():
+    if request.method == 'POST':
+    # Username = request.form["username"]
+        email = request.form["addemail"]
+
+        if constraint_email_format(email) == 0:
+            # previous = request.referrer
+            # return (request.referrer)
+            return render_template('6-regempvisit.html', error="Please enter a valid email!")
+
+        tempmail_insert(email)
+
+        response = get_tempmails()
+        if response == []:
+            return render_template('6-regempvisit.html', error="Please enter at least one email address!")
+
+        emails = []
+        for item in response:
+            email = {}
+            email['Email'] = item[0]
+            emails.append(email)
+        return render_template('6-regempvisit.html', emails=emails)
+
+@app.route("/remove_tempmail_empvis", methods=['POST'])
+def delete_tempmails_4():
+    email = request.form["rememail"]
+    delete_tempmail(email)
+    response = get_tempmails()
+    if response == []:
+        return render_template('6-regempvisit.html', error="Please enter at least one email address!")
+
+    emails = []
+    for item in response:
+        email = {}
+        email['Email'] = item[0]
+        emails.append(email)
+    return render_template('6-regempvisit.html', emails=emails)
+
+
 @app.route("/register_user", methods = ['POST'])
 def register_user():
     print "Starting user register functionality"
@@ -63,12 +204,6 @@ def register_user():
         UserType = 'User'
         confirmed_pass = request.form["confirm_password"]
 
-        # email = request.form["email"]
-
-
-
-        # if constraint_email_format(email) == 0:
-        #     return render_template("3-reguseronly.html", error="Email does not match format!")
         if constraint_username_format(Username) == 0:
             return render_template("3-reguseronly.html", error="Username does not meet requirement!")
 
@@ -81,6 +216,20 @@ def register_user():
             result = validate_user_registration(Username, Password, Status, Firstname, Lastname, UserType)
             #successful validation
             if result == 0:
+                response = get_tempmails()
+
+                for item in response:
+                    email = item[0]
+                    final = email_insert(Username, email)
+                    if final == 1:
+                        delete_mailrecs(Username)
+                        user_delete(Username)
+                        clear_tempmails()
+                        return(render_template("3-reguseronly.html", error="One or more emails you entered, has already been registered!"))
+                    else:
+                        clear_tempmails()
+
+
                 return render_template("1-login.html", error="")
             elif result == 1:
                 return render_template("3-reguseronly.html", error="Username has already been taken")
@@ -105,12 +254,12 @@ def register_visitor():
         Lastname = request.form["lastname"]
         UserType = 'Visitor'
         confirmed_pass = request.form["confirm_password"]
-        email = request.form["email"]
+        # email = request.form["email"]
 
 
 
-        if constraint_email_format(email) == 0:
-            return render_template("4-regvisit.html", error="Email does not match format!")
+        # if constraint_email_format(email) == 0:
+        #     return render_template("4-regvisit.html", error="Email does not match format!")
         if constraint_username_format(Username) == 0:
             return render_template("4-regvisit.html", error="Username does not meet requirement!")
 
@@ -118,12 +267,23 @@ def register_visitor():
         if Password != confirmed_pass:
             return render_template("4-regvisit.html", error="Passwords do not match!")
         elif constraint_password_format(Password) == 0:
-            return render_template("4-regvisit.html", error="Passwords do not meet requirement!")
+            return render_template("4-regvisit.html", eremove_tempmail_visitorrror="Passwords do not meet requirement!")
         else:
             result = validate_user_registration(Username, Password, Status, Firstname, Lastname, UserType)
             #successful validation
             if result == 0:
-                return render_template("1-login.html", error="")
+                response = get_tempmails()
+
+                for item in response:
+                    email = item[0]
+                    final = email_insert(Username, email)
+                    if final == 1:
+                        delete_mailrecs(Username)
+                        user_delete(Username)
+                        clear_tempmails()
+                        return(render_template("4-regvisit.html", error="One or more emails you entered, has already been registered!"))
+                    else:
+                        return render_template("1-login.html", error="")
             elif result == 1:
                 return render_template("4-regvisit.html", error="Username has already been taken")
             elif result == 2:
@@ -154,12 +314,12 @@ def register_employee():
         UserType = 'Employee'
         Status = 'Pending'
         confirmed_pass = request.form["confirm_password"]
-        email = request.form["email"]
+        # email = request.form["email"]
 
 
 
-        if constraint_email_format(email) == 0:
-            return render_template("5-regemp.html", error="Email does not match format!")
+        # if constraint_email_format(email) == 0:
+        #     return render_template("5-regemp.html", error="Email does not match format!")
         if constraint_username_format(Username) == 0:
             return render_template("5-regemp.html", error="Username does not meet requirement!")
 
@@ -175,6 +335,18 @@ def register_employee():
             if result1 == 0:
                 result2 = validate_employee_registration(Username, EmployeeID, Phone, EmployeeAddress, EmployeeCity, EmployeeState, EmployeeZipcode, EmployeeType)
                 if result2 == 0:
+                    response = get_tempmails()
+
+                    for item in response:
+                        email = item[0]
+                        final = email_insert(Username, email)
+                        if final == 1:
+                            delete_mailrecs(Username)
+                            user_delete(Username)
+                            clear_tempmails()
+                            return(render_template("5-regemp.html", error="One or more emails you entered, has already been registered!"))
+                    else:
+                        clear_tempmails()
                     return render_template("1-login.html", error="")
                 elif result2 == 1:
                     return render_template("5-regemp.html", error="Someone already registered that phone number. Try a different one.")
@@ -210,12 +382,12 @@ def register_employee_visitor():
         UserType = 'Employee'
         Status = 'Pending'
         confirmed_pass = request.form["confirm_password"]
-        email = request.form["email"]
+        # email = request.form["email"]
 
 
 
-        if constraint_email_format(email) == 0:
-            return render_template("6-regempvisit.html", error="Email does not match format!")
+        # if constraint_email_format(email) == 0:
+        #     return render_template("6-regempvisit.html", error="Email does not match format!")
         if constraint_username_format(Username) == 0:
             return render_template("6-regempvisit.html", error="Username does not meet requirement!")
 
@@ -231,6 +403,18 @@ def register_employee_visitor():
             if result1 == 0:
                 result2 = validate_employee_registration(Username, EmployeeID, Phone, EmployeeAddress, EmployeeCity, EmployeeState, EmployeeZipcode, EmployeeType)
                 if result2 == 0:
+                    response = get_tempmails()
+
+                    for item in response:
+                        email = item[0]
+                        final = email_insert(Username, email)
+                        if final == 1:
+                            delete_mailrecs(Username)
+                            user_delete(Username)
+                            clear_tempmails()
+                            return(render_template("6-regempvisit.html", error="One or more emails you entered, has already been registered!"))
+                    else:
+                        clear_tempmails()
                     return render_template("1-login.html", error="")
                 elif result2 == 1:
                     return render_template("6-regempvisit.html", error="Someone already registered that phone number. Try a different one.")
@@ -308,18 +492,18 @@ def sign_in():
                     _logged_user = _name
                     print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                     return render_template("8-adminfunc.html", error = "")
-               
+
                 elif _logged_userType in ['Manager']:
                     _logged_user = _name
                     print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                     return render_template("10-manfunc.html", error = "")
-               
+
                 elif _logged_userType in ['Staff']:
                     _logged_user = _name
                     print "logged person is: %s" % _logged_user
                     print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                     return render_template("12-stafffunc.html", error = "")
-                
+
                 else:
                     _logged_user = ""
                     return render_template("1-login.html", error = "Username or password is incorrect, please try again.")
@@ -340,33 +524,35 @@ def go_to_functionality_screen():
         p_type = usertype_checker(_logged_user)
         print(p_type)
 
-        if p_type in ['Employee', 'Employee, Visitor']:
+        if p_type in ['Employee']:
             emp_type = emptype_checker(_logged_user)
             if emp_type in ['Admin']:
                 return render_template("8-adminfunc.html", error = "")
-            elif emp_type in ['Admin, Visitor']:
-                return render_template("9-adminvisitfunc.html", error = "")
             elif emp_type in ['Manager']:
                 return render_template("10-manfunc.html", error = "")
-            elif emp_type in ['Manager, Visitor']:
-                return render_template("11-manvisitfunc.html", error = "")
             elif emp_type in ['Staff']:
                 return render_template("12-stafffunc.html", error = "")
-            elif emp_type in ['Staff, Visitor']:
+
+        elif p_type in ['Employee, Visitor']:
+            emp_type = emptype_checker(_logged_user)
+            if emp_type in ['Admin']:
+                return render_template("9-adminvisitfunc.html", error = "")
+            elif emp_type in ['Manager']:
+                return render_template("11-manvisitfunc.html", error = "")
+            elif emp_type in ['Staff']:
                 return render_template("13-staffvisitfunc.html", error = "")
 
         elif p_type in ['User']:
-
             return render_template("7-userfunc.html", error = "")
         elif p_type in ['Visitor']:
             return render_template("14-visitorfunc.html", error = "")
 
-@app.route("/to_visitor_explore_event")
-def to_visitor_explore_event():
-    """
-    Takes user to explore event page
-    """
-    return render_template('33-visitorexploreevent.html', error="")
+# @app.route("/to_visitor_explore_event")
+# def to_visitor_explore_event():
+#     """
+#     Takes user to explore event page
+#     """
+#     return render_template('33-visitorexploreevent.html', error="")
 
 @app.route("/to_visitor_explore_site")
 def to_visitor_explore_site():
@@ -383,11 +569,11 @@ def to_visitor_view_visit_history():
     return render_template('38-visitorexploresite.html', error="")
 
 
-
 #SCREEN 15
 @app.route("/to_user_take_transit", methods=['POST', 'GET'])
 def to_user_take_transit():
-    # getting the sites for the dropdown
+
+        # getting the sites for the dropdown
     response = getSiteNames()
     siteList = []
     for item in response:
@@ -452,41 +638,50 @@ def to_user_take_transit():
 
 @app.route("/user_log_transit", methods=['POST'])
 def log_transit():
-    transit = request.form["chosen_transit"]
-    date = request.form["dateLogged"]
+    try:
+        transit = request.form["chosen_transit"]
+        date = request.form["dateLogged"]
 
-    global _logged_user
-    logTransit(_logged_user, transit, date)
+        global _logged_user
+        logTransit(_logged_user, transit, date)
 
-    # getting the sites for the dropdown
-    response = getSiteNames()
-    siteList = []
-    for item in response:
-        site={}
-        site['SiteName'] = item[0]
-        siteList.append(site)
+        # getting the sites for the dropdown
+        response = getSiteNames()
+        siteList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteList.append(site)
 
-    # getting the transit types for the dropdown
-    response = getTransitTypes()
-    transitTypeList = []
-    for item in response:
-        tType={}
-        tType['TransitType'] = item[0]
-        transitTypeList.append(tType)
+        # getting the transit types for the dropdown
+        response = getTransitTypes()
+        transitTypeList = []
+        for item in response:
+            tType={}
+            tType['TransitType'] = item[0]
+            transitTypeList.append(tType)
 
-    # getting unfiltered transit when the page is first loaded, with default sort
-    response = getTransit15(None, None, None, None, None)
-    transitList = []
-    for item in response:
-        transit={}
-        transit['TransitRoute'] = item[0]
-        transit['TransitType'] = item[1]
-        transit['Price'] = item[2];
-        transit['ConnectedSites'] = item[3]
-        transitList.append(transit);
+        # getting unfiltered transit when the page is first loaded, with default sort
+        response = getTransit15(None, None, None, None, None)
+        transitList = []
+        for item in response:
+            transit={}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+            transit['Price'] = item[2];
+            transit['ConnectedSites'] = item[3]
+            transitList.append(transit);
 
-    return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList,
-            transits=transitList, filSite="-ALL-", filType="-ALL-", filMinPr=-1, filMaxPr=-1)
+        return render_template('15-usertaketransit.html', sites=siteList, types=transitTypeList,
+                transits=transitList, filSite="-ALL-", filType="-ALL-", filMinPr=-1, filMaxPr=-1)
+
+    except Exception as e:
+        print("---> run into Exception:")
+        print("---> " + str(e) + '\n')  # print exception message
+        if str(e)[1:5] == "1062":
+
+            # violates primary key constraint username
+             return render_template('15-usertaketransit.html', error="Transit already exists! Please click the back button and enter a different Transit")
 
 
 
@@ -562,21 +757,18 @@ def to_user_transit_history():
 def to_manage_profile():
     if request.method == 'GET':
         #getting info to populate the screen with
-        global _logged_user
-
-        global _logged_userType
-
+        _logged_user
         _logged_userType = get_usertype(_logged_user)
         print "FIIFI THE GUY IS: %s AND HIS USER IS: %s" % (_logged_userType, _logged_user)
-
         info = get_employee_info(_logged_user)
+        info2 = get_site_info17(_logged_user)
         fname = info[0]
         lname = info[1]
         uname = info[2]
-        sname = info[3]
-        eid = info[4]
-        phone = info[5]
-        address = info[6] + ", " + info[7] + ", " + info[8] + " " + str(info[9])
+        sname = info2
+        eid = info[3]
+        phone = info[4]
+        address = info[5] + ", " + info[6] + ", " + info[7] + " " + str(info[8])
 
         visitor = "0"
         if('Visitor' in _logged_userType):
@@ -593,33 +785,70 @@ def to_manage_profile():
                 sname=sname, eid=eid, phone=phone, newemail="", address=address, visitor=visitor, emails=emails)
 
     if request.method == 'POST':
-        # updating info
-        fname = request.form["firstname"];
-        lname = request.form["lastname"];
-        phone = request.form["phonenum"];
-        visitor = request.form["isvisitor"];
-        newemail = request.form["addemail"]
+        try:
+                # updating info
+            fname = request.form["firstname"];
+            lname = request.form["lastname"];
+            phone = request.form["phonenum"];
+            visitor = request.form["isvisitor"];
+            newemail = request.form["addemail"]
 
-        update_employee(_logged_user, fname, lname, phone, visitor)
+            print "visitor is: %s" % visitor
+            update_employee(_logged_user, fname, lname, phone, visitor)
 
-        # rendering screen again
-        global _logged_user
-        info = get_employee_info(_logged_user)
-        uname = info[2]
-        sname = info[3]
-        eid = info[4]
-        address = info[6] + ", " + info[7] + ", " + info[8] + " " + str(info[9])
+            # rendering screen again
+            global _logged_user
+            info = get_employee_info(_logged_user)
+            info2 = get_site_info17(_logged_user)
+            uname = info[2]
+            sname = info2
+            eid = info[3]
+            address = info[5] + ", " + info[6] + ", " + info[7] + " " + str(info[8])
 
-        response = get_employee_emails(_logged_user)
-        emails = []
-        for item in response:
-            email = {}
-            email['Email'] = item[0]
-            emails.append(email)
+            response = get_employee_emails(_logged_user)
+            emails = []
+            for item in response:
+                email = {}
+                email['Email'] = item[0]
+                emails.append(email)
 
-        return render_template('17-empmanageprofile.html', fname=fname, lname=lname, uname=uname,
-                sname=sname, eid=eid, phone=phone, address=address, visitor=visitor, emails=emails,
-                newemail=newemail)
+            return render_template('17-empmanageprofile.html', fname=fname, lname=lname, uname=uname,
+                    sname=sname, eid=eid, phone=phone, address=address, visitor=visitor, emails=emails,
+                    newemail=newemail)
+        except Exception as e:
+            print("---> run into Exception:")
+            print("---> " + str(e) + '\n')  # print exception message
+            _logged_user
+            _logged_userType = get_usertype(_logged_user)
+            if str(e)[1:5] == "1062":
+                # violates primary key constraint
+                info = get_employee_info(_logged_user)
+                info2 = get_site_info17(_logged_user)
+                fname = info[0]
+                lname = info[1]
+                uname = info[2]
+                sname = info2
+                eid = info[3]
+                phone = info[4]
+                address = info[5] + ", " + info[6] + ", " + info[7] + " " + str(info[8])
+
+                visitor = "0"
+                if('Visitor' in _logged_userType):
+                    visitor = "1"
+
+                response = get_employee_emails(_logged_user)
+                emails = []
+                for item in response:
+                    email = {}
+                    email['Email'] = item[0]
+                    emails.append(email)
+
+                return render_template('17-empmanageprofile.html',fname=fname, lname=lname, uname=uname,
+                    sname=sname, eid=eid, phone=phone, address=address, visitor=visitor, emails=emails,
+                    newemail=newemail, error="Phone number already exists!")
+            else:
+                # other violation
+                return 2
 
 @app.route("/remove_email", methods=['POST'])
 def delete_email():
@@ -638,10 +867,11 @@ def delete_email():
     # rendering screen again
     global _logged_user
     info = get_employee_info(_logged_user)
+    info2 = get_site_info17(_logged_user)
     uname = info[2]
-    sname = info[3]
-    eid = info[4]
-    address = info[6] + ", " + info[7] + ", " + info[8] + " " + str(info[9])
+    sname = info2
+    eid = info[3]
+    address = info[5] + ", " + info[6] + ", " + info[7] + " " + str(info[8])
 
     response = get_employee_emails(_logged_user)
     emails = []
@@ -671,10 +901,11 @@ def addEmail():
     # rendering screen again
     global _logged_user
     info = get_employee_info(_logged_user)
+    info2 = get_site_info17(_logged_user)
     uname = info[2]
-    sname = info[3]
-    eid = info[4]
-    address = info[6] + ", " + info[7] + ", " + info[8] + " " + str(info[9])
+    sname = info2
+    eid = info[3]
+    address = info[5] + ", " + info[6] + ", " + info[7] + " " + str(info[8])
 
     response = get_employee_emails(_logged_user)
     emails = []
@@ -687,30 +918,31 @@ def addEmail():
             sname=sname, eid=eid, phone=phone, newemail="", address=address, visitor=visitor, emails=emails)
 
 
-
 #SCREEN 18
-@app.route("/to_manage_user", methods=['POST', 'GET'])
-def manage_user():
-    if request.method == 'GET':
-        response = getAllUsersList();
+# @app.route("/to_manage_user", methods=['POST', 'GET'])
+# def manage_user():
+#     if request.method == 'GET':
+#         response = getAllUsersList();
 
-        userList=[]
-        for item in response:
-            user={}
-            user['Username']=item[0]
-            user['EmailCount']=item[1]
-            user['Type']=item[2]
-            user['Status']=item[3]
-            userList.append(user)
+#         userList=[]
+#         for item in response:
+#             user={}
+#             user['Username']=item[0]
+#             user['EmailCount']=item[1]
+#             user['Type']=item[2]
+#             user['Status']=item[3]
+#             userList.append(user)
 
-        return render_template('18-adminmanuser.html', users=userList)
+#         return render_template('18-adminmanuser.html', users=userList)
 
-    if request.method == 'POST':
-        username = request.form["username"]
-        type = request.form["type"]
-        status = request.form["status"]
+#     if request.method == 'POST':
+#         username = request.form["username"]
+#         type = request.form["type"]
+#         status = request.form["status"]
 
-        response = getFilteredUsersList(username, type, status)
+#         response = getFilteredUsersList(username, type, status)
+
+
 
 
 
@@ -841,6 +1073,7 @@ def render_manage_sites():
 
     return render_template('19-adminmansite.html', siteNames=siteNameList, managers=managerList,
             sites=siteList, filSite="-ALL-", filMan="-ALL-", filEvery="-ALL-")
+
 
 @app.route("/to_create_site", methods=['POST', 'GET'])
 def create_site():
@@ -1246,242 +1479,6 @@ def to_manage_event():
                 filRevMin=minrev, filRevMax=maxrev)
 
 
-
-
-
-# Screen 28
-@app.route("/to_view_staff", methods=['POST', 'GET'])
-def manageStaff():
-    
-     # getting the sites for the dropdown
-    response = getSiteNames()
-    siteList = []
-    for item in response:
-        site={}
-        site['SiteName'] = item[0]
-        siteList.append(site)
-
-        site_name = []
-    for val in siteList:
-        site_name.append(val['SiteName'])
-
-    firstSite = site_name[0]
-
-    if request.method == 'GET':
-        # getting unfiltered table when the page is first loaded
-        # global _logged_user
-        response =manageStaffers(firstSite, None, None, None, None, None)
-        stafflist = []
-        for item in response:
-            staff={}
-            staff['staffName'] = item[0]
-            staff['EventShift'] = item[1]
-            stafflist.append(staff);       
-        return render_template("28-managermanstaff.html", sites=siteList, Firstname="",Lastname="",
-            Startdate="", Enddate="", staffs=stafflist, filSite= "")
-    if request.method =='POST':
-
-
-        #getting filtered transit when some of the options have been played with
-        site = request.form["site"]
-        # print site
-        Startdate = request.form["sdate"]
-        Enddate = request.form["endate"]
-        Firstname = request.form["fname"]
-        Lastname = request.form["lname"]
-        sort = ""
-        try:
-            sort = request.form["sort"]
-        except:
-            sort = None
-
-        # global _logged_user
-        response =manageStaffers(site,Firstname,Lastname, Startdate, Enddate, sort) 
-        stafflist = []
-        for item in response:
-            staff={}
-            staff['staffName'] = item[0]
-            staff['EventShift'] = item[1]
-            stafflist.append(staff)
-        return render_template("28-managermanstaff.html", sites=siteList, Firstname=Firstname,Lastname=Lastname,
-            Startdate=Startdate, Enddate=Enddate, filSite=site,staffs=stafflist)
-
-
-
-#Screen32
-@app.route("/to_staff_event_detail", methods=['GET'])
-def eventDetails():
-    if request.method == 'GET':
-
-        # info1 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
-        # info2 = getstaffDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
-        # info3 = getEventDate32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
-
-
-        info1 = getEventDetail32(eventName, startDate, siteName)
-        info2 = getstaffDetail32(eventName, startDate, siteName)
-        info3 = getEventDate32(eventName, startDate, siteName)
-
-       
-        EventName = info1[0]
-        StartDate = str(info1[1])[0:10]
-        SiteName = info1[2]
-        EndDate = str(info1[3])[0:10]
-        EventPrice = info1[4]
-        Capacity = info1[5]
-        # MinStaffRequired = info1[6]
-        Description = info1[7]
-
-        staff = info2
-        stafflist = []
-        
-        for list in staff:
-            for item in list:
-                stafflist.append(item)
-
-        StaffUsername = ",\n".join(stafflist)
-        Duration = info3
-
-    return render_template("32-eventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName, EndDate=EndDate,
-        EventPrice=EventPrice, Capacity=Capacity,Description=Description,StaffUsername=StaffUsername,Duration=Duration)
-
-
-
-
-# Screen 34
-@app.route("/to_visitor_event_detail", methods=['GET'])
-def visitor_eventDetails():
-    if request.method == 'GET':
-        # info1 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
-        # info2 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
-        # info3 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
-
-
-        info1 = getEventDetail32(eventName, startDate, siteName)
-        info2 = getstaffDetail32(eventName, startDate, siteName)
-        info3 = getEventDate32(eventName, startDate, siteName)
-
-       
-        EventName = info1[0]
-        StartDate = str(info1[1])[0:10]
-        SiteName = info1[2]
-        EndDate = str(info1[3])[0:10]
-        price = info1[4]
-        Description = info1[7]
-        #FIX THIS USING PREVIOUS SCREEN:
-        TicketRemaining = 0
-                
-    
-
-    return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
-        price=price,Description=Description,TicketRemaining=TicketRemaining)
-
-
-@app.route("/visitor_logVisit", methods=[ 'POST'])
-def visitor_logVisit():
-    
-    try:
-        # info1 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
-        info1 = getEventDetail32(eventName, startDate, siteName)
-        EventName = info1[0]
-        StartDate = str(info1[1])[0:10]
-        SiteName = info1[2]
-        EndDate = str(info1[3])[0:10]
-        price = info1[4]
-        Description = info1[7]
-        #FIX THIS USING PREVIOUS SCREEN:
-        TicketRemaining = 0
-        VisitDate = request.form["visitdate"][0:10]
-
-        global _logged_user
-        print "THE VISITOR IS: %s" % _logged_user
-
-        newstart = datetime.strptime(StartDate, '%Y-%m-%d').date()
-        newend = datetime.strptime(EndDate, '%Y-%m-%d').date()
-        newvisitdate = datetime.strptime(VisitDate, '%Y-%m-%d').date()
-        # print newvisitdate
-
-        # Visit date must be b/n start and end and Remaining tickets > 0:
-        
-
-        if (newstart <= newvisitdate) and  (newvisitdate <= newend) and TicketRemaining > 0 :
-            result = logeventVisit(_logged_user, EventName, StartDate,SiteName, VisitDate)
-            if result == 1:
-                print "YAAAY"
-                return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
-                    price=price,Description=Description,TicketRemaining=TicketRemaining, success="Event has been logged!")
-            elif result == 0:
-                print  "NAAY"
-                return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
-                    price=price,Description=Description,TicketRemaining=TicketRemaining, error="An event with the same date has been already logged!")
-
-        elif (newvisitdate < newstart) or  (newvisitdate > newend):
-            return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
-                    price=price,Description=Description,TicketRemaining=TicketRemaining, error="Visit Date must be between Start and End Dates")
-        elif(TicketRemaining==0):
-            return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,price=price,Description=Description,TicketRemaining=TicketRemaining, error="The event is sold out!")
-        
-    except Exception as e:
-        print("---> run into Exception:")
-        print("---> " + str(e) + '\n')  # print exception message
-        if str(e)[1:5] == "1062":
-
-            # violates primary key constraint username
-            return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
-                price=price,Description=Description,TicketRemaining=TicketRemaining, error="An event with the same date has been already logged!")
-
-        return go_to_functionality_screen()
-
-
-
-
-#Screen 37
-@app.route("/to_visitor_site_detail", methods=['GET'])
-def visitor_siteDetails():
-    if request.method == 'GET':
-        # info1 = get_site_info('Atlanta Beltline Center')
-
-        info1 = get_site_info(sitename)
-               
-        SiteName = info1[0][0]
-        Address = str(info1[0][1])      
-        Zipcode = str(info1[0][2])
-        OpenEveryday = info1[0][3]
-        fulladdress = Address + " " + Zipcode
-    return render_template("37-vissitedetail.html", SiteName=SiteName, OpenEveryday=OpenEveryday,fulladdress=fulladdress)
-
-
-@app.route("/visitor_logsiteVisit", methods=[ 'POST'])
-def visitor_logsiteVisit():
-    
-    try:
-        global _logged_user
-        print "THE VISITOR IS: %s" % _logged_user
-
-        # info1 = get_site_info('Atlanta Beltline Center')
-
-        info1 = get_site_info(sitename)
-               
-        SiteName = info1[0][0]
-        Address = str(info1[0][1])      
-        Zipcode = str(info1[0][2])
-        OpenEveryday = info1[0][3]
-        fulladdress = Address + " " + Zipcode
-        sitevisitdate = request.form["sitevisitdate"][0:10]
-
-        result = logsiteVisit(_logged_user, SiteName, sitevisitdate)
-        if result == 1:
-            return render_template("37-vissitedetail.html", SiteName=SiteName, OpenEveryday=OpenEveryday,fulladdress=fulladdress, success="Site Visit logged successfully")
-
-    except Exception as e:
-        print("---> run into Exception:")
-        print("---> " + str(e) + '\n')  # print exception message
-        if str(e)[1:5] == "1062":
-
-            # violates primary key constraint username
-            return render_template("37-vissitedetail.html", SiteName=SiteName, OpenEveryday=OpenEveryday,fulladdress=fulladdress, error="Cannot log visit to the same site on same date")
-
-
 @app.route("/to_create_event", methods=['POST', 'GET'])
 def create_event():
     if request.method == 'GET':
@@ -1554,6 +1551,265 @@ def create_event():
         return render_template("27-managercreateevent.html", filName=name, filPrice=price,
                 filCap=capacity, filMinStaff=minstaff, filStDate=stdate, filEndDate=enddate,
                 filDescr=description, filStaff=selectedStaff, staffs=allStaff, error=error)
+
+
+
+
+
+# Screen 28
+@app.route("/to_view_staff", methods=['POST', 'GET'])
+def manageStaff():
+
+     # getting the sites for the dropdown
+    response = getSiteNames()
+    siteList = []
+    for item in response:
+        site={}
+        site['SiteName'] = item[0]
+        siteList.append(site)
+
+        site_name = []
+    for val in siteList:
+        site_name.append(val['SiteName'])
+
+    firstSite = site_name[0]
+
+    if request.method == 'GET':
+        # getting unfiltered table when the page is first loaded
+        # global _logged_user
+        response =manageStaffers(firstSite, None, None, None, None, None)
+        stafflist = []
+        for item in response:
+            staff={}
+            staff['staffName'] = item[0]
+            staff['EventShift'] = item[1]
+            stafflist.append(staff);
+        return render_template("28-managermanstaff.html", sites=siteList, Firstname="",Lastname="",
+            Startdate="", Enddate="", staffs=stafflist, filSite= "")
+    if request.method =='POST':
+
+
+        #getting filtered transit when some of the options have been played with
+        site = request.form["site"]
+        # print site
+        Startdate = request.form["sdate"]
+        Enddate = request.form["endate"]
+        Firstname = request.form["fname"]
+        Lastname = request.form["lname"]
+        sort = ""
+        try:
+            sort = request.form["sort"]
+        except:
+            sort = None
+
+        # global _logged_user
+        response =manageStaffers(site,Firstname,Lastname, Startdate, Enddate, sort)
+        stafflist = []
+        for item in response:
+            staff={}
+            staff['staffName'] = item[0]
+            staff['EventShift'] = item[1]
+            stafflist.append(staff)
+        return render_template("28-managermanstaff.html", sites=siteList, Firstname=Firstname,Lastname=Lastname,
+            Startdate=Startdate, Enddate=Enddate, filSite=site,staffs=stafflist)
+
+
+
+
+
+#Screen32
+@app.route("/to_staff_event_detail", methods=['POST'])
+def eventDetails():
+    if request.method == 'POST':
+
+        # info1 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+        # info2 = getstaffDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+        # info3 = getEventDate32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+        event = request.form["chosen_event"]
+        event = event.replace("{'", "").replace("}", "")
+        fields = event.split(", '")
+
+        eventName = ""
+        startDate = ""
+        siteName = ""
+
+        for field in fields:
+            if(len(field) >= 10 and field[0:10] == "EventName'"):
+                strings = field.split(": ")
+                eventName = strings[1][1:len(strings[1])-1]
+            if(len(field) >= 10 and field[0:10] == "StartDate'"):
+                strings = field.split(": ")
+                date = strings[1][17:len(strings[1])]
+                date = date.replace("(", "").replace(")", "")
+                components = date.split(", ")
+                year = components[0]
+                month = components[1]
+                day = components[2]
+
+                if(len(month) < 2):
+                    month = "0" + month;
+                if(len(day) < 2):
+                    day = "0" + day;
+                startDate = year + "-" + month + "-" + day
+            if(len(field) >= 9 and field[0:9] == "SiteName'"):
+                strings = field.split(": ")
+                siteName = strings[1][1:len(strings[1])-1]
+
+        info1 = getEventDetail32(eventName, startDate, siteName)
+        info2 = getstaffDetail32(eventName, startDate, siteName)
+        info3 = getEventDate32(eventName, startDate, siteName)
+
+
+        EventName = info1[0]
+        StartDate = str(info1[1])[0:10]
+        SiteName = info1[2]
+        EndDate = str(info1[3])[0:10]
+        EventPrice = info1[4]
+        Capacity = info1[5]
+        # MinStaffRequired = info1[6]
+        Description = info1[7]
+
+        staff = info2
+        stafflist = []
+
+        for list in staff:
+            for item in list:
+                stafflist.append(item)
+
+        StaffUsername = ",\n".join(stafflist)
+        Duration = info3
+
+    return render_template("32-eventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName, EndDate=EndDate,
+        EventPrice=EventPrice, Capacity=Capacity,Description=Description,StaffUsername=StaffUsername,Duration=Duration)
+
+
+
+
+
+
+# Screen 34
+@app.route("/to_visitor_event_detail", methods=['POST'])
+def visitor_eventDetails():
+    if request.method == 'POST':
+        # info1 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+        # info2 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+        # info3 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+
+        event = request.form["chosen_event"]
+        event = event.replace("{'", "").replace("}", "")
+        fields = event.split(", '")
+
+        eventName = ""
+        startDate = ""
+        siteName = ""
+        ticketsRemaining = ""
+
+        for field in fields:
+            if(len(field) >= 10 and field[0:10] == "EventName'"):
+                strings = field.split(": ")
+                eventName = strings[1][1:len(strings[1])-1]
+            if(len(field) >= 10 and field[0:10] == "StartDate'"):
+                strings = field.split(": ")
+                date = strings[1][17:len(strings[1])]
+                date = date.replace("(", "").replace(")", "")
+                components = date.split(", ")
+                year = components[0]
+                month = components[1]
+                day = components[2]
+
+                if(len(month) < 2):
+                    month = "0" + month;
+                if(len(day) < 2):
+                    day = "0" + day;
+                startDate = year + "-" + month + "-" + day
+            if(len(field) >= 9 and field[0:9] == "SiteName'"):
+                strings = field.split(": ")
+                siteName = strings[1][1:len(strings[1])-1]
+            if(len(field) >= 17 and field[0:17] == "TicketsRemaining'"):
+                strings = field.split(": ")
+                info = strings[1]
+                info = info.replace("Decimal('", "").replace("')", "")
+                ticketsRemaining = float(info)
+
+        print(event)
+        print(eventName)
+        print(startDate)
+        print(siteName)
+
+        info1 = getEventDetail32(eventName, startDate, siteName)
+        info2 = getstaffDetail32(eventName, startDate, siteName)
+        info3 = getEventDate32(eventName, startDate, siteName)
+
+        EventName = info1[0]
+        StartDate = str(info1[1])[0:10]
+        SiteName = info1[2]
+        EndDate = str(info1[3])[0:10]
+        price = info1[4]
+        Description = info1[7]
+        #FIX THIS USING PREVIOUS SCREEN!!!:
+        TicketRemaining = ticketsRemaining
+
+
+    return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
+        price=price,Description=Description,TicketRemaining=TicketRemaining)
+
+
+
+@app.route("/visitor_logVisit", methods=[ 'POST'])
+def visitor_logVisit():
+
+    try:
+        # info1 = getEventDetail32("Bus Tour", "2019-02-01 00:00:00", "Inman Park")
+        info1 = getEventDetail32(eventName, startDate, siteName)
+        EventName = info1[0]
+        StartDate = str(info1[1])[0:10]
+        SiteName = info1[2]
+        EndDate = str(info1[3])[0:10]
+        price = info1[4]
+        Description = info1[7]
+        #FIX THIS USING PREVIOUS SCREEN:
+        TicketRemaining = 0
+        VisitDate = request.form["visitdate"][0:10]
+
+        global _logged_user
+        print "THE VISITOR IS: %s" % _logged_user
+
+        newstart = datetime.strptime(StartDate, '%Y-%m-%d').date()
+        newend = datetime.strptime(EndDate, '%Y-%m-%d').date()
+        newvisitdate = datetime.strptime(VisitDate, '%Y-%m-%d').date()
+        # print newvisitdate
+
+        # Visit date must be b/n start and end and Remaining tickets > 0:
+
+
+        if (newstart <= newvisitdate) and  (newvisitdate <= newend) and TicketRemaining > 0 :
+            result = logeventVisit(_logged_user, EventName, StartDate,SiteName, VisitDate)
+            if result == 1:
+                print "YAAAY"
+                return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
+                    price=price,Description=Description,TicketRemaining=TicketRemaining, success="Event has been logged!")
+            elif result == 0:
+                print "NAAY"
+                return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
+                    price=price,Description=Description,TicketRemaining=TicketRemaining, error="An event with the same date has been already logged!")
+
+        elif (newvisitdate < newstart) or  (newvisitdate > newend):
+            return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
+                    price=price,Description=Description,TicketRemaining=TicketRemaining, error="Visit Date must be between Start and End Dates")
+        elif(TicketRemaining==0):
+            return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,price=price,Description=Description,TicketRemaining=TicketRemaining, error="The event is sold out!")
+
+    except Exception as e:
+        print("---> run into Exception:")
+        print("---> " + str(e) + '\n')  # print exception message
+        if str(e)[1:5] == "1062":
+
+            # violates primary key constraint username
+            return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
+                price=price,Description=Description,TicketRemaining=TicketRemaining, error="An event with the same date has been already logged!")
+
+        return go_to_functionality_screen()
+
 
 @app.route("/get_available_staff_to_create", methods=['POST'])
 def get_available_staff_to_create():
@@ -1849,6 +2105,7 @@ def edit_event():
 
 
 
+
 #SCREENS 29-30
 @app.route("/to_view_site_report", methods=['POST', 'GET'])
 def to_view_site_report():
@@ -1979,7 +2236,8 @@ def sort_daily_detail():
 
 
 
-#SCREENS 31-32
+
+#SCREENS 31
 @app.route("/to_view_schedule", methods=['POST', 'GET'])
 def to_view_schedule():
     if request.method == 'GET':
@@ -2026,9 +2284,7 @@ def to_view_schedule():
                 filStDate=startdate, filEndDate=enddate, events=events)
 
 
-
-
-#SCREENS 33-34
+#SCREENS 33
 @app.route("/to_vis_explore_event", methods=['POST', 'GET'])
 def to_vis_explore_event():
     if request.method == 'GET':
@@ -2045,6 +2301,7 @@ def to_vis_explore_event():
             event['TicketsRemaining'] = item[3]
             event['TotalVisits'] = item[4]
             event['MyVisits'] = item[5]
+            event['StartDate'] = item[6]
             events.append(event)
 
         # getting the sites for the dropdown
@@ -2103,6 +2360,7 @@ def to_vis_explore_event():
             event['TicketsRemaining'] = item[3]
             event['TotalVisits'] = item[4]
             event['MyVisits'] = item[5]
+            event['StartDate'] = item[6]
             events.append(event)
 
         # getting the sites for the dropdown
@@ -2117,6 +2375,459 @@ def to_vis_explore_event():
                 filSite=site, filStDate=startdate, filEndDate=enddate, toVisMin=toVisMin,
                 toVisMax=toVisMax, tPriceMin=tPriceMin, tPriceMax=tPriceMax, filIncVis=includeVisit,
                 filIncSoldOut=includeSoldOut, sites=siteList, events=events)
+
+
+
+#SCREEN 38
+@app.route("/to_vis_visit_history", methods=['POST', 'GET'])
+def to_vis_visit_history():
+    if request.method == 'GET':
+        response = getSiteNames();
+        siteNameList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteNameList.append(site)
+
+        #def getVisits(user, ename, site, sdate, edate, sort):
+        global _logged_user
+        response = getVisits(_logged_user, None, None, None, None, None)
+        visits = []
+        for item in response:
+            visit = {}
+            visit['Date'] = item[0]
+            visit['EventName'] = item[1]
+            visit['SiteName'] = item[2]
+            visit['Price'] = item[3]
+            visits.append(visit)
+
+        return render_template("38-visitorvisithistory.html", sites=siteNameList, visits=visits,
+                filName="", filStDate="", filEndDate="", filSite="")
+
+    if request.method == 'POST':
+        name = request.form["name"]
+        ssite = request.form["site"]
+        startdate = request.form["startdate"]
+        enddate = request.form["enddate"]
+        sort = ""
+        try:
+            sort = request.form["sort"]
+        except:
+            sort = None
+
+        response = getSiteNames();
+        siteNameList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteNameList.append(site)
+
+        global _logged_user
+        response = getVisits(_logged_user, name, ssite, startdate, enddate, sort)
+        visits = []
+        for item in response:
+            visit = {}
+            visit['Date'] = item[0]
+            visit['EventName'] = item[1]
+            visit['SiteName'] = item[2]
+            visit['Price'] = item[3]
+            visits.append(visit)
+
+        return render_template("38-visitorexploresite.html", sites=siteNameList, visits=visits,
+                filName=name, filStDate=startdate, filEndDate=enddate, filSite=ssite)
+
+
+
+
+
+#SCREEN 35
+@app.route("/to_vis_explore_site", methods=['POST', 'GET'])
+def to_vis_explore_site():
+    if request.method == 'GET':
+        # sends back to the manage sites page
+        response = getSiteNames();
+        siteNameList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteNameList.append(site)
+
+        global _logged_user
+        response = getSites35(_logged_user, None, None, None, None, None, None, None, None, None, None)
+        sites = []
+        for item in response:
+            site = {}
+            site['SiteName'] = item[0]
+            site['EventCount'] = item[1]
+            site['TotalVisits'] = item[2]
+            site['MyVisits'] = item[3]
+            sites.append(site)
+
+        return render_template("35-visitorexploresite.html", filSite="", filEvery="",
+                filStDate="", filEndDate="", toVisMin="", toVisMax="", eCountMin="",
+                eCountMax="", filIncVis="Yes", sites=siteNameList, ssites=sites)
+
+    if request.method == 'POST':
+        site = request.form["site"]
+        everyday = request.form["everyday"]
+        startdate = request.form["startdate"]
+        enddate = request.form["enddate"]
+        toVisMin = request.form["toVisMin"]
+        toVisMax = request.form["toVisMax"]
+        eCountMin = request.form["eCountMin"]
+        eCountMax = request.form["eCountMax"]
+        includeVisit = request.form["includeVisited"]
+        sort = ""
+        try:
+            sort = request.form["sort"]
+        except:
+            sort = None
+
+        if(toVisMin == "" or toVisMin is None):
+            toVisMin = -1
+        if(toVisMax == "" or toVisMax is None):
+            toVisMax = -1
+        if(eCountMin == "" or eCountMin is None):
+            eCountMin = -1
+        if(eCountMax == "" or eCountMax is None):
+            eCountMax = -1
+        toVisMin = float(toVisMin)
+        toVisMax = float(toVisMax)
+        eCountMin = float(eCountMin)
+        eCountMax = float(eCountMax)
+
+        global _logged_user
+        response = getSites35(_logged_user, site, everyday, startdate, enddate,
+                toVisMin, toVisMax, eCountMin, eCountMax, includeVisit, sort)
+        sites = []
+        for item in response:
+            site = {}
+            site['SiteName'] = item[0]
+            site['EventCount'] = item[1]
+            site['TotalVisits'] = item[2]
+            site['MyVisits'] = item[3]
+            sites.append(site)
+
+        # sends back to the manage sites page
+        response = getSiteNames();
+        siteNameList = []
+        for item in response:
+            site={}
+            site['SiteName'] = item[0]
+            siteNameList.append(site)
+
+        return render_template("35-visitorexploresite.html", filSite=site, filEvery=everyday,
+                filStDate=startdate, filEndDate=enddate, toVisMin=toVisMin, toVisMax=toVisMax,
+                eCountMin=eCountMin, eCountMax=eCountMax, filIncVis=includeVisit, sites=siteNameList, ssites=sites)
+
+# SCREEN 36 VISITOR TRANSIT DETAIL
+@app.route("/to_visitor_transitDetail", methods=['POST'])
+def to_visitor_transitDetail():
+    # getting the sites for the dropdown
+
+    # getting the transit types for the dropdown
+    response = getTransitTypes()
+    transitTypeList = []
+    for item in response:
+        tType={}
+        tType['TransitType'] = item[0]
+        transitTypeList.append(tType)
+
+    SiteName = ""
+
+    site = request.form["chosen_site"]
+    ssite = site.replace("{'", "").replace("}", "")
+    fields = ssite.split(", '")
+
+    for field in fields:
+        if(len(field) >= 9 and field[0:9] == "SiteName'"):
+            strings = field.split(": ")
+            SiteName = strings[1][1:len(strings[1])-1]
+
+    # getting unfiltered transit when the page is first loaded, with default sort
+    response = getTransitDetail36(SiteName, None, None)
+    transitList = []
+    for item in response:
+        transit={}
+        transit['TransitRoute'] = item[0]
+        transit['TransitType'] = item[1]
+        transit['Price'] = item[2];
+        transit['ConnectedSites'] = item[3]
+        transitList.append(transit);
+
+    return render_template('36-vistransitdetail.html', SiteName=SiteName, types=transitTypeList,
+            transits=transitList,filType="-ALL-", chosensite=request.form["chosen_site"])
+
+@app.route("/to_visitor_transitDetail2", methods=['POST'])
+def to_visitor_transitDetail2():
+    SiteName = ""
+
+    site = request.form["chosen_site"]
+    ssite = site.replace("{'", "").replace("}", "")
+    fields = ssite.split(", '")
+
+    for field in fields:
+        if(len(field) >= 9 and field[0:9] == "SiteName'"):
+            strings = field.split(": ")
+            SiteName = strings[1][1:len(strings[1])-1]
+
+    #getting filtered transit when some of the options have been played with
+    transitType = request.form["transittype"]
+    sort = ""
+    try:
+        sort = request.form["sort"]
+        print "SORT IS: %s" % sort
+    except:
+        sort = None
+
+
+    # getting the transit types for the dropdown
+    response = getTransitTypes()
+    transitTypeList = []
+    for item in response:
+        tType={}
+        tType['TransitType'] = item[0]
+        transitTypeList.append(tType)
+
+
+    response = getTransitDetail36(SiteName, transitType,sort)
+    transitList = []
+    for item in response:
+        transit={}
+        transit['TransitRoute'] = item[0]
+        transit['TransitType'] = item[1]
+        transit['Price'] = item[2];
+        transit['ConnectedSites'] = item[3]
+        transitList.append(transit);
+
+    return render_template('36-vistransitdetail.html', SiteName=SiteName, types=transitTypeList,
+            transits=transitList, filType="transitType", chosensite=request.form["chosen_site"])
+
+
+#Screen 37
+@app.route("/to_visitor_site_detail", methods=['POST'])
+def visitor_siteDetails():
+    siteName = ""
+
+    site = request.form["chosen_site"]
+    ssite = site.replace("{'", "").replace("}", "")
+    fields = ssite.split(", '")
+
+    for field in fields:
+        if(len(field) >= 9 and field[0:9] == "SiteName'"):
+            strings = field.split(": ")
+            siteName = strings[1][1:len(strings[1])-1]
+
+
+    info1 = get_site_info(siteName)
+
+    SiteName = info1[0][0]
+    Address = str(info1[0][1])
+    Zipcode = str(info1[0][2])
+    OpenEveryday = info1[0][3]
+    fulladdress = Address + " " + Zipcode
+    return render_template("37-vissitedetail.html", SiteName=SiteName, OpenEveryday=OpenEveryday,
+            fulladdress=fulladdress, chosensite=request.form["chosen_site"])
+
+
+@app.route("/visitor_logsiteVisit", methods=[ 'POST'])
+def visitor_logsiteVisit():
+
+    try:
+        global _logged_user
+        print "THE VISITOR IS: %s" % _logged_user
+
+        # info1 = get_site_info('Atlanta Beltline Center')
+
+        info1 = get_site_info(sitename)
+
+        SiteName = info1[0][0]
+        Address = str(info1[0][1])
+        Zipcode = str(info1[0][2])
+        OpenEveryday = info1[0][3]
+        fulladdress = Address + " " + Zipcode
+        sitevisitdate = request.form["sitevisitdate"][0:10]
+
+        result = logsiteVisit(_logged_user, SiteName, sitevisitdate)
+        if result == 1:
+            return render_template("37-vissitedetail.html", SiteName=SiteName, OpenEveryday=OpenEveryday,fulladdress=fulladdress, success="Site Visit logged successfully")
+
+    except Exception as e:
+        print("---> run into Exception:")
+        print("---> " + str(e) + '\n')  # print exception message
+        if str(e)[1:5] == "1062":
+
+            # violates primary key constraint username
+            return render_template("37-vissitedetail.html", SiteName=SiteName, OpenEveryday=OpenEveryday,fulladdress=fulladdress, error="Cannot log visit to the same site on same date")
+
+
+@app.route("/visitor_log_transit", methods=['POST'])
+def visitor_log_transit():
+    try:
+
+        transit = request.form["chosen_transit"]
+        date = request.form["dateLogged"]
+
+        global _logged_user
+        logTransit(_logged_user, transit, date)
+
+        info1 = get_site_info("Inman Park")
+            # info1 = get_site_info(sitename)
+        SiteName = str(info1[0][0])
+            # print SiteName
+
+        # getting the transit types for the dropdown
+        response = getTransitTypes()
+        transitTypeList = []
+        for item in response:
+            tType={}
+            tType['TransitType'] = item[0]
+            transitTypeList.append(tType)
+
+        # getting unfiltered transit when the page is first loaded, with default sort
+        response = getTransit15(None, None, None, None, None)
+        transitList = []
+        for item in response:
+            transit={}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+            transit['Price'] = item[2];
+            transit['ConnectedSites'] = item[3]
+            transitList.append(transit);
+
+        return render_template('36-vistransitdetail.html', SiteName=SiteName, types=transitTypeList,
+                    transits=transitList, filType="-ALL-", success="Transit has been logged!")
+
+    except Exception as e:
+
+        info1 = get_site_info("Inman Park")
+            # info1 = get_site_info(sitename)
+        SiteName = str(info1[0][0])
+
+        response = getTransitTypes()
+        transitTypeList = []
+        for item in response:
+            tType={}
+            tType['TransitType'] = item[0]
+            transitTypeList.append(tType)
+
+        response = getTransit15(None, None, None, None, None)
+        transitList = []
+        for item in response:
+            transit={}
+            transit['TransitRoute'] = item[0]
+            transit['TransitType'] = item[1]
+            transit['Price'] = item[2];
+            transit['ConnectedSites'] = item[3]
+            transitList.append(transit);
+
+        print("---> run into Exception:")
+        print("---> " + str(e) + '\n')  # print exception message
+        if str(e)[1:5] == "1062":
+
+            # violates primary key constraint username
+             return render_template('36-vistransitdetail.html',SiteName=SiteName, types=transitTypeList,
+                    transits=transitList, filType="-ALL-", error="Transit already exists! Please click the back button and enter a different Transit")
+
+
+
+
+
+
+#SCREEN 18
+@app.route("/to_manage_user", methods=['POST', 'GET'])
+def manage_user():
+    if request.method == 'GET':
+        response = getFilteredUsersList(None, None, None, None)
+
+        userList=[]
+        for item in response:
+            user={}
+            user['Username']=item[0]
+            user['EmailCount']=item[1]
+            user['Type']=item[2]
+            user['Status']=item[3]
+            userList.append(user)
+
+        return render_template('18-adminmanuser.html', users=userList)
+
+    if request.method == 'POST':
+        username = request.form["username"]
+        type = request.form["type"]
+        status = request.form["status"]
+        sort = ""
+        try:
+            sort = request.form["sort"]
+        except:
+            sort = None
+
+        response = getFilteredUsersList(username, type, status, sort)
+        userList=[]
+        for item in response:
+            user={}
+            user['Username']=item[0]
+            user['EmailCount']=item[1]
+            user['Type']=item[2]
+            user['Status']=item[3]
+            userList.append(user)
+        return render_template('18-adminmanuser.html', users=userList)
+
+@app.route("/approve_user", methods=['POST'])
+def approve_user():
+    print("Yeet")
+    username = request.form["chosen_user"]
+    status = getCurrentStatus(username)
+
+    if(status == "Pending" or status == "Declined"):
+        approveUser(username)
+        usertype = get_usertype(username)
+        if("Employee" in usertype):
+            id = employeeid_generator(username)
+            setEmployeeID(username, id)
+
+    response = getFilteredUsersList(None, None, None, None)
+
+    userList=[]
+    for item in response:
+        user={}
+        user['Username']=item[0]
+        user['EmailCount']=item[1]
+        user['Type']=item[2]
+        user['Status']=item[3]
+        userList.append(user)
+
+    return render_template('18-adminmanuser.html', users=userList)
+
+@app.route("/decline_user", methods=['POST'])
+def decline_user():
+    username = request.form["chosen_user"]
+    print("rigt here")
+    print(username)
+    status = getCurrentStatus(username)
+
+    if(status == "Pending"):
+        declineUser(username)
+
+    response = getFilteredUsersList(None, None, None, None)
+
+    userList=[]
+    for item in response:
+        user={}
+        user['Username']=item[0]
+        user['EmailCount']=item[1]
+        user['Type']=item[2]
+        user['Status']=item[3]
+        userList.append(user)
+
+    return render_template('18-adminmanuser.html', users=userList)
+
+
+
+
+
+
+
+
 
 
 

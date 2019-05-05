@@ -3,7 +3,10 @@
 from datetime import datetime
 import pymysql
 import traceback
-
+import sys
+import traceback
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 # Establish a secure connection to the database (which will be hosted on some gatech server?)
 
@@ -176,6 +179,65 @@ def email_insert(Username, Email):
         else:
             # other violation
             return 2
+
+def tempmail_insert(Email):
+    # print(Username)
+    print(Email)
+    query = "INSERT INTO tempmail(Email) VALUES(%s)"
+    try:
+        print("log :: executing user insertion query\n")
+        _cursor.execute(query ,(Email))
+        _database.commit()
+        print("++ Successfully inserted " + Email + " into tempmail table ++\n")
+        return 0
+
+    except Exception as e:
+        print("---> run into Exception:")
+        print("---> " + str(e) + '\n')  # print exception message
+        if str(e)[1:5] == "1062":
+            # violates primary key constraint
+            return 1
+        else:
+            # other violation
+            return 2
+
+def get_tempmails():
+    query = """
+        SELECT Email FROM tempmail;
+        """
+
+    response = _cursor.execute(query);
+    return _cursor.fetchall();
+
+#clear the table for next registration
+def clear_tempmails():
+    _cursor.execute("TRUNCATE TABLE tempmail")
+    return 1
+
+
+# delete specific temp email
+def delete_tempmail(email):
+    query = """
+        DELETE FROM tempmail
+        WHERE Email = '%s';
+        """
+    response = _cursor.execute(query % (email))
+    _database.commit();
+
+
+# delete specific user's emails if registration fails
+def delete_mailrecs(Username):
+    query = """
+        DELETE FROM useremail
+        WHERE Username = '%s';
+        """
+    response = _cursor.execute(query % (Username))
+    _database.commit()
+
+
+
+
+
 
 # Register function to insert employee into Employee table
 # returns:
@@ -388,24 +450,42 @@ def get_usertype(Username):
     response = _cursor.execute(query, (Username))
     return(_cursor.fetchone())[0]
 
+# Breaking this up into 2 queries to handle issue with employee who aren't managers of any site
 def get_employee_info(user):
     query = """
-        SELECT U.Firstname, U.Lastname, U.Username, S.SiteName, E.EmployeeID, E.Phone, E.EmployeeAddress, E.EmployeeCity, E.EmployeeState, E.EmployeeZipcode
+        SELECT U.Firstname, U.Lastname, U.Username, E.EmployeeID, E.Phone, E.EmployeeAddress, E.EmployeeCity, E.EmployeeState, E.EmployeeZipcode
         FROM allusers AS U
         INNER JOIN (
             SELECT Username, EmployeeID, Phone, EmployeeAddress, EmployeeCity, EmployeeState, EmployeeZipcode
             FROM employee
         ) AS E
         ON U.Username = E.Username
-        INNER JOIN (
-            SELECT SiteName, ManagerUsername
-            FROM site
-        ) AS S
-        ON U.Username = S.ManagerUsername
-        WHERE U.Username = '%s';
+        WHERE U.Username = %s;
         """
-    response = _cursor.execute(query % (user))
-    return _cursor.fetchone();
+    response = _cursor.execute(query, (user))
+    # print "stuff is: %s" % _cursor.fetchone()[0]
+    return (_cursor.fetchone())
+
+def get_site_info17(user):
+    query = """
+        SELECT S.SiteName
+        FROM allusers AS U
+        INNER JOIN (
+            SELECT SiteName, ManagerUsername 
+            FROM site
+            ) AS S
+            ON U.Username = S.ManagerUsername
+            WHERE U.Username = %s;
+        """
+    response = _cursor.execute(query, (user))
+    # print response
+    # print result
+    if response == 0:
+        return ""
+    else:
+        result = _cursor.fetchone()[0]
+    # print "stuff is: %s" % _cursor.fetchone()[0]
+        return (result)
 
 def get_employee_emails(user):
     query = """
@@ -417,24 +497,52 @@ def get_employee_emails(user):
     response = _cursor.execute(query % (user));
     return _cursor.fetchall();
 
-def getFilteredUsersList(user, type, status):
-    if(user == ""):
+def getFilteredUsersList(user, type, status, sort):
+    if(user == "" or user is None):
         user = "-ALL-";
-
+    if(type == "" or type is None):
+        type = "-ALL-"
+    if(status == "" or status is None):
+        status = "-ALL-"
+    if(sort == "" or sort is None):
+        sort = "Username ASC"
     query = """
-        SELECT U.Username, Email.Count, U.UserType, U.Status
-        FROM allusers AS U
-        INNER JOIN (
-          	SELECT DISTINCT Username, COUNT(Username) AS Count
-            FROM useremail
-            GROUP BY Username
-        ) As Email
-        ON U.Username = Email.Username
-        WHERE (U.Username = '%s' OR '%s' = '-ALL-')
-        AND (U.UserType = '%s' OR '%s' = '-ALL-')
-        AND (U.Status = '%s' OR '%s' = '-ALL-')
+        SELECT *
+        FROM (
+            SELECT V.Username, V.EmailCount, CONCAT(' ', V.UserType) AS UserType, V.Status
+            FROM (
+                SELECT U.Username, U.EmailCount, REPLACE(U.UserType, 'Employee', U.EmployeeType) AS UserType, U.Status
+                FROM (
+                    SELECT A.Username, Email.Count AS EmailCount, A.UserType, A.Status, B.EmployeeType
+                    FROM allusers AS A
+                    INNER JOIN (
+                        SELECT DISTINCT Username, COUNT(Username) AS Count
+                        FROM useremail
+                        GROUP BY Username
+                    ) As Email
+                    ON A.Username = Email.Username
+                    INNER JOIN (
+                        SELECT Username, EmployeeType
+                        FROM employee
+
+                        UNION
+
+                        SELECT Username, ('nope') AS EmployeeType
+                        FROM allusers
+                        WHERE UserType = 'Visitor'
+                        OR UserType = 'User'
+                    ) AS B
+                    ON B.Username = A.Username
+                ) AS U
+            ) AS V
+            WHERE (V.Username = '%s' OR '%s' = '-ALL-')
+            AND (LOCATE('%s', V.UserType) > 0 OR '%s' = '-ALL-')
+            AND (V.Status = '%s' OR '%s' = '-ALL-')
+        ) AS Z
+        ORDER BY %s
         """
-    response = _cursor.execute(query % (user, user, type, type, status, status))
+    print(query % (user, user, type, type, status, status, sort))
+    response = _cursor.execute(query % (user, user, type, type, status, status, sort))
     return _cursor.fetchall();
 
 def getManagerNames():
@@ -444,6 +552,210 @@ def getManagerNames():
         """
     response = _cursor.execute(query)
     return _cursor.fetchall();
+
+
+def manageStaffers(siteName, firstname, lastname, sdate, edate,sort):
+
+    if(sort == "" or sort is None):
+        sort = "Shifts ASC"
+    if(firstname == "" or firstname is None):
+        firstname = "-ALL-"
+    if(lastname == "" or lastname is None):
+        lastname = "-ALL-"
+    if(sdate == "" or sdate is None):
+        sdate = "1900-01-01"
+    if(edate == "" or edate is None):
+        edate = "2100-12-31"
+    if(siteName is None):
+        siteName = "-ALL-"
+
+    # print siteName
+    query = """
+        SELECT *
+        FROM (
+            SELECT C.StaffName, Count(C.EventName) As Shifts
+            FROM (
+                SELECT A.StaffName, B.EndDate, A.EventName, A.SiteName, A.FirstName, A.Lastname, A.StartDate, A.StaffUsername
+                FROM (
+                    SELECT Distinct Concat(Firstname,' ', Lastname) AS StaffName, EventName, SiteName, Firstname, Lastname, StartDate, StaffUsername
+                    FROM assignto
+                    INNER JOIN allusers
+                    ON StaffUsername = Username
+                ) AS A
+                INNER JOIN (
+                    SELECT EventName, StartDate, SiteName, EndDate
+                    FROM event
+                ) AS B
+                ON A.EventName = B.EventName WHERE A.StartDate = B.StartDate AND A.SiteName = B.SiteName
+                AND A.SiteName = '%s'
+                AND (LOCATE('%s',A.Firstname) > 0 OR '%s' = '-ALL-')
+                AND (LOCATE('%s',A.Lastname) > 0 OR '%s' = '-ALL-')
+                AND DATEDIFF(A.StartDate, '%s') <= 0
+                AND DATEDIFF(B.EndDate, '%s') >= 0
+            ) AS C
+            GROUP BY StaffUsername
+        ) AS F
+        ORDER BY %s;
+    """
+    response2 = _cursor.execute(query % (siteName, firstname, firstname, lastname, lastname, edate, sdate, sort))
+    result2 = _cursor.fetchall()
+    return (result2)
+
+def getSites35(user, site, everyday, sdate, edate, toVisMin, toVisMax, eCountMin, eCountMax, includeVisit, sort):
+    if(site is None):
+        site = "-ALL-"
+    if(everyday is None):
+        everyday = "-ALL-"
+    if(sdate == "" or sdate is None):
+        sdate = "1900-01-01"
+    if(edate == "" or edate is None):
+        edate = "2100-12-31"
+    if(toVisMin == "" or toVisMin is None):
+        toVisMin = -1
+    if(toVisMax == "" or toVisMax is None):
+        toVisMax = -1
+    if(eCountMin == "" or eCountMin is None):
+        eCountMin = -1;
+    if(eCountMax == "" or eCountMax is None):
+        eCountMax = -1;
+    if(includeVisit == "Yes"):
+        includeVisit = 500
+    else:
+        includeVisit = 0
+    if(sort == "" or sort is None):
+        sort = "SiteName ASC"
+    query = """
+        SELECT *
+        FROM (
+            SELECT ZZ.SiteName, ZZ.EventCount, ZZ.TotalVisits, ZZ.MyVisits
+            FROM (
+                SELECT G.SiteName, G.EventCount, D.TotalVisits, J.MyVisits, AB.OpenEveryday
+                FROM (
+                    SELECT A.SiteName, SUM(A.EventCount) AS EventCount
+                    FROM (
+                        SELECT B.SiteName, COUNT(*) AS EventCount
+                        FROM (
+                            SELECT *
+                            FROM event
+                            WHERE DATEDIFF(StartDate, '%s') <= 0
+                            AND DATEDIFF(EndDate, '%s') >= 0
+                        ) AS B
+                        GROUP BY B.SiteName
+
+                        UNION
+
+                        SELECT SiteName, 0 AS EventCount
+                        FROM site
+                    ) AS A
+                    GROUP BY A.SiteName
+                ) AS G
+                INNER JOIN (
+                    SELECT I.SiteName, SUM(I.TotalVisits) AS TotalVisits
+                    FROM (
+                        SELECT Y.SiteName, SUM(Y.TotalVisits) AS TotalVisits
+                        FROM (
+                            SELECT C.EventName, C.StartDate, C.SiteName, SUM(C.TotalVisits) AS TotalVisits
+                            FROM (
+                                SELECT EventName, StartDate, SiteName, COUNT(VisitorUsername) AS TotalVisits
+                                FROM visitevent
+                                WHERE DATEDIFF(VisitEventDate, '%s') <= 0
+                                AND DATEDIFF(VisitEventDate, '%s') >= 0
+                                GROUP BY EventName, StartDate, SiteName
+
+                                UNION
+
+                                SELECT EventName, StartDate, SiteName, 0 AS TotalVisits
+                                FROM event
+                            ) AS C
+                            GROUP BY C.EventName, C.StartDate, C.SiteName
+                        ) AS Y
+                        GROUP BY Y.SiteName
+
+                        UNION
+
+                        SELECT H.SiteName, SUM(H.TotalVisits) AS H
+                        FROM (
+                            SELECT SiteName, COUNT(VisitorUsername) AS TotalVisits
+                            FROM visitsite
+                            WHERE DATEDIFF(VisitSiteDate, '%s') <= 0
+                            AND DATEDIFF(VisitSiteDate, '%s') >= 0
+                            GROUP BY SiteName
+
+                            UNION
+
+                            SELECT SiteName, 0 AS TotalVisits
+                            FROM site
+                        ) AS H
+                        GROUP BY H.SiteName
+                    ) AS I
+                    GROUP BY I.SiteName
+                ) AS D
+                ON G.SiteName = D.SiteName
+                INNER JOIN (
+                    SELECT O.SiteName, SUM(O.MyVisits) AS MyVisits
+                    FROM (
+                        SELECT Z.SiteName, SUM(Z.MyVisits) AS MyVisits
+                        FROM (
+                            SELECT K.EventName, K.StartDate, K.SiteName, SUM(K.TotalVisits) AS MyVisits
+                            FROM (
+                                SELECT EventName, StartDate, SiteName, COUNT(VisitorUsername) AS TotalVisits
+                                FROM visitevent
+                                WHERE VisitorUsername = '%s'
+                                AND DATEDIFF(VisitEventDate, '%s') <= 0
+                                AND DATEDIFF(VisitEventDate, '%s') >= 0
+                                GROUP BY EventName, StartDate, SiteName
+
+                                UNION
+
+                                SELECT EventName, StartDate, SiteName, 0 AS TotalVisits
+                                FROM event
+                            ) AS K
+                            GROUP BY K.EventName, K.StartDate, K.SiteName
+                        ) AS Z
+                        GROUP BY Z.SiteName
+
+                        UNION
+
+                        SELECT M.SiteName, SUM(M.MyVisits)
+                        FROM (
+                            SELECT SiteName, COUNT(VisitorUsername) AS MyVisits
+                            FROM visitsite
+                            WHERE VisitorUsername = '%s'
+                            AND DATEDIFF(VisitSiteDate, '%s') <= 0
+                            AND DATEDIFF(VisitSiteDate, '%s') >= 0
+                            GROUP BY SiteName
+
+                            UNION
+
+                            SELECT SiteName, 0 AS MyVisits
+                            FROM site
+                        ) AS M
+                        GROUP BY M.SiteName
+                    ) AS O
+                    GROUP BY O.SiteName
+                ) AS J
+                ON J.SiteName = D.SiteName
+                INNER JOIN (
+                    SELECT SiteName, OpenEveryday
+                    FROM site
+                ) AS AB
+                ON AB.SiteName = D.SiteName
+            ) AS ZZ
+            WHERE (ZZ.SiteName = '%s' OR '%s' = '-ALL-')
+            AND (ZZ.TotalVisits >= %d OR %d = -1)
+            AND (ZZ.TotalVisits <= %d OR %d = -1)
+            AND (ZZ.EventCount >= %d OR %d = -1)
+            AND (ZZ.EventCount <= %d OR %d = -1)
+            AND (ZZ.OpenEveryday = '%s' OR '%s' = '-ALL-')
+            AND (ZZ.MyVisits <= %d)
+        ) AS ABC
+        ORDER BY %s
+        """
+    response = _cursor.execute(query % (edate, sdate, edate, sdate, edate, sdate, user,
+            edate, sdate, user, edate, sdate, site, site, toVisMin,
+            toVisMin, toVisMax, toVisMax, eCountMin, eCountMin, eCountMax, eCountMax,
+            everyday, everyday, includeVisit, sort))
+    return _cursor.fetchall()
 
 
 def getSites19(site, manager, openeveryday, sort):
@@ -557,12 +869,14 @@ def getTransit22(site, type, route, minPrice, maxPrice, sort):
     return _cursor.fetchall();
 
 def update_employee(user, fname, lname, phone, visitor):
+    print "db visitor is: %s" % visitor 
     query0 = """
         UPDATE allusers
         SET Firstname = %s, Lastname = %s
         WHERE Username = %s;
         """
     response = _cursor.execute(query0, (fname, lname, user))
+    print "rep 1: %s" % response
     _database.commit();
 
     query1 = """
@@ -571,11 +885,31 @@ def update_employee(user, fname, lname, phone, visitor):
         WHERE Username = %s;
         """
     response = _cursor.execute(query1, (phone, user))
+    print "rep 2: %s" % response
     _database.commit();
 
-    # TODO UPDATE VISITOR
-    # visitor = 0 ... isVisitor = false
-    # visitor = 1 ... isVisitor = true
+    if visitor == "1":
+
+        user_type = "Employee, Visitor"
+        query2 = """
+            UPDATE allusers
+            SET UserType = %s
+            WHERE Username = %s;
+            """
+        response = _cursor.execute(query2, (user_type, user))
+        print "rep 3: %s" % response
+        _database.commit();
+
+    elif visitor == "0":
+        user_type = "Employee"
+        query3 = """
+            UPDATE allusers
+            SET UserType = %s
+            WHERE Username = %s;
+            """
+        response = _cursor.execute(query3, (user_type, user))
+        print "rep 4: %s" % response
+        _database.commit();
 
 def deleteEmail(email):
     query = """
@@ -1049,6 +1383,7 @@ def updateEvent(eventname, startdate, site, description, assignedStaff):
         response2 = _cursor.execute(query2, (staff['Username'], eventname, startdate, site))
         _database.commit()
 
+
 def getSiteReport(stDate, endDate, eCountMin, eCountMax, stCountMin, stCountMax,
         toVisMin, toVisMax, toRevMin, toRevMax, site, sort):
     if(eCountMin == "" or eCountMin is None):
@@ -1062,7 +1397,7 @@ def getSiteReport(stDate, endDate, eCountMin, eCountMax, stCountMin, stCountMax,
     if(toVisMin == "" or toVisMin is None):
         toVisMin = -1
     if(toVisMax == "" or toVisMax is None):
-        toVisMax = -1
+        toVisMin = -1
     if(toRevMin == "" or toRevMin is None):
         toRevMin = -1
     if(toRevMax == "" or toRevMax is None):
@@ -1297,6 +1632,7 @@ def getSchedule(user, ename, keyword, sdate, edate, sort):
     return _cursor.fetchall();
 
 
+
 def getEvents33(user, name, keyword, site, sdate, edate, toVisMin, toVisMax,
         tPriceMin, tPriceMax, includeVisit, includeSoldOut, sort):
     if(name == "" or name is None):
@@ -1331,53 +1667,53 @@ def getEvents33(user, name, keyword, site, sdate, edate, toVisMin, toVisMax,
     query = """
         SELECT *
         FROM (
-            SELECT I.EventName, I.SiteName, I.TicketPrice, I.TicketsRemaining, I.TotalVisits, I.MyVisits
+            SELECT I.EventName, I.SiteName, I.TicketPrice, I.TicketsRemaining, I.TotalVisits, I.MyVisits, I.StartDate
             FROM (
                 SELECT G.EventName, G.StartDate, G.SiteName, G.TicketPrice, G.TicketsRemaining, G.TotalVisits, G.MyVisits, H.Description, H.EndDate
                 FROM (
-                	SELECT D.EventName, D.StartDate, D.SiteName, D.EventPrice AS TicketPrice, (D.Capacity-D.TotalVisits) AS TicketsRemaining, D.TotalVisits, E.MyVisits
-                	FROM (
-                		SELECT A.EventName, A.StartDate, A.SiteName, A.EventPrice, A.Capacity, B.TotalVisits
-                		FROM event AS A
-                		INNER JOIN (
-                			SELECT C.EventName, C.StartDate, C.SiteName, SUM(C.TotalVisits) AS TotalVisits
-                			FROM (
-                				SELECT EventName, StartDate, SiteName, COUNT(VisitorUsername) AS TotalVisits
-                				FROM visitevent
-                				GROUP BY EventName, StartDate, SiteName
+                    SELECT D.EventName, D.StartDate, D.SiteName, D.EventPrice AS TicketPrice, (D.Capacity-D.TotalVisits) AS TicketsRemaining, D.TotalVisits, E.MyVisits
+                    FROM (
+                        SELECT A.EventName, A.StartDate, A.SiteName, A.EventPrice, A.Capacity, B.TotalVisits
+                        FROM event AS A
+                        INNER JOIN (
+                            SELECT C.EventName, C.StartDate, C.SiteName, SUM(C.TotalVisits) AS TotalVisits
+                            FROM (
+                                SELECT EventName, StartDate, SiteName, COUNT(VisitorUsername) AS TotalVisits
+                                FROM visitevent
+                                GROUP BY EventName, StartDate, SiteName
 
-                				UNION
+                                UNION
 
-                				SELECT EventName, StartDate, SiteName, 0 AS TotalVisits
-                				FROM event
-                			) AS C
-                			GROUP BY C.EventName, C.StartDate, C.SiteName
-                		) AS B
-                		ON A.EventName = B.EventName
-                		WHERE A.SiteName = B.SiteName
-                		AND A.StartDate = B.StartDate
-                	) AS D
-                	INNER JOIN (
-                		SELECT F.EventName, F.StartDate, F.SiteName, SUM(F.TotalVisits) AS MyVisits
-                		FROM (
-                			SELECT EventName, StartDate, SiteName, COUNT(VisitorUsername) AS TotalVisits
-                			FROM visitevent
-                			WHERE VisitorUsername = '%s'
-                			GROUP BY EventName, StartDate, SiteName
+                                SELECT EventName, StartDate, SiteName, 0 AS TotalVisits
+                                FROM event
+                            ) AS C
+                            GROUP BY C.EventName, C.StartDate, C.SiteName
+                        ) AS B
+                        ON A.EventName = B.EventName
+                        WHERE A.SiteName = B.SiteName
+                        AND A.StartDate = B.StartDate
+                    ) AS D
+                    INNER JOIN (
+                        SELECT F.EventName, F.StartDate, F.SiteName, SUM(F.TotalVisits) AS MyVisits
+                        FROM (
+                            SELECT EventName, StartDate, SiteName, COUNT(VisitorUsername) AS TotalVisits
+                            FROM visitevent
+                            WHERE VisitorUsername = '%s'
+                            GROUP BY EventName, StartDate, SiteName
 
-                			UNION
+                            UNION
 
-                			SELECT EventName, StartDate, SiteName, 0 AS TotalVisits
-                			FROM event
-                		) AS F
-                		GROUP BY F.EventName, F.StartDate, F.SiteName
-                	) AS E
-                	ON D.EventName = E.EventName
-                	WHERE D.StartDate = E.StartDate
-                	AND D.SiteName = E.SiteName
+                            SELECT EventName, StartDate, SiteName, 0 AS TotalVisits
+                            FROM event
+                        ) AS F
+                        GROUP BY F.EventName, F.StartDate, F.SiteName
+                    ) AS E
+                    ON D.EventName = E.EventName
+                    WHERE D.StartDate = E.StartDate
+                    AND D.SiteName = E.SiteName
                 ) AS G
                 INNER JOIN (
-                	SELECT *
+                    SELECT *
                     FROM event
                 ) AS H
                 ON G.EventName = H.EventName
@@ -1406,6 +1742,221 @@ def getEvents33(user, name, keyword, site, sdate, edate, toVisMin, toVisMax,
             site, site, toVisMin, toVisMin, toVisMax, toVisMax, tPriceMin, tPriceMin,
             tPriceMax, tPriceMax, includeVisit, includeSoldOut, sort))
     return _cursor.fetchall()
+
+
+def getEventDetail32(eventName, startDate, siteName):
+    query = """
+        SELECT *
+        FROM event
+        WHERE EventName = %s
+        AND StartDate = %s
+        AND SiteName = %s;
+        """
+    response = _cursor.execute(query, (eventName, startDate, siteName))
+    return (_cursor.fetchall()[0])
+
+
+def getstaffDetail32(eventName, startDate, siteName):
+    query = """
+    SELECT StaffUsername
+    FROM assignto
+    WHERE EventName = %s
+    AND StartDate = %s
+    AND SiteName = %s
+    ORDER BY StaffUsername ASC;
+    """
+
+    response = _cursor.execute(query, (eventName, startDate, siteName))
+    return (_cursor.fetchall())
+
+
+def getEventDate32(eventName, startDate, siteName):
+    query = """
+    SELECT DATEDIFF(EndDate,StartDate)
+    FROM event
+    WHERE EventName = %s
+    AND StartDate = %s
+    AND SiteName = %s;
+    """
+    response = _cursor.execute(query, (eventName, startDate, siteName))
+    return (_cursor.fetchone()[0])
+
+
+def logeventVisit(user, eventName, startDate, siteName, date):
+    try:
+        query = """
+        INSERT INTO visitevent
+        VALUES (%s, %s, %s,%s, %s);
+        """
+
+        response = _cursor.execute(query, (user, eventName, startDate, siteName, date))
+        _database.commit();
+        return 1
+
+    except Exception as e:
+        print("---> run into Exception:")
+        print("---> " + str(e) + '\n')  # print exception message
+        return 0
+
+
+
+def logsiteVisit(user, siteName, date):
+    try:
+        query = """
+        INSERT into visitsite
+        VALUES(%s, %s, %s)
+        """
+        response = _cursor.execute(query, (user, siteName, date))
+        _database.commit();
+        return 1
+    except Exception as e:
+        print("---> run into Exception:")
+        print("---> " + str(e) + '\n')  # print exception message
+        return 0
+
+
+
+
+#Query for screen 36
+
+def getTransitDetail36(site, type,sort):
+    if(type is None):
+        type = "-ALL-"
+    if(sort is None):
+        sort = "TransitType ASC"
+    print "Sort in DB is: %s" % sort
+    query = """
+    SELECT *
+    FROM (
+        SELECT DISTINCT TransitRoute, TransitType, TransitPrice, D.Count AS ConnectedSites
+        FROM (
+            SELECT E.TransitRoute, E.TransitType, E.TransitPrice, E.Count, F.SiteName
+            FROM (
+                SELECT T.TransitRoute, T.TransitType, T.TransitPrice, C.Count
+                FROM transit AS T
+                INNER JOIN (
+                    SELECT TransitRoute, TransitType, Count(*) AS Count
+                    FROM connect
+                    GROUP BY TransitRoute, TransitType
+                ) AS C
+                ON T.TransitType = C.TransitType
+                WHERE T.TransitRoute = C.TransitRoute
+            ) AS E
+            INNER JOIN (
+                SELECT TransitRoute, TransitType, SiteName
+                FROM connect
+            ) AS F
+            ON F.TransitType = E.TransitType
+            WHERE F.TransitRoute = E.TransitRoute
+        ) AS D
+        WHERE (D.SiteName = '%s')
+        AND (D.TransitType = '%s' OR '%s' = '-ALL-')
+    ) AS Z
+    ORDER BY %s
+    """
+    # print (query % (site, type, type, sort))
+    response = _cursor.execute(query % (site, type, type, sort));
+    return _cursor.fetchall()
+
+
+
+
+
+
+def getVisits(user, ename, site, sdate, edate, sort):
+    if(ename == "" or ename is None):
+        ename = "-ALL-"
+    if(site == "" or site is None):
+        site = "-ALL-"
+    if(sdate == "" or sdate is None):
+        sdate = "1900-01-01"
+    if(edate == "" or edate is None):
+        edate = "2100-12-31"
+    if(sort == "" or sort is None):
+        sort = "Date ASC"
+    query = """
+        SELECT *
+        FROM (
+            SELECT D.Date, D.EventName, D.SiteName, D.Price
+            FROM (
+                SELECT C.Date, C.EventName, C.SiteName, C.Price
+                FROM (
+                    SELECT A.VisitEventDate AS Date, A.EventName, A.StartDate, A.SiteName, B.EventPrice AS Price
+                    FROM visitevent AS A
+                    INNER JOIN (
+                        SELECT EventName, StartDate, SiteName, EventPrice
+                        FROM event
+                    ) AS B
+                    ON A.EventName = B.EventName
+                    WHERE A.StartDate = B.StartDate
+                    AND A.SiteName = B.SiteName
+                    AND DATEDIFF(A.VisitEventDate, '%s') <= 0
+                    AND DATEDIFF(A.VisitEventDate, '%s') >= 0
+                    AND A.VisitorUsername = '%s'
+                ) AS C
+
+                UNION
+
+                SELECT E.VisitSiteDate AS Date, ('') AS EventName, E.SiteName, 0 AS Price
+                FROM visitsite AS E
+                WHERE DATEDIFF(E.VisitSiteDate, '%s') <= 0
+                AND DATEDIFF(E.VisitSiteDate, '%s') >= 0
+                AND E.VisitorUsername = '%s'
+            ) AS D
+            WHERE (LOCATE('%s', D.EventName) > 0 OR '%s' = '-ALL-')
+            AND (D.SiteName = '%s' OR '%s' = '-ALL-')
+        ) AS Z
+        ORDER BY %s
+        """
+    print(query % (edate, sdate, user, edate, sdate, user, ename,
+            ename, site, site, sort))
+    response = _cursor.execute(query % (edate, sdate, user, edate, sdate, user, ename,
+            ename, site, site, sort))
+    return _cursor.fetchall()
+
+
+
+
+def getCurrentStatus(username):
+    query = """
+        SELECT Status
+        FROM allusers
+        WHERE Username = '%s'
+        """
+    response = _cursor.execute(query % (username));
+    return _cursor.fetchone()[0]
+
+def approveUser(username):
+    query = """
+        UPDATE allusers
+        SET Status = %s
+        WHERE Username = %s
+        """
+    response = _cursor.execute(query, ("Approved", username))
+    _database.commit()
+
+def declineUser(username):
+    query = """
+        UPDATE allusers
+        SET Status = %s
+        WHERE Username = %s
+        """
+    response = _cursor.execute(query, ("Declined", username))
+    _database.commit()
+
+def setEmployeeID(user, id):
+    query = """
+        UPDATE employee
+        SET EmployeeID = %s
+        WHERE Username = %s
+        """
+    response = _cursor.execute(query, (id, user))
+    _database.commit()
+
+
+
+
+
 
 
 # DEPRECATED FUNCTIONS
