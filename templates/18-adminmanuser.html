@@ -29,7 +29,7 @@
             <div class="row">
                 <div class="col-xs-4" align=left>
                     <label for="uname">Username</label>
-                    <input type="text" name="username" id="uname" style="width:100px">
+                    <input type="text" name="username" value="{{filUName}}" style="width:100px">
                 </div>
 
                 <div class="col-xs-4" align=center>
@@ -55,23 +55,48 @@
             </div>
 
             <!-- filter button -->
-            <button id="btnFilter" type="submit" style="width: 100px">Filter</a></button>
-        </form>
-
-        <form class="form-group" align=center style="width:60%; min-width:600px" action="/to_manage_user/edit" method="post" enctype="multipart/form-data">
+            <button type="submit" style="width: 100px" formnovalidate>Filter</button>
             <!-- results table -->
             <div align=center style="margin:20px">
                 <table class="table table-striped">
                 <tr>
-                    <th>Username</th>
-                    <th>Email Count</th>
-                    <th>User Type</th>
-                    <th>Status</th>
+                    <th>Username
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="Username ASC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                        </button>
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="Username DESC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        </button>
+                    </th>
+                    <th>Email Count
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="EmailCount ASC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                        </button>
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="EmailCount DESC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        </button>
+                    </th>
+                    <th>User Type
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="UserType ASC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                        </button>
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="UserType DESC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        </button>
+                    </th>
+                    <th>Status
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="Status ASC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+                        </button>
+                        <button type="submit" class="btn btn-default btn-xs" name="sort" value="Status DESC" formnovalidate>
+                            <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        </button>
+                    </th>
                 </tr>
 
                 {% for user in users %}
                 <tr>
-                    <td><input type="radio" name="chosen_transit" id="chosen_transit" value="{{user}}" required> {{user.Username}}</td>
+                    <td><input type="radio" name="chosen_user" value="{{user.Username}}" required> {{user.Username}}</td>
                     <td>{{user.EmailCount}}</td>
                     <td>{{user.Type}}</td>
                     <td>{{user.Status}}</td>
@@ -82,11 +107,12 @@
             </div>
             <div class="row" align=center>
                 <div class="col-xs-4" align=right>
-                    <button id="btnLogTransit" type="submit" style="width:100px" href="/18-adminmanuser/approve">Approve</a></button>
+                    <button id="btnLogTransit" type="submit" style="width:100px" formaction="/approve_user">Approve</a></button>
                 </div>
                 <div class="col-xs-4" align=left>
-                    <button id="btnLogTransit" type="submit" style="width:100px" href="/18-adminmanuser/decline">Decline</a></button>
+                    <button id="btnLogTransit" type="submit" style="width:100px" formaction="/decline_user">Decline</a></button>
                 </div>
+            </div>
         </form>
 
         <a class=" btn btn-default" href="/back-button" role="button">Back</a>

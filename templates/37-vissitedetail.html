@@ -25,6 +25,8 @@
         <h1>Site Detail</h1>
 
           <div class="row">
+              <input type="hidden" name="chosen_site" value="{{chosensite}}"/>
+
                 <div class="col-xs-3" align=middle>
                     <label for="SiteName">Site</label>
                 </div>
@@ -56,7 +58,7 @@
 
             </div>
 
-            
+
             <form class="form-group" align=center action="/visitor_logsiteVisit" method="post" enctype="multipart/form-data">
             <div class="col-xs-12" align=middle>
                     <input type="date" name="sitevisitdate" class="form-control" value="{{sitevisitdate}}" required autofocus style="width:15%;min-width:200px"><br>
@@ -70,7 +72,7 @@
         </form>
                 <br>
 
-        <a class=" btn btn-default" href="/to_explore_site" role="button">Back</a>
+        <a class=" btn btn-default" href="/to_vis_explore_site" role="button">Back</a>
         <p id = "feedback"  style="color: red">{{error}}</p>
         <p id = "feedback"  style="color: green">{{success}}</p>
     </div>

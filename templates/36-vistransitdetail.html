@@ -17,36 +17,26 @@
 
     <!--<script src="../Scripts/login.js"></script>-->
 
-    <title>User Take Transit</title>
+    <title>Visitor Transit Detail</title>
 </head>
 
 <body>
     <div align=center class="container-fluid">
-        <form class="form-group" align=center style="width:80%; min-width:800px" action="/to_user_take_transit" method="post" enctype="multipart/form-data">
-            <h1>Take Transit</h1>
+        <form class="form-group" align=center style="width:80%; min-width:800px" action="/to_visitor_transitDetail2" method="post" enctype="multipart/form-data">
+            <h1>Transit Detail</h1>
 
-            <!-- contain site and transport type -->
+            <!-- site and transport type -->
             <div class="row">
-                <div class="col-xs-6" align=left>
-                    <label for="site">Contain Site</label>
-                    <select name="site">
-                        {% if filSite == '-ALL-' -%}
-                        <option value="-ALL-" selected="selected">-ALL-</option>
-                        {% else -%}
-                        <option value="-ALL-">-ALL-</option>
-                        {%- endif %}
-
-                        {% for site in sites %}
-                        {% if filSite == site.SiteName -%}
-                        <option value="{{site.SiteName}}" selected="selected">{{site.SiteName}}</option>
-                        {% else -%}
-                        <option value="{{site.SiteName}}">{{site.SiteName}}</option>
-                        {%- endif %}
-                        {% endfor %}
-                    </select>
+                <input type="hidden" name="chosen_site" value="{{chosensite}}"/>
+                <div class="col-xs-1" align=left>
+                    <label for="SiteName">Site</label>
+                </div>
+                <div class="col-xs-2" align=left>
+                    <label for="siteCurrent">{{SiteName}}</label>
                 </div>
 
-                <div class="col-xs-6" align=right>
+
+                <div class="col-xs-9" align=right>
                     <label for="transtype">Transport Type</label>
                     <select name="transittype">
                         {% if filSite == '-ALL-' -%}
@@ -66,24 +56,9 @@
                 </div>
             </div>
 
-            <!-- price range and filter button -->
+            <!-- filter button -->
             <div class="row">
-                <div class="col-xs-8" align=left>
-                    <label for="range">Price Range</label>
-                    {% if filMinPr == -1 %}
-                    <input type="number" name="minPrice" placeholder="min" min=0 step=0.1 style="width:75px;">
-                    {% else -%}
-                    <input type="number" value={{filMinPr}} name="minPrice" placeholder="min" min=0 step=0.1 style="width:75px;">
-                    {%- endif %}
-
-                    <label for="dash"> -- </label>
-                    {% if filMaxPr == -1 %}
-                    <input type="number" name="maxPrice" placeholder="max" min=0 step=0.1 style="width:75px;">
-                    {% else -%}
-                    <input type="number" value={{filMaxPr}} name="maxPrice" placeholder="max" min=0 step=0.1 style="width:75px;">
-                    {%- endif %}
-                </div>
-                <div class="col-xs-4" align=right>
+                <div class="col-xs-12" align=right>
                     <button type="submit" style="width: 100px" formnovalidate>Filter</a></button>
                 </div>
             </div>
@@ -140,7 +115,7 @@
             <!-- back button, log transit -->
             <div class="row">
                 <div class="col-xs-3" align=right>
-                    <button type="back"><a href="/back-button">Back</a></button>
+                    <a class=" btn btn-default" href="/to_vis_explore_site" role="button">Back</a>
                 </div>
 
                 <div class="col-xs-6" align=center>
@@ -149,11 +124,12 @@
                 </div>
 
                 <div class="col-xs-3" align=left>
-                    <button type="submit" formaction="/user_log_transit">Log Transit</a></button>
+                    <button type="submit" formaction="/visitor_log_transit">Log Transit</a></button>
+                    <p id = "feedback"  style="color: red">{{error}}</p>
+                    <p id = "feedback"  style="color: green">{{success}}</p>
+
                 </div>
             </div>
-             <p id = "feedback"  style="color: red">{{error}}</p>
-             
         </form>
     </div>
 </body>

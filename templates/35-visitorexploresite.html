@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta http-equiv="Content-Language" content="en">
     <meta charset="UTF-8">
 
     <!-- Latest compiled and minified CSS -->
@@ -17,40 +18,54 @@
 
     <!--<script src="../Scripts/login.js"></script>-->
 
-<title>Visitor Explore Event</title>
+<title>Visitor Explore Site</title>
 </head>
 <body>
     <div align=center class="container-fluid">
-        <h1>Explore Event</h1>
-        <form class="form-group" action="/to_vis_explore_event" method="post" enctype="multipart/form-data">
+        <h1>Explore Site</h1>
+        <form class="form-group" action="/to_vis_explore_site" method="post" enctype="multipart/form-data">
             <div style="width:50%; min-width:500px" align=center>
                 <div class="row">
                     <div class="col-xs-6" align=left>
                         <label>Name</label>
-                        <input type="text" name="name" value="{{filName}}"/>
+                        <select name="site">
+                            {% if filSite == '-ALL-' -%}
+                            <option value="-ALL-" selected="selected">-ALL-</option>
+                            {% else -%}
+                            <option value="-ALL-">-ALL-</option>
+                            {%- endif %}
+
+                            {% for site in sites %}
+                            {% if filSite == site.SiteName -%}
+                            <option value="{{site.SiteName}}" selected="selected">{{site.SiteName}}</option>
+                            {% else -%}
+                            <option value="{{site.SiteName}}">{{site.SiteName}}</option>
+                            {%- endif %}
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="col-xs-6" align=right>
                         <label>Descr. Keyword</label>
-                        <input type="text" name="description" value="{{filDescr}}"/>
-                    </div>
-                </div>
-                <div class="row" align=left>
-                    <label>Site Name</label>
-                    <select name="site">
-                        {% if filSite == '-ALL-' -%}
-                        <option value="-ALL-" selected="selected">-ALL-</option>
-                        {% else -%}
-                        <option value="-ALL-">-ALL-</option>
-                        {%- endif %}
+                        <select name="everyday">
+                            {% if filEvery == '-ALL-' -%}
+                            <option value="-ALL-" selected="selected">-ALL-</option>
+                            {% else -%}
+                            <option value="-ALL-">-ALL-</option>
+                            {%- endif %}
 
-                        {% for site in sites %}
-                        {% if filSite == site.SiteName -%}
-                        <option value="{{site.SiteName}}" selected="selected">{{site.SiteName}}</option>
-                        {% else -%}
-                        <option value="{{site.SiteName}}">{{site.SiteName}}</option>
-                        {%- endif %}
-                        {% endfor %}
-                    </select>
+                            {% if filEvery == 'Yes' -%}
+                            <option value="Yes" selected="selected">Yes</option>
+                            {% else -%}
+                            <option value="Yes">Yes</option>
+                            {%- endif %}
+
+                            {% if filEvery == 'No' -%}
+                            <option value="No" selected="selected">No</option>
+                            {% else -%}
+                            <option value="No">No</option>
+                            {%- endif %}
+                        </select>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-xs-6" align=left>
@@ -79,23 +94,22 @@
                         {%- endif %}
                     </div>
                     <div class="col-xs-6" align=right>
-                        <label for="tvr">Ticket Price Range</label>
-                        {% if tPriceMin == -1 -%}
-                        <input type="number" style="width:50px" name="tPriceMin" min=0 step=1/>
+                        <label for="tvr">Event Count Range</label>
+                        {% if eCountMin == -1 -%}
+                        <input type="number" style="width:50px" name="eCountMin" min=0 step=1/>
                         {% else -%}
-                        <input type="number" style="width:50px" name="tPriceMin" min=0 step=1 value="{{tPriceMin}}"/>
+                        <input type="number" style="width:50px" name="eCountMin" min=0 step=1 value="{{eCountMin}}"/>
                         {%- endif %}
 
                         <label for="dot">--</label>
-                        {% if tPriceMax == -1 -%}
-                        <input type="number" style="width:50px" name="tPriceMax" min=0 step=1/>
+                        {% if eCountMax == -1 -%}
+                        <input type="number" style="width:50px" name="eCountMax" min=0 step=1/>
                         {% else -%}
-                        <input type="number" style="width:50px" name="tPriceMax" min=0 step=1 value="{{tPriceMax}}"/>
+                        <input type="number" style="width:50px" name="eCountMax" min=0 step=1 value="{{eCountMax}}"/>
                         {%- endif %}
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-xs-6" align=center>
+                <div class="row" align=center>
                         {% if filIncVis == "Yes" -%}
                         <input type="checkbox" name="includeVisited" value="Yes" checked> Include Visited</input>
                         <input type="hidden" name="includeVisited" value="No">
@@ -105,39 +119,22 @@
                         <input type="hidden" name="includeVisited" value="No">
                         <br>
                         {%- endif %}
-                    </div>
-                    <div class="col-xs-6" align=center>
-                        {% if filIncSoldOut == "Yes" -%}
-                        <input type="checkbox" name="includeSoldOut" value="Yes" checked> Included Sold Out Events</input>
-                        <input type="hidden" name="includeSoldOut" value="No">
-                        <br>
-                        {% else -%}
-                        <input type="checkbox" name="includeSoldOut" value="Yes"> Included Sold Out Events</input>
-                        <input type="hidden" name="includeSoldOut" value="No">
-                        <br>
-                        {%- endif %}
-                    </div>
                 </div>
                 <div class="row">
-                    <div class="col-xs-6" align=center>
+                    <div class="col-xs-4" align=center>
                         <button type="submit" style="width:125px" name="Filter" formnovalidate>Filter</button>
                     </div>
-                    <div class="col-xs-6" align=center>
-                        <button type="submit" style="width:125px" name="Event Detail" formaction="/to_visitor_event_detail">Event Detail</button>
+                    <div class="col-xs-4" align=center>
+                        <button type="submit" style="width:125px" name="Site Detail" formaction="/to_visitor_site_detail" formmethod="post">Site Detail</button>
+                    </div>
+                    <div class="col-xs-4" align=center>
+                        <button type="submit" style="width:125px" name="Transit Detail" formaction="/to_visitor_transitDetail" formmethod="post">Transit Detail</button>
                     </div>
                 </div>
             </div>
             <div align=center style="margin:20px">
                 <table class="table table-striped">
                     <tr>
-                        <th>Event Name
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="EventName ASC" formnovalidate>
-                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
-                            </button>
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="EventName DESC" formnovalidate>
-                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
-                            </button>
-                        </th>
                         <th>Site Name
                             <button type="submit" class="btn btn-default btn-xs" name="sort" value="SiteName ASC" formnovalidate>
                                 <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
@@ -146,19 +143,11 @@
                                 <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
                             </button>
                         </th>
-                        <th>Ticket Price
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TicketPrice ASC" formnovalidate>
+                        <th>Event Count
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="EventCount ASC" formnovalidate>
                                 <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
                             </button>
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TicketPrice DESC" formnovalidate>
-                                <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
-                            </button>
-                        </th>
-                        <th>Ticket Remaining
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TicketsRemaining ASC" formnovalidate>
-                                <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
-                            </button>
-                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="TicketsRemaining DESC" formnovalidate>
+                            <button type="submit" class="btn btn-default btn-xs" name="sort" value="EventCount DESC" formnovalidate>
                                 <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
                             </button>
                         </th>
@@ -180,14 +169,12 @@
                         </th>
                     </tr>
 
-                    {% for event in events %}
+                    {% for site in ssites %}
                     <tr>
-                        <td><input type="radio" name="chosen_event" value="{{event}}" required> {{event.EventName}}</td>
-                        <td>{{event.SiteName}}</td>
-                        <td>{{event.TicketPrice}}</td>
-                        <td>{{event.TicketsRemaining}}</td>
-                        <td>{{event.TotalVisits}}</td>
-                        <td>{{event.MyVisits}}</td>
+                        <td><input type="radio" name="chosen_site" value="{{site}}" required> {{site.SiteName}}</td>
+                        <td>{{site.EventCount}}</td>
+                        <td>{{site.TotalVisits}}</td>
+                        <td>{{site.MyVisits}}</td>
                     </tr>
                     {% endfor %}
                 </table>

@@ -48,7 +48,7 @@
                     <input type = "text" name="fname" value="{{Firstname}}"/>
                     <label for="lname">Last Name</label>
                     <input type = "text" name="lname" value="{{Lastname}}"/><br>
-                </div> 
+                </div>
 
                 <div  class="col-xl-5" align=middle>
                     <label for="sdate">Start Date</label>
@@ -56,15 +56,15 @@
                     &nbsp<label for="endate">End Date</label>
                     <input type = "date" name="endate" value="{{Enddate}}"/>
                 </div>
-            </div> 
+            </div>
 
-            
+
             <br>
             <div class="col-xs-15"align="middle">
                 <button id="btnFilter" type="submit" style="width: 80px">Filter</a></button>
             </div>
-            
-        
+
+
             <br></br>
          <!-- results table -->
             <div>
@@ -87,20 +87,20 @@
                         </button>
                         </th>
                     </thead>
-                 <tbody>                     
+                 <tbody>
                 {% for staff in staffs %}
 
                 <tr>
                     <td>{{staff.staffName}}</td>
                     <td>{{staff.EventShift}}</td>
-                    
+
                 </tr>
                 {% endfor %}
             </tbody>
                 </table>
             </div>
 
-        
+
 
         <br>
         <a class=" btn btn-default" href="/back-button" role="button">Back</a>

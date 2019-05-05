@@ -20,7 +20,7 @@
 </head>
 <body>
     <div align=center class="container-fluid">
-        <h1>Manage Profile</h1>
+        <h1>Register Employee Visitor</h1>
 
         <form class="form-group" style="width:60%; min-width:600px" action="/to_manage_profile" method="post" enctype="multipart/form-data">
 
@@ -117,6 +117,7 @@
             <div style="width:150px">
                 <br>
                 <a class=" btn btn-default" href="/back-button" role="button">Back</a>
+                <p id = "feedback"  style="color: red">{{error}}</p>
             </div>
         </form>
     </div>
