@@ -194,7 +194,6 @@ def delete_tempmails_4():
 
 @app.route("/register_user", methods = ['POST'])
 def register_user():
-    print "Starting user register functionality"
     if request.method == 'POST':
         Username = request.form["username"]
         Password = request.form["password"]
@@ -245,7 +244,6 @@ def to_visitor_register():
 
 @app.route("/register_visitor", methods = ['POST'])
 def register_visitor():
-    print "Starting visitor register functionality"
     if request.method == 'POST':
         Username = request.form["username"]
         Password = request.form["password"]
@@ -298,7 +296,6 @@ def to_employee_register():
 
 @app.route("/register_employee", methods = ['POST'])
 def register_employee():
-    print "Starting employee register functionality"
     if request.method == 'POST':
         Username = request.form["username"]
         Password = request.form["password"]
@@ -366,7 +363,6 @@ def to_emp_visitor_register():
 
 @app.route("/register_employee_visitor", methods = ['POST'])
 def register_employee_visitor():
-    print "Starting employee visitor register functionality"
     if request.method == 'POST':
         Username = request.form["username"]
         Password = request.form["password"]
@@ -446,9 +442,9 @@ def sign_in():
         _name = request.form["username"]
         _password = request.form["password"]
         # hash_password() --deprecated function
-    	login_response = login(_name, _password)
+        login_response = login(_name, _password)
 
-    	if login_response == 0:
+        if login_response == 0:
             global _logged_user
             _logged_user = ""
             return render_template("1-login.html", error = "Cannot login, try again.")
@@ -456,12 +452,10 @@ def sign_in():
             if login_response in ['User']:
                 _logged_user = _name
                 _logged_userType = login_response
-                print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                 return render_template("7-userfunc.html", error = "")
             elif login_response in ['Visitor']:
                 _logged_user = _name
                 _logged_userType = login_response
-                print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                 return render_template("14-visitorfunc.html", error = "")
 
             elif login_response in ['Employee, Visitor']:
@@ -470,17 +464,14 @@ def sign_in():
 
                 if _logged_userType in ['Admin']:
                     _logged_user = _name
-                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                     return render_template("9-adminvisitfunc.html", error = "")
 
                 elif _logged_userType in ['Manager']:
                     _logged_user = _name
-                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                     return render_template("11-manvisitfunc.html", error = "")
 
                 elif _logged_userType in ['Staff']:
                     _logged_user = _name
-                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                     return render_template("13-staffvisitfunc.html", error = "")
 
 
@@ -490,18 +481,14 @@ def sign_in():
 
                 if _logged_userType in ['Admin']:
                     _logged_user = _name
-                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                     return render_template("8-adminfunc.html", error = "")
 
                 elif _logged_userType in ['Manager']:
                     _logged_user = _name
-                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                     return render_template("10-manfunc.html", error = "")
 
                 elif _logged_userType in ['Staff']:
                     _logged_user = _name
-                    print "logged person is: %s" % _logged_user
-                    print "The username of the logged user is: %s and his type is: %s" % (_logged_user,_logged_userType)
                     return render_template("12-stafffunc.html", error = "")
 
                 else:
@@ -520,9 +507,7 @@ def go_to_functionality_screen():
 
         global _logged_user
         person = _logged_user
-        print(person)
         p_type = usertype_checker(_logged_user)
-        print(p_type)
 
         if p_type in ['Employee']:
             emp_type = emptype_checker(_logged_user)
@@ -759,7 +744,6 @@ def to_manage_profile():
         #getting info to populate the screen with
         _logged_user
         _logged_userType = get_usertype(_logged_user)
-        print "FIIFI THE GUY IS: %s AND HIS USER IS: %s" % (_logged_userType, _logged_user)
         info = get_employee_info(_logged_user)
         info2 = get_site_info17(_logged_user)
         fname = info[0]
@@ -793,7 +777,6 @@ def to_manage_profile():
             visitor = request.form["isvisitor"];
             newemail = request.form["addemail"]
 
-            print "visitor is: %s" % visitor
             update_employee(_logged_user, fname, lname, phone, visitor)
 
             # rendering screen again
@@ -1533,7 +1516,6 @@ def create_event():
             for item in response:
                 staff={}
                 staff['Username'] = item[0]
-                print(item)
                 allStaff.append(staff)
 
         if(name == "" or price == -1 or capacity == -1 or minstaff == -1 or stdate == ""
@@ -1591,7 +1573,6 @@ def manageStaff():
 
         #getting filtered transit when some of the options have been played with
         site = request.form["site"]
-        # print site
         Startdate = request.form["sdate"]
         Enddate = request.form["endate"]
         Firstname = request.form["fname"]
@@ -1731,11 +1712,6 @@ def visitor_eventDetails():
                 info = info.replace("Decimal('", "").replace("')", "")
                 ticketsRemaining = float(info)
 
-        print(event)
-        print(eventName)
-        print(startDate)
-        print(siteName)
-
         info1 = getEventDetail32(eventName, startDate, siteName)
         info2 = getstaffDetail32(eventName, startDate, siteName)
         info3 = getEventDate32(eventName, startDate, siteName)
@@ -1772,12 +1748,10 @@ def visitor_logVisit():
         VisitDate = request.form["visitdate"][0:10]
 
         global _logged_user
-        print "THE VISITOR IS: %s" % _logged_user
 
         newstart = datetime.strptime(StartDate, '%Y-%m-%d').date()
         newend = datetime.strptime(EndDate, '%Y-%m-%d').date()
         newvisitdate = datetime.strptime(VisitDate, '%Y-%m-%d').date()
-        # print newvisitdate
 
         # Visit date must be b/n start and end and Remaining tickets > 0:
 
@@ -1785,11 +1759,9 @@ def visitor_logVisit():
         if (newstart <= newvisitdate) and  (newvisitdate <= newend) and TicketRemaining > 0 :
             result = logeventVisit(_logged_user, EventName, StartDate,SiteName, VisitDate)
             if result == 1:
-                print "YAAAY"
                 return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
                     price=price,Description=Description,TicketRemaining=TicketRemaining, success="Event has been logged!")
             elif result == 0:
-                print "NAAY"
                 return render_template("34-viseventdetail.html", EventName=EventName, StartDate=StartDate,SiteName=SiteName,EndDate=EndDate,
                     price=price,Description=Description,TicketRemaining=TicketRemaining, error="An event with the same date has been already logged!")
 
@@ -1814,7 +1786,6 @@ def visitor_logVisit():
 @app.route("/get_available_staff_to_create", methods=['POST'])
 def get_available_staff_to_create():
     error=""
-    print("why isn't htis working")
     name=request.form["name"]
     price=request.form["price"]
     capacity=request.form["capacity"]
@@ -1848,8 +1819,6 @@ def get_available_staff_to_create():
             included = "No"
         if(included == "Yes"):
             selectedStaff.append(staff)
-    print(stdate)
-    print(enddate)
     if(stdate == "" or enddate == ""):
         error="You must fill in a start and end date to get available staff"
         return render_template("27-managercreateevent.html", filName=name, filPrice=price,
@@ -1861,7 +1830,6 @@ def get_available_staff_to_create():
         for item in response:
             staff={}
             staff['Username'] = item[0]
-            print(item)
             availableStaff.append(staff)
         return render_template("27-managercreateevent.html", filName=name, filPrice=price,
                 filCap=capacity, filMinStaff=minstaff, filStDate=stdate, filEndDate=enddate,
@@ -1965,15 +1933,12 @@ def to_edit_event():
     capacity = float(capacity)
     minstaff = float(minstaff)
 
-    print(stDate)
-    print(endDate)
     response = getAvailableStaff(stDate, endDate);
     availableStaff = []
     for item in response:
         staff={}
         staff['Username'] = item[0]
         availableStaff.append(staff)
-    print(availableStaff)
 
 
     response = getAssignedStaff(eventname, startdate, site)
@@ -1983,7 +1948,6 @@ def to_edit_event():
         staff['Username'] = item[0]
         #availableStaff.append(staff)
         assignedStaff.append(staff)
-    print(assignedStaff)
 
     response = getDayInfo(eventname, startdate, site, None, None, None, None)
     days = []
@@ -2257,7 +2221,6 @@ def to_view_schedule():
                 filStDate="", filEndDate="", events=events)
 
     if request.method == 'POST':
-        print("LOL")
         ename = request.form["name"]
         descr = request.form["description"]
         startdate = request.form["startdate"]
@@ -2576,7 +2539,6 @@ def to_visitor_transitDetail2():
     sort = ""
     try:
         sort = request.form["sort"]
-        print "SORT IS: %s" % sort
     except:
         sort = None
 
@@ -2635,7 +2597,6 @@ def visitor_logsiteVisit():
 
     try:
         global _logged_user
-        print "THE VISITOR IS: %s" % _logged_user
 
         # info1 = get_site_info('Atlanta Beltline Center')
 
@@ -2674,7 +2635,6 @@ def visitor_log_transit():
         info1 = get_site_info("Inman Park")
             # info1 = get_site_info(sitename)
         SiteName = str(info1[0][0])
-            # print SiteName
 
         # getting the transit types for the dropdown
         response = getTransitTypes()
@@ -2774,7 +2734,6 @@ def manage_user():
 
 @app.route("/approve_user", methods=['POST'])
 def approve_user():
-    print("Yeet")
     username = request.form["chosen_user"]
     status = getCurrentStatus(username)
 
@@ -2801,8 +2760,6 @@ def approve_user():
 @app.route("/decline_user", methods=['POST'])
 def decline_user():
     username = request.form["chosen_user"]
-    print("rigt here")
-    print(username)
     status = getCurrentStatus(username)
 
     if(status == "Pending"):

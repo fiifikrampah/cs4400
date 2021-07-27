@@ -36,7 +36,6 @@ def set_connection():
             if _connected:
                 # _cursor.execute("SELECT VERSION()")
                 # version = _cursor.fetchone()
-                # print("Database version: {}".format(version[0]))
                 print("*     Connection Setup Successfully!       *")
             else:
                 print("*        Connection Setup Failed!          *")
@@ -77,12 +76,10 @@ def db_login(username, password):
 
     # if login is bad, error out
     if response0 == 0:
-        # print("bad login")
         return 0
     elif response0 ==1:
         query1 = "SELECT UserType from allusers WHERE Username = %s"
         response1 = _cursor.execute(query1, (username))
-        # print("good login")
         return(_cursor.fetchone())[0]
     else:
         return 0
@@ -94,7 +91,6 @@ def db_login(username, password):
 
 #     # if login is bad, error out
 #     if response0 == 0:
-#         # print("bad login")
 #         return 0
 #     elif response0 ==1:
 #         query1 = "SELECT Username from allusers WHERE Username = %s"
@@ -160,8 +156,6 @@ def user_insert(Username, Password, Status, Firstname, Lastname, UserType):
 #   2 - other violations
 
 def email_insert(Username, Email):
-    print(Username)
-    print(Email)
     query = "INSERT INTO useremail(Username, Email) VALUES(%s, %s)"
     try:
         print("log :: executing user insertion query\n")
@@ -181,8 +175,6 @@ def email_insert(Username, Email):
             return 2
 
 def tempmail_insert(Email):
-    # print(Username)
-    print(Email)
     query = "INSERT INTO tempmail(Email) VALUES(%s)"
     try:
         print("log :: executing user insertion query\n")
@@ -233,11 +225,6 @@ def delete_mailrecs(Username):
         """
     response = _cursor.execute(query % (Username))
     _database.commit()
-
-
-
-
-
 
 # Register function to insert employee into Employee table
 # returns:
@@ -380,16 +367,12 @@ def logTransit(user, transit, date):
     ttype = ""
 
     for field in fields:
-        print(field)
         if(len(field) >= 14 and field[0:14]=="'TransitRoute'"):
             strings = field.split(": ")
             route = strings[1][1:len(strings[1])-1]
         if(len(field) >= 13 and field[0:13]=="'TransitType'"):
             strings = field.split(": ")
             ttype = strings[1][1:len(strings[1])-1]
-    print(route)
-    print(ttype)
-    print(date)
     query = """
         INSERT INTO taketransit
         VALUES ('%s', '%s', '%s', '%s');
@@ -463,7 +446,6 @@ def get_employee_info(user):
         WHERE U.Username = %s;
         """
     response = _cursor.execute(query, (user))
-    # print "stuff is: %s" % _cursor.fetchone()[0]
     return (_cursor.fetchone())
 
 def get_site_info17(user):
@@ -478,13 +460,10 @@ def get_site_info17(user):
             WHERE U.Username = %s;
         """
     response = _cursor.execute(query, (user))
-    # print response
-    # print result
     if response == 0:
         return ""
     else:
         result = _cursor.fetchone()[0]
-    # print "stuff is: %s" % _cursor.fetchone()[0]
         return (result)
 
 def get_employee_emails(user):
@@ -541,7 +520,6 @@ def getFilteredUsersList(user, type, status, sort):
         ) AS Z
         ORDER BY %s
         """
-    print(query % (user, user, type, type, status, status, sort))
     response = _cursor.execute(query % (user, user, type, type, status, status, sort))
     return _cursor.fetchall();
 
@@ -569,7 +547,6 @@ def manageStaffers(siteName, firstname, lastname, sdate, edate,sort):
     if(siteName is None):
         siteName = "-ALL-"
 
-    # print siteName
     query = """
         SELECT *
         FROM (
@@ -869,14 +846,12 @@ def getTransit22(site, type, route, minPrice, maxPrice, sort):
     return _cursor.fetchall();
 
 def update_employee(user, fname, lname, phone, visitor):
-    print "db visitor is: %s" % visitor 
     query0 = """
         UPDATE allusers
         SET Firstname = %s, Lastname = %s
         WHERE Username = %s;
         """
     response = _cursor.execute(query0, (fname, lname, user))
-    print "rep 1: %s" % response
     _database.commit();
 
     query1 = """
@@ -885,7 +860,6 @@ def update_employee(user, fname, lname, phone, visitor):
         WHERE Username = %s;
         """
     response = _cursor.execute(query1, (phone, user))
-    print "rep 2: %s" % response
     _database.commit();
 
     if visitor == "1":
@@ -897,7 +871,6 @@ def update_employee(user, fname, lname, phone, visitor):
             WHERE Username = %s;
             """
         response = _cursor.execute(query2, (user_type, user))
-        print "rep 3: %s" % response
         _database.commit();
 
     elif visitor == "0":
@@ -908,7 +881,6 @@ def update_employee(user, fname, lname, phone, visitor):
             WHERE Username = %s;
             """
         response = _cursor.execute(query3, (user_type, user))
-        print "rep 4: %s" % response
         _database.commit();
 
 def deleteEmail(email):
@@ -1572,7 +1544,6 @@ def getDailyDetail(site, date, sort):
         ) AS G
         ORDER BY %s
         """
-    #print(query % (date, date, site, date, sort))
     response = _cursor.execute(query % (date, date, site, date, sort))
     return _cursor.fetchall();
 
@@ -1627,7 +1598,6 @@ def getSchedule(user, ename, keyword, sdate, edate, sort):
         ) AS G
         ORDER BY %s
         """
-    print(query % (user, edate, sdate, ename, ename, keyword, keyword, sort))
     response = _cursor.execute(query % (user, edate, sdate, ename, ename, keyword, keyword, sort));
     return _cursor.fetchall();
 
@@ -1735,9 +1705,6 @@ def getEvents33(user, name, keyword, site, sdate, edate, toVisMin, toVisMax,
         ORDER BY %s
         """
 
-    print((query % (user, name, name, keyword, keyword, edate, sdate,
-            site, site, toVisMin, toVisMin, toVisMax, toVisMax, tPriceMin, tPriceMin,
-            tPriceMax, tPriceMax, includeVisit, includeSoldOut, sort)))
     response = _cursor.execute(query % (user, name, name, keyword, keyword, edate, sdate,
             site, site, toVisMin, toVisMin, toVisMax, toVisMax, tPriceMin, tPriceMin,
             tPriceMax, tPriceMax, includeVisit, includeSoldOut, sort))
@@ -1824,7 +1791,6 @@ def getTransitDetail36(site, type,sort):
         type = "-ALL-"
     if(sort is None):
         sort = "TransitType ASC"
-    print "Sort in DB is: %s" % sort
     query = """
     SELECT *
     FROM (
@@ -1854,7 +1820,6 @@ def getTransitDetail36(site, type,sort):
     ) AS Z
     ORDER BY %s
     """
-    # print (query % (site, type, type, sort))
     response = _cursor.execute(query % (site, type, type, sort));
     return _cursor.fetchall()
 
@@ -1908,8 +1873,6 @@ def getVisits(user, ename, site, sdate, edate, sort):
         ) AS Z
         ORDER BY %s
         """
-    print(query % (edate, sdate, user, edate, sdate, user, ename,
-            ename, site, site, sort))
     response = _cursor.execute(query % (edate, sdate, user, edate, sdate, user, ename,
             ename, site, site, sort))
     return _cursor.fetchall()
